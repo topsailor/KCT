@@ -13,7 +13,6 @@ namespace KerbalConstructionTime
         public static string lastSOIVessel = "";
         public static List<VesselType> VesselTypesForSOI = new List<VesselType>() { VesselType.Base, VesselType.Lander, VesselType.Probe, VesselType.Ship, VesselType.Station };
         public static List<Orbit.PatchTransitionType> SOITransitions = new List<Orbit.PatchTransitionType> { Orbit.PatchTransitionType.ENCOUNTER, Orbit.PatchTransitionType.ESCAPE };
-        public static bool delayStart = false;
         public static KCT_Settings settings = new KCT_Settings();
 
         public static KCT_KSC ActiveKSC = null;
@@ -34,7 +33,6 @@ namespace KerbalConstructionTime
         public static bool firstStart = false;
         public static IKCTBuildItem targetedItem = null;
         public static double EditorBuildTime = 0, EditorRolloutCosts = 0;
-        public static Dictionary<string, int> EditedVesselParts = new Dictionary<string, int>();
         public static bool LaunchFromTS = false;
         public static List<AvailablePart> ExperimentalParts = new List<AvailablePart>();
 
@@ -95,7 +93,7 @@ namespace KerbalConstructionTime
     }
 }
 /*
-Copyright (C) 2014  Michael Marvin, Zachary Eck
+Copyright (C) 2018  Michael Marvin, Zachary Eck
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

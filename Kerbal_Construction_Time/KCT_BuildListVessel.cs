@@ -140,7 +140,9 @@ namespace KerbalConstructionTime
             {
                 foreach (ProtoCrewMember crew in CrewAssignmentDialog.Instance.GetManifest().GetAllCrew(true) ?? new List<ProtoCrewMember>())
                 {
-                    DesiredManifest.Add(crew?.name);
+                   
+                        DesiredManifest.Add(crew?.name ?? string.Empty);
+                    
                 }
             }
         }
@@ -202,7 +204,7 @@ namespace KerbalConstructionTime
             numStages = stages.Count;
             // FIXME ignore stageable part count and cost - it'll be fixed when we put this back in the editor.
 
-            buildPoints = KCT_Utilities.GetBuildTime(shipNode.GetNodes("PART").ToList(), false);
+            buildPoints = KCT_Utilities.GetBuildTime(shipNode.GetNodes("PART").ToList());
             flag = HighLogic.CurrentGame.flagURL;
             progress = buildPoints;
 
@@ -412,10 +414,17 @@ namespace KerbalConstructionTime
         {
             KCT_BuildListVessel ret = new KCT_BuildListVessel(this.shipName, this.launchSite, this.buildPoints, this.flag, this.cost, (int)GetEditorFacility());
             ret.shipNode = this.shipNode.CreateCopy();
+
+            //refresh all inventory parts to new
+            foreach (ConfigNode part in ret.ExtractedPartNodes)
+            {
+                ScrapYardWrapper.RefreshPart(part);
+            }
+
             ret.id = Guid.NewGuid();
             if (RecalcTime)
             {
-                ret.buildPoints = KCT_Utilities.GetBuildTime(ret.ExtractedPartNodes, true);
+                ret.buildPoints = KCT_Utilities.GetBuildTime(ret.ExtractedPartNodes);
             }
             ret.TotalMass = this.TotalMass;
             ret.emptyMass = this.emptyMass;
@@ -480,10 +489,13 @@ namespace KerbalConstructionTime
         public void Launch()
         {
             if (GetEditorFacility() == EditorFacilities.VAB)
+            {
                 HighLogic.CurrentGame.editorFacility = EditorFacility.VAB;
+            }
             else
+            {
                 HighLogic.CurrentGame.editorFacility = EditorFacility.SPH;
-           // HighLogic.CurrentGame.editorFacility = GetEditorFacility();
+            }
 
             string tempFile = KSPUtil.ApplicationRootPath + "saves/" + HighLogic.SaveFolder + "/Ships/temp.craft";
             UpdateRFTanks();
@@ -798,7 +810,7 @@ namespace KerbalConstructionTime
     }
 }
 /*
-Copyright (C) 2014  Michael Marvin, Zachary Eck
+Copyright (C) 2018  Michael Marvin, Zachary Eck
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

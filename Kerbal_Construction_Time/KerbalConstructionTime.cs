@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using KSP;
+using System.Collections;
+using KSP.UI.Screens;
+using KSP.UI;
 
 namespace KerbalConstructionTime
 {
@@ -36,7 +39,13 @@ namespace KerbalConstructionTime
     {
         public override void OnSave(ConfigNode node)
         {
-           // Boolean error = false;
+            /* 1.4 Addition
+            if (KCT_Utilities.CurrentGameIsMission())
+            {
+                return;
+            }
+            */
+            // Boolean error = false;
             KCTDebug.Log("Writing to persistence.");
             base.OnSave(node);
             KCT_DataStorage kctVS = new KCT_DataStorage();
@@ -62,8 +71,15 @@ namespace KerbalConstructionTime
         }
         public override void OnLoad(ConfigNode node)
         {
-            KCTDebug.Log("Reading from persistence.");
+            
             base.OnLoad(node);
+            /* 1.4 Addition
+            if (KCT_Utilities.CurrentGameIsMission())
+            {
+                return;
+            }
+            */
+            KCTDebug.Log("Reading from persistence.");
             KCT_GameStates.KSCs.Clear();
             KCT_GameStates.ActiveKSC = null;
             //KCT_Utilities.SetActiveKSC("Stock");
@@ -112,6 +128,12 @@ namespace KerbalConstructionTime
     //[KSPAddon(KSPAddon.Startup.EditorAny | KSPAddon.Startup.Flight | KSPAddon.Startup.SpaceCentre | KSPAddon.Startup.TrackingStation, false)]
     public class KerbalConstructionTime : MonoBehaviour
     {
+        internal void FacilityContextMenuSpawn(KSCFacilityContextMenu menu)
+        {
+            KCT_KSCContextMenuOverrider overrider = new KCT_KSCContextMenuOverrider(menu);
+            StartCoroutine(overrider.OnContextMenuSpawn());
+        }
+
         public bool editorRecalcuationRequired;
         public int updateRateThrottle;
 
@@ -133,16 +155,23 @@ namespace KerbalConstructionTime
 
         private void OnGUI()
         {
-            OnDraw();
-        }
-
-        private void OnDraw()
-        {
+            /* 1.4 Addition
+            if (KCT_Utilities.CurrentGameIsMission())
+            {
+                return;
+            }
+            */
             KCT_GUI.SetGUIPositions();
         }
 
         public void Awake()
         {
+            /* 1.4 Addition
+            if (KCT_Utilities.CurrentGameIsMission())
+            {
+                return;
+            }
+            */
             KCTDebug.Log("Awake called");
             KCT_GameStates.erroredDuringOnLoad.OnLoadStart();
             KCT_GameStates.PersistenceLoaded = false;
@@ -186,6 +215,13 @@ namespace KerbalConstructionTime
 
         public void Start()
         {
+            /* 1.4 Addition
+            if (KCT_Utilities.CurrentGameIsMission())
+            {
+                return;
+            }
+            */
+
             KCTDebug.Log("Start called");
 
             //add the events
@@ -205,16 +241,6 @@ namespace KerbalConstructionTime
                 KCT_GUI.buildRateForDisplay = null;
                 if (!KCT_GUI.PrimarilyDisabled)
                 {
-                    if (KCT_GameStates.settings.OverrideLaunchButton)
-                    {
-                        KCTDebug.Log("Attempting to take control of launch button");
-
-                        EditorLogic.fetch.launchBtn.onClick = new UnityEngine.UI.Button.ButtonClickedEvent(); //delete all other listeners (sorry :( )
-
-                        EditorLogic.fetch.launchBtn.onClick.AddListener(ShowLaunchAlert);
-                    }
-                    else
-                        InputLockManager.SetControlLock(ControlTypes.EDITOR_LAUNCH, "KCTLaunchLock");
                     KCT_Utilities.RecalculateEditorBuildTime(EditorLogic.fetch.ship);
                 }
             }
@@ -250,11 +276,6 @@ namespace KerbalConstructionTime
                         KCT_GUI.ClickOn();
                     else
                         KCT_GUI.ClickOff();
-                }
-                if (KCT_GameStates.EditorShipEditingMode && KCT_GameStates.delayStart)
-                {
-                    KCT_GameStates.delayStart = false;
-                    EditorLogic.fetch.shipNameField.text = KCT_GameStates.editedVessel.shipName;
                 }
             }
             else if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
@@ -371,6 +392,13 @@ namespace KerbalConstructionTime
         private static bool ratesUpdated = false;
         public void FixedUpdate()
         {
+            /* 1.4 Addition
+            if (KCT_Utilities.CurrentGameIsMission())
+            {
+                return;
+            }
+            */
+
             double lastUT = KCT_GameStates.UT > 0 ? KCT_GameStates.UT : Planetarium.GetUniversalTime();
             KCT_GameStates.UT = Planetarium.GetUniversalTime();
             try
@@ -525,6 +553,12 @@ namespace KerbalConstructionTime
 
         public void LateUpdate()
         {
+            /* 1.4 Addition
+            if (KCT_Utilities.CurrentGameIsMission())
+            {
+                return;
+            }
+            */
             // FIXME really should run this only once, and then again on techlist change.
             // For now, spam per frame
             if (KSP.UI.Screens.RDController.Instance != null)
@@ -532,10 +566,12 @@ namespace KerbalConstructionTime
                 for (int i = KSP.UI.Screens.RDController.Instance.nodes.Count; i-- > 0;)
                 {
                     KSP.UI.Screens.RDNode node = KSP.UI.Screens.RDController.Instance.nodes[i];
-                    if (node.tech != null)
+                    if (node?.tech != null)
                     {
                         if (HasTechInList(node.tech.techID))
-                            node.graphics.SetIconColor(XKCDColors.KSPNotSoGoodOrange);
+                        {
+                            node.graphics?.SetIconColor(XKCDColors.KSPNotSoGoodOrange);
+                        }
                         // else reset? Bleh, why bother.
                     }
                 }
@@ -553,6 +589,12 @@ namespace KerbalConstructionTime
 
         public static void DelayedStart()
         {
+            /* 1.4 Addition
+            if (KCT_Utilities.CurrentGameIsMission())
+            {
+                return;
+            }
+            */
             KCTDebug.Log("DelayedStart start");
             if (KCT_PresetManager.Instance?.ActivePreset == null || !KCT_PresetManager.Instance.ActivePreset.generalSettings.Enabled)
                 return;
@@ -732,75 +774,28 @@ namespace KerbalConstructionTime
             }
 
 
-            MultiOptionDialog diag = new MultiOptionDialog(txt, "Vessels Contain Missing Parts", null, options);
+            MultiOptionDialog diag = new MultiOptionDialog("missingPartsPopup", txt, "Vessels Contain Missing Parts", null, options);
             PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), diag, false, HighLogic.UISkin);
             //PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), "Vessel Contains Missing Parts", "The KCT vessel " + errored.shipName + " contains missing or invalid parts. You will not be able to do anything with the vessel until the parts are available again.", "Understood", false, HighLogic.UISkin);
         }
 
-        public static void ShowLaunchAlert()
+        public static void ShowLaunchAlert(string launchSite)
         {
             KCTDebug.Log("Showing Launch Alert");
             if (KCT_GUI.PrimarilyDisabled)
+            {
                 EditorLogic.fetch.launchVessel();
+            }
             else
             {
-                KCT_Utilities.AddVesselToBuildList();
+                KCT_Utilities.AddVesselToBuildList(launchSite);
                 KCT_Utilities.RecalculateEditorBuildTime(EditorLogic.fetch.ship);
-            }
-        }
-
-        public void UpdateOldFormulaCFG()
-        {
-            String filePath = KSPUtil.ApplicationRootPath + "GameData/KerbalConstructionTime/KCT_Formulas.cfg";
-            if (System.IO.File.Exists(filePath))
-            {
-                bool didUpdate = false;
-                ConfigNode current = ConfigNode.Load(filePath).GetNode("KCT_FormulaSettings");
-                if (current.HasValue("NodeMax") && current.HasValue("NodeFormula"))
-                {
-                    string max = current.GetValue("NodeMax");
-                    if (max != "" && double.Parse(max) > 0)
-                    {
-                        didUpdate = true;
-                        KCTDebug.Log("Updating node formula.");
-                        string concat = "min(" + max + ", " + current.GetValue("NodeFormula") + ")";
-                        current.SetValue("NodeFormula", concat);
-                    }
-                }
-                if (current.HasValue("UpgradeFundsMax") && current.HasValue("UpgradeFundsFormula"))
-                {
-                    string max = current.GetValue("UpgradeFundsMax");
-                    if (max != "" && double.Parse(max) > 0)
-                    {
-                        didUpdate = true;
-                        KCTDebug.Log("Updating funds upgrades formula.");
-                        string concat = "min(" + max + ", " + current.GetValue("UpgradeFundsFormula") + ")";
-                        current.SetValue("UpgradeFundsFormula", concat);
-                    }
-                }
-                if (current.HasValue("UpgradeScienceMax") && current.HasValue("UpgradeScienceFormula"))
-                {
-                    string max = current.GetValue("UpgradeScienceMax");
-                    if (max != "" && double.Parse(max) > 0)
-                    {
-                        didUpdate = true;
-                        KCTDebug.Log("Updating science upgrades formula.");
-                        string concat = "min(" + max + ", " + current.GetValue("UpgradeScienceFormula") + ")";
-                        current.SetValue("UpgradeScienceFormula", concat);
-                    }
-                }
-                if (didUpdate)
-                {
-                    ConfigNode save = new ConfigNode("KCT_FormulaSettings");
-                    save.AddNode(current);
-                    save.Save(filePath);
-                }
             }
         }
     }
 }
 /*
-Copyright (C) 2014  Michael Marvin, Zachary Eck
+Copyright (C) 2018  Michael Marvin, Zachary Eck
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

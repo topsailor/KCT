@@ -97,8 +97,8 @@ namespace KerbalConstructionTime
             KCT_GameStates.ActiveKSC.RDUpgrades = RDUpgrades;*/
             KCT_GameStates.PurchasedUpgrades = PurchasedUpgrades;
             KCT_GameStates.activeKSCName = activeKSC;
-            KCT_GameStates.InventorySalesFigures = SalesFigures;
-            KCT_GameStates.InventorySaleUpgrades = (float)KCT_MathParsing.GetStandardFormulaValue("InventorySales", new Dictionary<string, string> { { "V", "0" }, { "P", SalesFigures.ToString() } });
+            //KCT_GameStates.InventorySalesFigures = SalesFigures;
+            //KCT_GameStates.InventorySaleUpgrades = (float)KCT_MathParsing.GetStandardFormulaValue("InventorySales", new Dictionary<string, string> { { "V", "0" }, { "P", SalesFigures.ToString() } });
             KCT_GameStates.UpgradesResetCounter = UpgradesResetCounter;
             KCT_GameStates.TechUpgradesTotal = TechUpgrades;
             KCT_GameStates.PermanentModAddedUpgradesButReallyWaitForTheAPI = SavedUpgradePointsPreAPI;
@@ -178,7 +178,7 @@ namespace KerbalConstructionTime
     }
 }
 /*
-Copyright (C) 2014  Michael Marvin, Zachary Eck
+Copyright (C) 2018  Michael Marvin, Zachary Eck
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
