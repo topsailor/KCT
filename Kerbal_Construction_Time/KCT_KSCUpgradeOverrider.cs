@@ -82,14 +82,14 @@ namespace KerbalConstructionTime
             return default(T);
         }
 
-        internal void handleUpgrade()
+        internal void processUpgrade()
         {
             int oldLevel = getMember<int>("level");
             KCTDebug.Log($"Upgrading from level {oldLevel}");
 
             string facilityID = GetFacilityID();
 
-            KCT_UpgradingBuilding upgrading = new KCT_UpgradingBuilding(facilityID, oldLevel+1, oldLevel, facilityID.Split('/').Last());
+            KCT_UpgradingBuilding upgrading = new KCT_UpgradingBuilding(facilityID, oldLevel + 1, oldLevel, facilityID.Split('/').Last());
 
             upgrading.isLaunchpad = facilityID.ToLower().Contains("launchpad");
             if (upgrading.isLaunchpad)
@@ -119,11 +119,30 @@ namespace KerbalConstructionTime
                     ScreenMessages.PostScreenMessage("Not enough funds to upgrade facility!", 4.0f, ScreenMessageStyle.UPPER_CENTER);
                 }
             }
-            else if (oldLevel+1 != upgrading.currentLevel)
+            else if (oldLevel + 1 != upgrading.currentLevel)
             {
                 ScreenMessages.PostScreenMessage("Facility is already being upgraded!", 4.0f, ScreenMessageStyle.UPPER_CENTER);
-                KCTDebug.Log($"Facility {facilityID} tried to upgrade to lvl {oldLevel+1} but already in list!");
+                KCTDebug.Log($"Facility {facilityID} tried to upgrade to lvl {oldLevel + 1} but already in list!");
             }
+        }
+
+        void stub() { }
+
+        internal void handleUpgrade()
+        {
+            if (GetFacilityID().ToLower().Contains("launchpad"))
+            {
+                PopupDialog.SpawnPopupDialog(new MultiOptionDialog("kctUpgradePadConfirm",
+                            "Upgrading this launchpad will render it unusable until the upgrade finishes.\n\nAre you sure you want to?",
+                            "Upgrade Launchpad?",
+                            HighLogic.UISkin,
+                            new DialogGUIButton("Yes", processUpgrade),
+                            new DialogGUIButton("No", stub)),
+                            false,
+                            HighLogic.UISkin);
+            }
+            else
+                processUpgrade();
 
             _menu.Dismiss(KSCFacilityContextMenu.DismissAction.None);
         }

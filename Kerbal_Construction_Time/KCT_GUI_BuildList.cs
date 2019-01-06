@@ -483,8 +483,13 @@ namespace KerbalConstructionTime
                         if (rolloutEnabled && !HighLogic.LoadedSceneIsEditor && recovery == null && !siteHasActiveRolloutOrRollback) //rollout if the pad isn't busy
                         {
                             bool hasRecond = false;
+                            bool isUpgrading = KCT_GameStates.KSCs.Find(ksc => 
+                                ksc == KCT_GameStates.ActiveKSC 
+                                && ksc.KSCTech.Find(ub => 
+                                    ub.isLaunchpad 
+                                    && ub.launchpadID == KCT_GameStates.ActiveKSC.LaunchPads.IndexOf(KCT_GameStates.ActiveKSC.ActiveLPInstance)) != null) != null;
                             GUIStyle btnColor = greenButton;
-                            if (KCT_GameStates.ActiveKSC.ActiveLPInstance.destroyed)
+                            if (KCT_GameStates.ActiveKSC.ActiveLPInstance.destroyed || KCT_GameStates.ActiveKSC.ActiveLPInstance.upgradeRepair || isUpgrading)
                                 btnColor = redButton;
                             else if (hasRecond = KCT_GameStates.ActiveKSC.GetReconditioning(KCT_GameStates.ActiveKSC.ActiveLPInstance.name) != null)
                                 btnColor = yellowButton;
@@ -505,14 +510,24 @@ namespace KerbalConstructionTime
                                     {
                                         if (!KCT_GameStates.ActiveKSC.ActiveLPInstance.destroyed)
                                         {
-                                            b.launchSiteID = KCT_GameStates.ActiveKSC.ActiveLaunchPadID;
-
-                                            if (rollout != null)
+                                            if (!isUpgrading)
                                             {
-                                                rollout.SwapRolloutType();
+                                                b.launchSiteID = KCT_GameStates.ActiveKSC.ActiveLaunchPadID;
+
+                                                if (rollout != null)
+                                                {
+                                                    rollout.SwapRolloutType();
+                                                }
+                                                // tmpRollout.launchPadID = KCT_GameStates.ActiveKSC.ActiveLPInstance.name;
+                                                KCT_GameStates.ActiveKSC.Recon_Rollout.Add(tmpRollout);
                                             }
-                                            // tmpRollout.launchPadID = KCT_GameStates.ActiveKSC.ActiveLPInstance.name;
-                                            KCT_GameStates.ActiveKSC.Recon_Rollout.Add(tmpRollout);
+                                            else
+                                            {
+                                                PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), "cannotLaunchUpgradePopup", 
+                                                    "Cannot Launch!", 
+                                                    "You must finish upgrading the launchpad before you can launch a vessel from it!", 
+                                                    "Acknowledged", false, HighLogic.UISkin);
+                                            }
                                         }
                                         else
                                         {
