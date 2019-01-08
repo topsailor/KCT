@@ -676,47 +676,18 @@ namespace KerbalConstructionTime
                 {
                     renamingLaunchPad = true;
                     newName = KCT_GameStates.ActiveKSC.ActiveLPInstance.name;
+                    showNewPad = false;
                     showRename = true;
                     showBuildList = false;
                     showBLPlus = false;
                 }
                 if (costOfNewLP >= 0 && GUILayout.Button("New", GUILayout.ExpandWidth(false)))
                 {
-                    //open dialog to unlock new
-                    costOfNewLP = KCT_MathParsing.GetStandardFormulaValue("NewLaunchPadCost", new Dictionary<string, string> { { "N", KCT_GameStates.ActiveKSC.LaunchPads.Count.ToString() } });
-                    DialogGUIBase[] options = new DialogGUIBase[2];
-                    options[0] = new DialogGUIButton("Yes", () =>
-                    {
-                        if (!KCT_Utilities.CurrentGameIsCareer())
-                        {
-                            KCTDebug.Log("Building new launchpad!");
-                            KCT_GameStates.ActiveKSC.LaunchPads.Add(new KCT_LaunchPad("LaunchPad " + (KCT_GameStates.ActiveKSC.LaunchPads.Count + 1), 2));
-                        }
-                        else if (Funding.CanAfford((float)costOfNewLP))
-                        {
-                            KCTDebug.Log("Building new launchpad!");
-                            //take the funds
-                            KCT_Utilities.SpendFunds(costOfNewLP, TransactionReasons.StructureConstruction);
-                            //create new launchpad at level -1
-                            KCT_GameStates.ActiveKSC.LaunchPads.Add(new KCT_LaunchPad("LaunchPad " + (KCT_GameStates.ActiveKSC.LaunchPads.Count + 1), -1));
-                            //create new upgradeable
-                            KCT_UpgradingBuilding newPad = new KCT_UpgradingBuilding();//(null, 0, -1, "LaunchPad");
-                            newPad.id = "SpaceCenter/LaunchPad";
-                            newPad.isLaunchpad = true;
-                            newPad.launchpadID = KCT_GameStates.ActiveKSC.LaunchPads.Count-1;
-                            newPad.upgradeLevel = 0;
-                            newPad.currentLevel = -1;
-                            newPad.cost = costOfNewLP;
-                            newPad.SetBP(costOfNewLP);
-                            newPad.commonName = "LaunchPad " + (KCT_GameStates.ActiveKSC.LaunchPads.Count);
-                            KCT_GameStates.ActiveKSC.KSCTech.Add(newPad);
-
-                        }
-                        costOfNewLP = -13;
-                    });
-                    options[1] = new DialogGUIButton("No", DummyVoid);
-                    MultiOptionDialog diag = new MultiOptionDialog("newLaunchpadPopup", "It will cost " + Math.Round(costOfNewLP, 2).ToString("N") + " funds to build a new launchpad. Would you like to build it?", "Build LaunchPad", null, 300, options);
-                    PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), diag, false, HighLogic.UISkin);
+                    newName = "LaunchPad " + (KCT_GameStates.ActiveKSC.LaunchPads.Count + 1);
+                    showNewPad = true;
+                    showRename = false;
+                    showBuildList = false;
+                    showBLPlus = false;
                 }
                 GUILayout.FlexibleSpace();
                 if (lpCount > 1 && GUILayout.Button(">>", GUILayout.ExpandWidth(false)))
@@ -1181,6 +1152,7 @@ namespace KerbalConstructionTime
                 centralWindowPosition.height = 1;
                 showBuildList = false;
                 showBLPlus = false;
+                showNewPad = false;
                 showRename = true;
                 newName = b.shipName;
                 renamingLaunchPad = false;

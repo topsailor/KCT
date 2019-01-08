@@ -12,7 +12,7 @@ namespace KerbalConstructionTime
     {
         public static bool showMainGUI, showEditorGUI, showSOIAlert, showLaunchAlert, showTimeRemaining,
             showBuildList, showClearLaunch, showShipRoster, showCrewSelect, showSettings, showUpgradeWindow,
-            showBLPlus, showRename, showFirstRun, showLaunchSiteSelector;
+            showBLPlus, showNewPad, showRename, showFirstRun, showLaunchSiteSelector;
 
         public static bool clicked = false;
 
@@ -96,6 +96,8 @@ namespace KerbalConstructionTime
                     bLPlusPosition = GUILayout.Window(8953, bLPlusPosition, KCT_GUI.DrawBLPlusWindow, "Options", HighLogic.Skin.window);
                 if (showRename)
                     centralWindowPosition = GUILayout.Window(8954, centralWindowPosition, KCT_GUI.DrawRenameWindow, "Rename", HighLogic.Skin.window);
+                if (showNewPad)
+                    centralWindowPosition = GUILayout.Window(8954, centralWindowPosition, KCT_GUI.DrawNewPadWindow, "New launch pad", HighLogic.Skin.window);
                 if (showFirstRun)
                     centralWindowPosition = GUILayout.Window(8954, centralWindowPosition, KCT_GUI.DrawFirstRun, "Kerbal Construction Time", HighLogic.Skin.window);
                 if (showPresetSaver)
@@ -112,7 +114,7 @@ namespace KerbalConstructionTime
 
 
                 //Disable KSC things when certain windows are shown.
-                if (showFirstRun || showRename || showUpgradeWindow || showSettings || showCrewSelect || showShipRoster || showClearLaunch)
+                if (showFirstRun || showRename || showNewPad || showUpgradeWindow || showSettings || showCrewSelect || showShipRoster || showClearLaunch)
                 {
                     if (!isKSCLocked)
                     {
@@ -1753,6 +1755,109 @@ namespace KerbalConstructionTime
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
             CenterWindow(ref centralWindowPosition);
+        }
+
+        private static int selectedPadIdx = 0;
+        private static string[] padLvlOptions = null;
+        private static double[] padCosts = null;
+
+        public static void DrawNewPadWindow(int windowID)
+        {
+            if (padCosts == null || padLvlOptions == null)
+            {
+                LoadPadNamesAndCosts();
+            }
+
+            GUILayout.BeginVertical();
+            GUILayout.Label("Name:");
+            newName = GUILayout.TextField(newName);
+
+            GUILayout.Label("Pad level:");
+            selectedPadIdx = GUILayout.SelectionGrid(selectedPadIdx, padLvlOptions, 1);
+
+            double curPadCost = padCosts[selectedPadIdx];
+            GUILayout.Label($"It will cost {Math.Round(curPadCost, 2):N} funds to build the new launchpad. Would you like to build it?");
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Yes"))
+            {
+                showNewPad = false;
+                centralWindowPosition.height = 1;
+                centralWindowPosition.width = 150;
+                centralWindowPosition.x = (Screen.width - 150) / 2;
+                showBuildList = true;
+
+                if (!KCT_Utilities.CurrentGameIsCareer())
+                {
+                    KCTDebug.Log("Building new launchpad!");
+                    KCT_GameStates.ActiveKSC.LaunchPads.Add(new KCT_LaunchPad(newName, selectedPadIdx));
+                }
+                else if (Funding.CanAfford((float)curPadCost))
+                {
+                    KCTDebug.Log("Building new launchpad!");
+                    //take the funds
+                    KCT_Utilities.SpendFunds(curPadCost, TransactionReasons.StructureConstruction);
+                    //create new launchpad at level -1
+                    KCT_GameStates.ActiveKSC.LaunchPads.Add(new KCT_LaunchPad(newName, -1));
+                    //create new upgradeable
+                    KCT_UpgradingBuilding newPad = new KCT_UpgradingBuilding();
+                    newPad.id = KCT_LaunchPad.LPID;
+                    newPad.isLaunchpad = true;
+                    newPad.launchpadID = KCT_GameStates.ActiveKSC.LaunchPads.Count - 1;
+                    newPad.upgradeLevel = selectedPadIdx;
+                    newPad.currentLevel = -1;
+                    newPad.cost = curPadCost;
+                    newPad.SetBP(curPadCost);
+                    newPad.commonName = "LaunchPad " + KCT_GameStates.ActiveKSC.LaunchPads.Count;
+                    KCT_GameStates.ActiveKSC.KSCTech.Add(newPad);
+                }
+                else
+                {
+                    ScreenMessages.PostScreenMessage("Not enough funds to build this launchpad.");
+                }
+
+                padCosts = null;
+                padLvlOptions = null;
+                costOfNewLP = -13;
+            }
+            if (GUILayout.Button("No"))
+            {
+                centralWindowPosition.height = 1;
+                centralWindowPosition.width = 150;
+                centralWindowPosition.x = (Screen.width - 150) / 2;
+                padCosts = null;
+                padLvlOptions = null;
+                showNewPad = false;
+                showBuildList = true;
+            }
+            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
+            CenterWindow(ref centralWindowPosition);
+        }
+
+        private static void LoadPadNamesAndCosts()
+        {
+            KCT_LaunchPad lp = KCT_GameStates.ActiveKSC.ActiveLPInstance;
+            var list = lp.GetUpgradeableFacilityReferences();
+            var padUpgdLvls = list[0].UpgradeLevels;
+
+            padLvlOptions = new string[padUpgdLvls.Length];
+            padCosts = new double[padUpgdLvls.Length];
+
+            for (int i = 0; i < padUpgdLvls.Length; i++)
+            {
+                padLvlOptions[i] = "Level " + (i + 1);
+                if (i > 0)
+                {
+                    var lvl = padUpgdLvls[i];
+                    padCosts[i] = padCosts[i - 1] + lvl.levelCost;
+                }
+                else
+                {
+                    // Use the KCT formula for determining the cost of first level
+                    padCosts[0] = costOfNewLP;
+                }
+            }
         }
 
         public static void DrawFirstRun(int windowID)

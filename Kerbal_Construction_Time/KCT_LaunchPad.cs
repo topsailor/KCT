@@ -27,7 +27,7 @@ namespace KerbalConstructionTime
             }
         }
 
-        private string LPID = "SpaceCenter/LaunchPad";
+        public const string LPID = "SpaceCenter/LaunchPad";
 
         public KCT_LaunchPad(string LPName, int lvl=0)
         {
@@ -140,7 +140,7 @@ namespace KerbalConstructionTime
             }
         }
 
-        List<Upgradeables.UpgradeableFacility> GetUpgradeableFacilityReferences()
+        public List<Upgradeables.UpgradeableFacility> GetUpgradeableFacilityReferences()
         {
             return ScenarioUpgradeableFacilities.protoUpgradeables[LPID].facilityRefs;
         }
