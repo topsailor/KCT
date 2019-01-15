@@ -78,7 +78,7 @@ namespace KerbalConstructionTime
             //KCT_Events.allowedToUpgrade = false;
         }
 
-        List<Upgradeables.UpgradeableFacility> GetFacilityReferences()
+        public List<Upgradeables.UpgradeableFacility> GetFacilityReferences()
         {
             return ScenarioUpgradeableFacilities.protoUpgradeables[id].facilityRefs;
         }
