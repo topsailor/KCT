@@ -1373,14 +1373,30 @@ namespace KerbalConstructionTime
         public static double researchRate = -13, upResearchRate = -13;
         private static void DrawUpgradeWindow(int windowID)
         {
-            int spentPoints = KCT_Utilities.TotalSpentUpgrades(null);
+            int spentPoints = KCT_Utilities.TotalSpentUpgrades();
             GUILayout.BeginVertical();
             GUILayout.BeginHorizontal();
             int upgrades = KCT_Utilities.TotalUpgradePoints();
-            GUILayout.Label("Total Points: " + upgrades);
+            GUILayout.Label("Total Points:", GUILayout.Width(90));
+            GUILayout.Label(upgrades.ToString());
             GUILayout.Label("Available: " + (upgrades - spentPoints));
           //  if (KCT_Utilities.RSSActive)
            //     GUILayout.Label("Minimum Available: ");
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Points in VAB:", GUILayout.Width(90));
+            GUILayout.Label(KCT_Utilities.SpentUpgradesFor(SpaceCenterFacility.VehicleAssemblyBuilding).ToString());
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Points in SPH:", GUILayout.Width(90));
+            GUILayout.Label(KCT_Utilities.SpentUpgradesFor(SpaceCenterFacility.SpaceplaneHangar).ToString());
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Points in R&D:", GUILayout.Width(90));
+            GUILayout.Label(KCT_Utilities.SpentUpgradesFor(SpaceCenterFacility.ResearchAndDevelopment).ToString());
             GUILayout.EndHorizontal();
 
             if (KCT_Utilities.CurrentGameHasScience())
@@ -1509,7 +1525,7 @@ namespace KerbalConstructionTime
                     GUILayout.Label(rate + " BP/s");
                     if (upgrades - spentPoints > 0 && (i == 0 || upgraded <= KCT_Utilities.GetBuildRate(i - 1, KCT_BuildListVessel.ListType.VAB, KSC)) && upgraded - rate > 0)
                     {
-                        if (GUILayout.Button("+" + Math.Round(upgraded - rate,2), GUILayout.Width(45)))
+                        if (GUILayout.Button("+" + Math.Round(upgraded - rate,3), GUILayout.Width(55)))
                         {
                             if (i < KSC.VABUpgrades.Count)
                                 ++KSC.VABUpgrades[i];
@@ -1527,7 +1543,7 @@ namespace KerbalConstructionTime
                 if (KCT_GameStates.TotalUpgradePoints - spentPoints > 0 && ((KSC.VABUpgrades.Count + 1) * 0.05)
                     <= KCT_Utilities.GetBuildRate(KSC.VABUpgrades.Count - 1, KCT_BuildListVessel.ListType.VAB, KSC))
                 {
-                    if (GUILayout.Button("+" + ((KSC.VABUpgrades.Count + 1) * 0.05), GUILayout.Width(45)))
+                    if (GUILayout.Button("+" + ((KSC.VABUpgrades.Count + 1) * 0.05), GUILayout.Width(55)))
                     {
                         KSC.VABUpgrades.Add(1);
                         KSC.RecalculateBuildRates();
@@ -1555,7 +1571,7 @@ namespace KerbalConstructionTime
                     GUILayout.Label(rate + " BP/s");
                     if (upgrades - spentPoints > 0 && (i == 0 || upgraded <= KCT_Utilities.GetBuildRate(i-1, KCT_BuildListVessel.ListType.SPH, KSC)) && upgraded-rate > 0)
                     {
-                        if (GUILayout.Button("+" + Math.Round(upgraded - rate, 2), GUILayout.Width(45)))
+                        if (GUILayout.Button("+" + Math.Round(upgraded - rate, 3), GUILayout.Width(55)))
                         {
                             if (i < KSC.SPHUpgrades.Count)
                                 ++KSC.SPHUpgrades[i];
@@ -1573,7 +1589,7 @@ namespace KerbalConstructionTime
                 if (KCT_GameStates.TotalUpgradePoints - spentPoints > 0 && ((KSC.SPHUpgrades.Count + 1) * 0.05)
                     <= KCT_Utilities.GetBuildRate(KSC.SPHUpgrades.Count - 1, KCT_BuildListVessel.ListType.SPH, KSC))
                 {
-                    if (GUILayout.Button("+" + ((KSC.SPHUpgrades.Count + 1) * 0.05), GUILayout.Width(45)))
+                    if (GUILayout.Button("+" + ((KSC.SPHUpgrades.Count + 1) * 0.05), GUILayout.Width(55)))
                     {
                         KSC.SPHUpgrades.Add(1);
                         KSC.RecalculateBuildRates();

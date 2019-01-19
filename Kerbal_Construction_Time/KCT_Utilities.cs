@@ -822,26 +822,83 @@ namespace KerbalConstructionTime
             return newVal;
         }
 
-        public static int TotalSpentUpgrades(KCT_KSC ksc)
+        public static int TotalSpentUpgrades(KCT_KSC ksc = null)
         {
             if (ksc == null) ksc = KCT_GameStates.ActiveKSC;
             int spentPoints = 0;
             if (KCT_PresetManager.Instance.ActivePreset.generalSettings.SharedUpgradePool)
             {
-                foreach (KCT_KSC KSC in KCT_GameStates.KSCs)
+                for (int j = 0; j < KCT_GameStates.KSCs.Count; j++)
                 {
-                    foreach (int i in KSC.VABUpgrades) spentPoints += i;
-                    foreach (int i in KSC.SPHUpgrades) spentPoints += i;
+                    KCT_KSC KSC = KCT_GameStates.KSCs[j];
+                    for (int i = 0; i < KSC.VABUpgrades.Count; i++) spentPoints += KSC.VABUpgrades[i];
+                    for (int i = 0; i < KSC.SPHUpgrades.Count; i++) spentPoints += KSC.SPHUpgrades[i];
                     spentPoints += KSC.RDUpgrades[0];
                 }
                 spentPoints += ksc.RDUpgrades[1]; //only count this once, all KSCs share this value
             }
             else
             {
-                foreach (int i in ksc.VABUpgrades) spentPoints += i;
-                foreach (int i in ksc.SPHUpgrades) spentPoints += i;
-                foreach (int i in ksc.RDUpgrades) spentPoints += i;
+                for (int i = 0; i < ksc.VABUpgrades.Count; i++) spentPoints += ksc.VABUpgrades[i];
+                for (int i = 0; i < ksc.SPHUpgrades.Count; i++) spentPoints += ksc.SPHUpgrades[i];
+                for (int i = 0; i < ksc.RDUpgrades.Count; i++) spentPoints += ksc.RDUpgrades[i];
             }
+            return spentPoints;
+        }
+
+        public static int SpentUpgradesFor(SpaceCenterFacility facility, KCT_KSC ksc = null)
+        {
+            if (ksc == null) ksc = KCT_GameStates.ActiveKSC;
+            int spentPoints = 0;
+            switch (facility)
+            {
+                case SpaceCenterFacility.ResearchAndDevelopment:
+                    if (KCT_PresetManager.Instance.ActivePreset.generalSettings.SharedUpgradePool)
+                    {
+                        for (int j = 0; j < KCT_GameStates.KSCs.Count; j++)
+                        {
+                            KCT_KSC KSC = KCT_GameStates.KSCs[j];
+                            spentPoints += KSC.RDUpgrades[0];
+                        }
+                        spentPoints += ksc.RDUpgrades[1]; //only count this once, all KSCs share this value
+                    }
+                    else
+                    {
+                        for (int i = 0; i < ksc.RDUpgrades.Count; i++) spentPoints += ksc.RDUpgrades[i];
+                    }
+                    break;
+                case SpaceCenterFacility.SpaceplaneHangar:
+                    if (KCT_PresetManager.Instance.ActivePreset.generalSettings.SharedUpgradePool)
+                    {
+                        for (int j = 0; j < KCT_GameStates.KSCs.Count; j++)
+                        {
+                            KCT_KSC KSC = KCT_GameStates.KSCs[j];
+                            for (int i = 0; i < KSC.SPHUpgrades.Count; i++) spentPoints += KSC.SPHUpgrades[i];
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < ksc.SPHUpgrades.Count; i++) spentPoints += ksc.SPHUpgrades[i];
+                    }
+                    break;
+                case SpaceCenterFacility.VehicleAssemblyBuilding:
+                    if (KCT_PresetManager.Instance.ActivePreset.generalSettings.SharedUpgradePool)
+                    {
+                        for (int j = 0; j < KCT_GameStates.KSCs.Count; j++)
+                        {
+                            KCT_KSC KSC = KCT_GameStates.KSCs[j];
+                            for (int i = 0; i < KSC.VABUpgrades.Count; i++) spentPoints += KSC.VABUpgrades[i];
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < ksc.VABUpgrades.Count; i++) spentPoints += ksc.VABUpgrades[i];
+                    }
+                    break;
+                default:
+                    throw new ArgumentException("invalid facility");
+            }
+
             return spentPoints;
         }
 
