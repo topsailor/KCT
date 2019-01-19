@@ -429,7 +429,7 @@ namespace KerbalConstructionTime
                 }
 
                 if (KCT_GameStates.EditorRolloutCosts > 0)
-                    GUILayout.Label("Rollout Cost: " + Math.Round(KCT_GameStates.EditorRolloutCosts, 1));
+                    GUILayout.Label("Launch Cost: " + Math.Round(KCT_GameStates.EditorRolloutCosts, 1));
 
                 //bool useHolder = useInventory;
                 //useInventory = GUILayout.Toggle(useInventory, " Use parts from inventory?");
