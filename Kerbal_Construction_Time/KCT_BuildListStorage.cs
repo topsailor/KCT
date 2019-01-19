@@ -123,6 +123,10 @@ namespace KerbalConstructionTime
             [Persistent]
             float cost = 0, mass = 0, kscDistance = 0;
             [Persistent]
+            int numStageParts = 0, numStages = 0;
+            [Persistent]
+            double stagePartCost = 0;
+            [Persistent]
             int rushBuildClicks = 0;
             [Persistent]
             int EditorFacility = 0, LaunchPadID = -1;
@@ -136,6 +140,9 @@ namespace KerbalConstructionTime
                 ret.id = new Guid(shipID);
                 ret.cannotEarnScience = cannotEarnScience;
                 ret.TotalMass = mass;
+                ret.numStageParts = numStageParts;
+                ret.numStages = numStages;
+                ret.stagePartCost = stagePartCost;
                 ret.DistanceFromKSC = kscDistance;
                 ret.rushBuildClicks = rushBuildClicks;
                 ret.launchSiteID = LaunchPadID;
@@ -156,6 +163,9 @@ namespace KerbalConstructionTime
                 this.cost = blv.cost;
                 this.rushBuildClicks = blv.rushBuildClicks;
                 this.mass = blv.TotalMass;
+                this.numStageParts = blv.numStageParts;
+                this.numStages = blv.numStages;
+                this.stagePartCost = blv.stagePartCost;
                 this.kscDistance = blv.DistanceFromKSC;
                 this.EditorFacility = (int)blv.GetEditorFacility();
                 this.LaunchPadID = blv.launchSiteID;
