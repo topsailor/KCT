@@ -287,19 +287,27 @@ namespace KerbalConstructionTime
 
                     foreach (KCT_Recon_Rollout rr in ksc.Recon_Rollout)
                     {
-                        double prog = rr.progress;
+                        double progBefore = rr.progress;
                         rr.progress += rr.AsBuildItem().GetBuildRate() * (UTDiff);
                         if (rr.progress > rr.BP) rr.progress = rr.BP;
 
-                        if (KCT_Utilities.CurrentGameIsCareer() && rr.RRType == KCT_Recon_Rollout.RolloutReconType.Rollout && rr.cost > 0)
+                        if (CurrentGameIsCareer() && rr.RRType == KCT_Recon_Rollout.RolloutReconType.Rollout && rr.cost > 0)
                         {
                             int steps = 0;
-                            if ((steps = (int)(Math.Floor((rr.progress/rr.BP)*10) - Math.Floor((prog/rr.BP)*10))) > 0) //passed 10% of the progress
+                            if ((steps = (int)(Math.Floor((rr.progress/rr.BP)*10) - Math.Floor((progBefore/rr.BP)*10))) > 0) //passed 10% of the progress
                             {
                                 if (Funding.Instance.Funds < rr.cost / 10) //If they can't afford to continue the rollout, progress stops
-                                    rr.progress = prog;
+                                {
+                                    rr.progress = progBefore;
+                                    if (TimeWarp.CurrentRate > 1f && KCT_GameStates.warpInitiated && rr == KCT_GameStates.targetedItem)
+                                    {
+                                        ScreenMessages.PostScreenMessage("Timewarp was stopped because there's insufficient funds to continue the rollout");
+                                        TimeWarp.SetRate(0, true);
+                                        KCT_GameStates.warpInitiated = false;
+                                    }
+                                }
                                 else
-                                    KCT_Utilities.SpendFunds(rr.cost / 10, TransactionReasons.None);
+                                    SpendFunds((rr.cost / 10) * steps, TransactionReasons.None);
                             }
                         }
                     }
