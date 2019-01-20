@@ -127,6 +127,43 @@ namespace KerbalConstructionTime
             }
         }
 
+        public void SwitchToPrevLaunchPad()
+        {
+            SwitchLaunchPad(false);
+        }
+
+        public void SwitchToNextLaunchPad()
+        {
+            SwitchLaunchPad(true);
+        }
+
+        public void SwitchLaunchPad(bool forwardDirection)
+        {
+            if (KCT_GameStates.ActiveKSC.LaunchPadCount < 2) return;
+
+            int activePadCount = LaunchPads.Count(p => p.level >= 0);
+            if (activePadCount < 2) return;
+
+            int idx = KCT_GameStates.ActiveKSC.ActiveLaunchPadID;
+            KCT_LaunchPad pad;
+            do
+            {
+                if (forwardDirection)
+                {
+                    idx = (idx + 1) % LaunchPads.Count;
+                }
+                else
+                {
+                    //Simple fix for mod function being "weird" in the negative direction
+                    //http://stackoverflow.com/questions/1082917/mod-of-negative-number-is-melting-my-brain
+                    idx = ((idx - 1) % LaunchPads.Count + LaunchPads.Count) % LaunchPads.Count;
+                }
+                pad = LaunchPads[idx];
+            } while (pad.level < 0);
+
+            KCT_GameStates.ActiveKSC.SwitchLaunchPad(idx);
+        }
+
         public void SwitchLaunchPad(int LP_ID, bool updateDestrNode = true)
         {
             //set the active LP's new state

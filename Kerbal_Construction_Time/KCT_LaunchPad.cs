@@ -51,7 +51,7 @@ namespace KerbalConstructionTime
             {
                 if (ksc.LaunchPads.Contains(this))
                 {
-                    if (ksc.LaunchPads.Exists(lp => lp.name == newName))
+                    if (ksc.LaunchPads.Exists(lp => string.Equals(lp.name, newName, StringComparison.OrdinalIgnoreCase)))
                         return; //can't name it something that already is named that
 
                     foreach (KCT_Recon_Rollout rr in ksc.Recon_Rollout)

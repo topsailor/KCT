@@ -658,9 +658,7 @@ namespace KerbalConstructionTime
                 int lpCount = KCT_GameStates.ActiveKSC.LaunchPadCount;
                 if (lpCount > 1 && GUILayout.Button("<<", GUILayout.ExpandWidth(false)))
                 {
-                    //Simple fix for mod function being "weird" in the negative direction
-                    //http://stackoverflow.com/questions/1082917/mod-of-negative-number-is-melting-my-brain
-                    KCT_GameStates.ActiveKSC.SwitchLaunchPad(((KCT_GameStates.ActiveKSC.ActiveLaunchPadID - 1) % lpCount + lpCount) % lpCount);
+                    KCT_GameStates.ActiveKSC.SwitchToPrevLaunchPad();
                     if (HighLogic.LoadedSceneIsEditor)
                     {
                         KCT_Utilities.RecalculateEditorBuildTime(EditorLogic.fetch.ship);
@@ -692,7 +690,7 @@ namespace KerbalConstructionTime
                 GUILayout.FlexibleSpace();
                 if (lpCount > 1 && GUILayout.Button(">>", GUILayout.ExpandWidth(false)))
                 {
-                    KCT_GameStates.ActiveKSC.SwitchLaunchPad((KCT_GameStates.ActiveKSC.ActiveLaunchPadID + 1) % KCT_GameStates.ActiveKSC.LaunchPadCount);
+                    KCT_GameStates.ActiveKSC.SwitchToNextLaunchPad();
                     if (HighLogic.LoadedSceneIsEditor)
                     {
                         KCT_Utilities.RecalculateEditorBuildTime(EditorLogic.fetch.ship);

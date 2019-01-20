@@ -1797,6 +1797,22 @@ namespace KerbalConstructionTime
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Yes"))
             {
+                if (string.IsNullOrEmpty(newName))
+                {
+                    ScreenMessages.PostScreenMessage("Enter a name for the new launchpad");
+                    return;
+                }
+
+                for (int i = 0; i < KCT_GameStates.ActiveKSC.LaunchPads.Count; i++)
+                {
+                    var lp = KCT_GameStates.ActiveKSC.LaunchPads[i];
+                    if (string.Equals(lp.name, newName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        ScreenMessages.PostScreenMessage("Another launchpad with the same name already exists");
+                        return;
+                    }
+                }
+
                 showNewPad = false;
                 centralWindowPosition.height = 1;
                 centralWindowPosition.width = 150;
@@ -1824,7 +1840,7 @@ namespace KerbalConstructionTime
                     newPad.currentLevel = -1;
                     newPad.cost = curPadCost;
                     newPad.SetBP(curPadCost);
-                    newPad.commonName = "LaunchPad " + KCT_GameStates.ActiveKSC.LaunchPads.Count;
+                    newPad.commonName = newName;
                     KCT_GameStates.ActiveKSC.KSCTech.Add(newPad);
                 }
                 else
