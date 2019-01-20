@@ -40,6 +40,11 @@ namespace KerbalConstructionTime
             GameEvents.OnKSCStructureRepaired.Add(FaciliyRepaired);
             GameEvents.OnKSCStructureCollapsed.Add(FacilityDestroyed);
 
+            GameEvents.StageManager.OnGUIStageAdded.Add(StageCountChangedEvent);
+            GameEvents.StageManager.OnGUIStageRemoved.Add(StageCountChangedEvent);
+            GameEvents.StageManager.OnGUIStageSequenceModified.Add(StagingOrderChangedEvent);
+            GameEvents.StageManager.OnPartUpdateStageability.Add(PartStageabilityChangedEvent);
+
             GameEvents.FindEvent<EventVoid>("OnSYInventoryAppliedToVessel")?.Add(SYInventoryApplied);
             GameEvents.FindEvent<EventVoid>("OnSYReady")?.Add(SYReady);
             GameEvents.FindEvent<EventData<Part>>("OnSYInventoryAppliedToPart")?.Add((p) => { KerbalConstructionTime.instance.editorRecalcuationRequired = true; });
@@ -254,6 +259,21 @@ namespace KerbalConstructionTime
         }
 
         private void ShipModifiedEvent(ShipConstruct vessel)
+        {
+            KerbalConstructionTime.instance.editorRecalcuationRequired = true;
+        }
+
+        private void StageCountChangedEvent(int num)
+        {
+            KerbalConstructionTime.instance.editorRecalcuationRequired = true;
+        }
+
+        private void StagingOrderChangedEvent()
+        {
+            KerbalConstructionTime.instance.editorRecalcuationRequired = true;
+        }
+
+        private void PartStageabilityChangedEvent(Part p)
         {
             KerbalConstructionTime.instance.editorRecalcuationRequired = true;
         }
