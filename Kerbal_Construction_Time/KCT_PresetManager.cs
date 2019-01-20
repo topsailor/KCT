@@ -356,7 +356,8 @@ namespace KerbalConstructionTime
         //provides the variables [PV] and [MV] to the EffectiveCost functions
         public Dictionary<string, double> Part_Variables = new Dictionary<string, double>(); //Dictionary of partName : modifier
         public Dictionary<string, double> Module_Variables = new Dictionary<string, double>(); //Dictionary of moduleName : modifier
-            //if multiple modules are present on the part, they are all multiplied together.
+                                                                                               //if multiple modules are present on the part, they are all multiplied together.
+        public Dictionary<string, double> Resource_Variables = new Dictionary<string, double>(); //Dictionary of resourceName : modifier
 
         public Dictionary<string, double> Global_Variables = new Dictionary<string, double>();
 
@@ -388,6 +389,7 @@ namespace KerbalConstructionTime
             ConfigNode node = new ConfigNode("KCT_Preset_Part_Variables");
             node.AddNode(DictionaryToNode(Part_Variables, "Part_Variables"));
             node.AddNode(DictionaryToNode(Module_Variables, "Module_Variables"));
+            node.AddNode(DictionaryToNode(Resource_Variables, "Resource_Variables"));
             node.AddNode(DictionaryToNode(Global_Variables, "Global_Variables"));
 
             return node;
@@ -397,12 +399,15 @@ namespace KerbalConstructionTime
         {
             Part_Variables.Clear();
             Module_Variables.Clear();
+            Resource_Variables.Clear();
             Global_Variables.Clear();
 
             if (node.HasNode("Part_Variables"))
                 Part_Variables = NodeToDictionary(node.GetNode("Part_Variables"));
             if (node.HasNode("Module_Variables"))
                 Module_Variables = NodeToDictionary(node.GetNode("Module_Variables"));
+            if (node.HasNode("Resource_Variables"))
+                Resource_Variables = NodeToDictionary(node.GetNode("Resource_Variables"));
             if (node.HasNode("Global_Variables"))
                 Global_Variables = NodeToDictionary(node.GetNode("Global_Variables"));
         }
@@ -421,6 +426,17 @@ namespace KerbalConstructionTime
             foreach (string name in moduleNames)
             {
                 if (Module_Variables.ContainsKey(name))
+                    value *= Module_Variables[name];
+            }
+            return value;
+        }
+
+        public double GetResourceVariable(List<string> resourceNames)
+        {
+            double value = 1.0;
+            foreach (string name in resourceNames)
+            {
+                if (Resource_Variables.ContainsKey(name))
                     value *= Module_Variables[name];
             }
             return value;
@@ -445,6 +461,17 @@ namespace KerbalConstructionTime
             {
                 if (Module_Variables.ContainsKey(mod.moduleName))
                     value *= Module_Variables[mod.moduleName];
+            }
+            return value;
+        }
+
+        public double GetResourceVariable(PartResourceList resources)
+        {
+            double value = 1.0;
+            foreach (PartResource r in resources)
+            {
+                if (Resource_Variables.ContainsKey(r.resourceName))
+                    value *= Resource_Variables[r.resourceName];
             }
             return value;
         }

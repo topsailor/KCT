@@ -74,6 +74,7 @@ namespace KerbalConstructionTime
 
                 double PartMultiplier = KCT_PresetManager.Instance.ActivePreset.partVariables.GetPartVariable(name);
                 double ModuleMultiplier = KCT_PresetManager.Instance.ActivePreset.partVariables.GetModuleVariable(p.Modules);
+                double ResourceMultiplier = KCT_PresetManager.Instance.ActivePreset.partVariables.GetResourceVariable(p.Resources);
                 KCT_PresetManager.Instance.ActivePreset.partVariables.SetGlobalVariables(globalVariables, p.Modules);
 
                 double InvEff = (inventorySample.Contains(p) ? KCT_PresetManager.Instance.ActivePreset.timeSettings.InventoryEffect : 0);
@@ -84,7 +85,7 @@ namespace KerbalConstructionTime
                 effectiveCost = KCT_MathParsing.GetStandardFormulaValue("EffectivePart", new Dictionary<string, string>() { {"C", cost.ToString()}, {"c", dryCost.ToString()}, {"M",wetmass.ToString()},
                     { "m", drymass.ToString()}, {"U", builds.ToString()}, {"u", used.ToString() }, {"O", KCT_PresetManager.Instance.ActivePreset.timeSettings.OverallMultiplier.ToString()}, {"I", InvEff.ToString()},
                     { "B", KCT_PresetManager.Instance.ActivePreset.timeSettings.BuildEffect.ToString()}, 
-                    {"PV", PartMultiplier.ToString()}, {"MV", ModuleMultiplier.ToString()}});
+                    {"PV", PartMultiplier.ToString()}, {"RV", ResourceMultiplier.ToString()}, {"MV", ModuleMultiplier.ToString()}});
 
                 if (InvEff != 0)
                 {
@@ -125,6 +126,12 @@ namespace KerbalConstructionTime
                 foreach (ConfigNode modNode in GetModulesFromPartNode(p))
                     moduleNames.Add(modNode.GetValue("name"));
                 double ModuleMultiplier = KCT_PresetManager.Instance.ActivePreset.partVariables.GetModuleVariable(moduleNames);
+
+                List<string> resourceNames = new List<string>();
+                foreach (ConfigNode rNode in GetResourcesFromPartNode(p))
+                    resourceNames.Add(rNode.GetValue("name"));
+                double ResourceMultiplier = KCT_PresetManager.Instance.ActivePreset.partVariables.GetResourceVariable(resourceNames);
+
                 KCT_PresetManager.Instance.ActivePreset.partVariables.SetGlobalVariables(globalVariables, moduleNames);
 
                 double InvEff = (inventorySample.Contains(p) ? KCT_PresetManager.Instance.ActivePreset.timeSettings.InventoryEffect : 0);
@@ -134,7 +141,7 @@ namespace KerbalConstructionTime
 
                 effectiveCost = KCT_MathParsing.GetStandardFormulaValue("EffectivePart", new Dictionary<string, string>() { {"C", cost.ToString()}, {"c", dryCost.ToString()}, {"M",wetMass.ToString()},
                 {"m", dryMass.ToString()}, {"U", builds.ToString()}, {"u", used.ToString()}, {"O", KCT_PresetManager.Instance.ActivePreset.timeSettings.OverallMultiplier.ToString()}, {"I", InvEff.ToString()}, {"B", KCT_PresetManager.Instance.ActivePreset.timeSettings.BuildEffect.ToString()}, 
-                {"PV", PartMultiplier.ToString()}, {"MV", ModuleMultiplier.ToString()}});
+                {"PV", PartMultiplier.ToString()}, {"RV", PartMultiplier.ToString()}, {"MV", ModuleMultiplier.ToString()}});
 
                 if (InvEff != 0)
                 {
@@ -182,7 +189,12 @@ namespace KerbalConstructionTime
         {
             return partNode.GetNodes("MODULE");
         }
-        
+
+        public static ConfigNode[] GetResourcesFromPartNode(ConfigNode partNode)
+        {
+            return partNode.GetNodes("RESOURCE");
+        }
+
         public static double GetBuildRate(int index, KCT_BuildListVessel.ListType type, KCT_KSC KSC, bool UpgradedRate = false)
         {
             if (KSC == null) KSC = KCT_GameStates.ActiveKSC;
