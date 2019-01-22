@@ -11,14 +11,18 @@ namespace KerbalConstructionTime
     class KCT_Events
     {
         public static KCT_Events instance = new KCT_Events();
-        public bool eventAdded;
+        public bool subscribedToEvents;
+        public bool createdEvents;
+
+        public static EventData<RDTech> onTechQueued;
 
         public KCT_Events()
         {
-            eventAdded = false;
+            subscribedToEvents = false;
+            createdEvents = false;
         }
 
-        public void addEvents()
+        public void SubscribeToEvents()
         {
             GameEvents.onGUILaunchScreenSpawn.Add(launchScreenOpenEvent);
             GameEvents.onVesselRecovered.Add(vesselRecoverEvent);
@@ -76,8 +80,14 @@ namespace KerbalConstructionTime
             GameEvents.onEditorStarted.Add(() => { KCT_Utilities.HandleEditorButton(); });
 
             GameEvents.onFacilityContextMenuSpawn.Add(FacilityContextMenuSpawn);
+            
+            subscribedToEvents = true;
+        }
 
-            eventAdded = true;
+        public void CreateEvents()
+        {
+            onTechQueued = new EventData<RDTech>("OnKctTechQueued");
+            createdEvents = true;
         }
 
         public void HideAllGUIs()
@@ -352,6 +362,7 @@ namespace KerbalConstructionTime
                             techItem.UpdateBuildRate(KCT_GameStates.TechList.IndexOf(techItem));
                         double timeLeft = tech.BuildRate > 0 ? tech.TimeLeft : tech.EstimatedTimeLeft;
                         ScreenMessages.PostScreenMessage("[KCT] Node will unlock in " + MagiCore.Utilities.GetFormattedTime(timeLeft), 4.0f, ScreenMessageStyle.UPPER_LEFT);
+                        onTechQueued.Fire(ev.host);
                     }
                 }
                 else

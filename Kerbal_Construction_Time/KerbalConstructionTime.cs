@@ -192,6 +192,11 @@ namespace KerbalConstructionTime
             }
             KCT_PresetManager.Instance.SetActiveFromSaveData();
 
+            // Create events for other mods
+            if (!KCT_Events.instance.createdEvents)
+            {
+                KCT_Events.instance.CreateEvents();
+            }
 
             //Add the toolbar button
             if (ToolbarManager.ToolbarAvailable && ToolbarManager.Instance != null && KCT_GameStates.settings.PreferBlizzyToolbar)
@@ -224,10 +229,10 @@ namespace KerbalConstructionTime
 
             KCTDebug.Log("Start called");
 
-            //add the events
-            if (!KCT_Events.instance.eventAdded)
+            // Subscribe to events from KSP and other mods
+            if (!KCT_Events.instance.subscribedToEvents)
             {
-                KCT_Events.instance.addEvents();
+                KCT_Events.instance.SubscribeToEvents();
             }
 
             KCT_GameStates.settings.Save(); //Save the settings file, with defaults if it doesn't exist
