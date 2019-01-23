@@ -437,7 +437,7 @@ namespace KerbalConstructionTime
             foreach (string name in resourceNames)
             {
                 if (Resource_Variables.ContainsKey(name))
-                    value *= Module_Variables[name];
+                    value *= Resource_Variables[name];
             }
             return value;
         }
