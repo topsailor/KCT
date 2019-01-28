@@ -454,11 +454,15 @@ namespace KerbalConstructionTime
         }
 
         //These are all multiplied in case multiple modules exist on one part (this one takes a PartModuleList instead)
-        public double GetModuleVariable(PartModuleList modules)
+        public double GetModuleVariable(PartModuleList modules, out bool hasResourceMult)
         {
             double value = 1.0;
+            hasResourceMult = true;
             foreach (PartModule mod in modules)
             {
+                if (mod.moduleName == "ModuleTagNoResourceCostMult")
+                    hasResourceMult = false;
+
                 if (Module_Variables.ContainsKey(mod.moduleName))
                     value *= Module_Variables[mod.moduleName];
             }

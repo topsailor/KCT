@@ -73,8 +73,11 @@ namespace KerbalConstructionTime
                 double wetmass = p.GetResourceMass() + drymass;
 
                 double PartMultiplier = KCT_PresetManager.Instance.ActivePreset.partVariables.GetPartVariable(name);
-                double ModuleMultiplier = KCT_PresetManager.Instance.ActivePreset.partVariables.GetModuleVariable(p.Modules);
-                double ResourceMultiplier = KCT_PresetManager.Instance.ActivePreset.partVariables.GetResourceVariable(p.Resources);
+                bool doRes;
+                double ModuleMultiplier = KCT_PresetManager.Instance.ActivePreset.partVariables.GetModuleVariable(p.Modules, out doRes);
+                double ResourceMultiplier = 1d;
+                if (doRes)
+                    ResourceMultiplier = KCT_PresetManager.Instance.ActivePreset.partVariables.GetResourceVariable(p.Resources);
                 KCT_PresetManager.Instance.ActivePreset.partVariables.SetGlobalVariables(globalVariables, p.Modules);
 
                 double InvEff = (inventorySample.Contains(p) ? KCT_PresetManager.Instance.ActivePreset.timeSettings.InventoryEffect : 0);
@@ -123,14 +126,24 @@ namespace KerbalConstructionTime
 
                 double PartMultiplier = KCT_PresetManager.Instance.ActivePreset.partVariables.GetPartVariable(raw_name);
                 List<string> moduleNames = new List<string>();
+                bool hasResourceCostMult = true;
                 foreach (ConfigNode modNode in GetModulesFromPartNode(p))
-                    moduleNames.Add(modNode.GetValue("name"));
+                {
+                    string s = modNode.GetValue("name");
+                    if (s == "ModuleTagNoResourceCostMult")
+                        hasResourceCostMult = false;
+                    moduleNames.Add(s);
+                }
                 double ModuleMultiplier = KCT_PresetManager.Instance.ActivePreset.partVariables.GetModuleVariable(moduleNames);
 
-                List<string> resourceNames = new List<string>();
-                foreach (ConfigNode rNode in GetResourcesFromPartNode(p))
-                    resourceNames.Add(rNode.GetValue("name"));
-                double ResourceMultiplier = KCT_PresetManager.Instance.ActivePreset.partVariables.GetResourceVariable(resourceNames);
+                double ResourceMultiplier = 1d;
+                if (hasResourceCostMult)
+                {
+                    List<string> resourceNames = new List<string>();
+                    foreach (ConfigNode rNode in GetResourcesFromPartNode(p))
+                        resourceNames.Add(rNode.GetValue("name"));
+                    ResourceMultiplier = KCT_PresetManager.Instance.ActivePreset.partVariables.GetResourceVariable(resourceNames);
+                }
 
                 KCT_PresetManager.Instance.ActivePreset.partVariables.SetGlobalVariables(globalVariables, moduleNames);
 
