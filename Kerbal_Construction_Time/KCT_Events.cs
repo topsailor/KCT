@@ -327,7 +327,10 @@ namespace KerbalConstructionTime
             if (tech!= null && tech.isInList())
             {
                 ScreenMessages.PostScreenMessage("[KCT] You must wait until the node is fully researched to purchase parts!", 4.0f, ScreenMessageStyle.UPPER_LEFT);
-                KCT_Utilities.AddFunds(part.entryCost, TransactionReasons.RnDPartPurchase);
+                if (part.costsFunds)
+                {
+                    KCT_Utilities.AddFunds(part.entryCost, TransactionReasons.RnDPartPurchase);
+                }
                 tech.protoNode.partsPurchased.Remove(part);
                 tech.DisableTech();
             }
