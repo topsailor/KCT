@@ -20,6 +20,7 @@ namespace KerbalConstructionTime
         public static string activeKSCName = "";
         public static bool UpdateLaunchpadDestructionState = false;
         public static int TechUpgradesTotal = 0;
+        public static float SciPointsTotal = -1f;
         public static List<KCT_TechItem> TechList = new List<KCT_TechItem>();
 
         public static List<int> PurchasedUpgrades = new List<int>() { 0, 0 };

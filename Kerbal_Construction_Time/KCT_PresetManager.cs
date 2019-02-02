@@ -338,6 +338,7 @@ namespace KerbalConstructionTime
         public string NodeFormula = "2^([N]+1) / 86400",
             UpgradeFundsFormula = "min(2^([N]+4) * 1000, 1024000)",
             UpgradeScienceFormula = "min(2^([N]+2) * 1.0, 512)",
+            UpgradesForScience = "0",
             ResearchFormula = "[N]*0.5/86400",
             EffectivePartFormula = "min([C]/([I] + ([B]*([U]+1))) *[MV]*[PV], [C])",
             ProceduralPartFormula = "(([C]-[A]) + ([A]*10/max([I],1))) / max([B]*([U]+1),1) *[MV]*[PV]",

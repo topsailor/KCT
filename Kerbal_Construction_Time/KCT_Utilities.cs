@@ -1,12 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
-using System.Text.RegularExpressions;
-using UnityEngine;
 using KSP.UI.Screens;
-using System.Collections;
-using KSP.UI;
+using UnityEngine;
 
 namespace KerbalConstructionTime
 {
@@ -685,6 +684,65 @@ namespace KerbalConstructionTime
             KCTDebug.Log("Adding funds: " + toAdd + ", New total: " + (Funding.Instance.Funds + toAdd));
             Funding.Instance.AddFunds(toAdd, reason);
             return Funding.Instance.Funds;
+        }
+
+        public static void ProcessSciPointTotalChange(float changeDelta)
+        {
+            // Earned point totals shouldn't decrease. This would only make sense when done through the cheat menu.
+            if (changeDelta <= 0f) return;
+
+            EnsureCurrentSaveHasSciTotalsInitialized();
+
+            float pointsBef = KCT_GameStates.SciPointsTotal;
+            KCT_GameStates.SciPointsTotal += changeDelta;
+            KCTDebug.Log("Total sci points earned is now: " + KCT_GameStates.SciPointsTotal);
+
+            double upgradesBef = KCT_MathParsing.GetStandardFormulaValue("UpgradesForScience", new Dictionary<string, string>() { { "N", pointsBef.ToString() } });
+            double upgradesAft = KCT_MathParsing.GetStandardFormulaValue("UpgradesForScience", new Dictionary<string, string>() { { "N", KCT_GameStates.SciPointsTotal.ToString() } });
+            KCTDebug.Log($"Upg points bef: {upgradesBef}; aft: {upgradesAft}");
+
+            int upgradesToAdd = (int)upgradesAft - (int)upgradesBef;
+            if (upgradesToAdd > 0)
+            {
+                KCT_GameStates.PurchasedUpgrades[1] += upgradesToAdd;
+                KCTDebug.Log($"Added {upgradesToAdd} upgrade points");
+                ScreenMessages.PostScreenMessage($"{upgradesToAdd} KCT Upgrade Point{(upgradesToAdd > 1 ? "s" : string.Empty)} Added!", 8.0f, ScreenMessageStyle.UPPER_LEFT);
+            }
+        }
+
+        public static void EnsureCurrentSaveHasSciTotalsInitialized()
+        {
+            if (KCT_GameStates.SciPointsTotal == -1f)
+            {
+                KCTDebug.Log("Trying to determine total science points for current save...");
+
+                float totalSci = 0f;
+                foreach (KCT_TechItem t in KCT_GameStates.TechList)
+                {
+                    KCTDebug.Log($"Found tech in KCT list: {t.protoNode.techID} | {t.protoNode.state} | {t.protoNode.scienceCost}");
+                    if (t.protoNode.state == RDTech.State.Available) continue;
+
+                    totalSci += t.protoNode.scienceCost;
+                }
+
+                // Looks like the KSP API does allow publicly accessing all the science nodes outside the R&D scene
+                var ptnField = typeof(ResearchAndDevelopment).GetField("protoTechNodes", BindingFlags.Instance | BindingFlags.NonPublic);
+                var protoTechNodes = (Dictionary<string, ProtoTechNode>)ptnField.GetValue(ResearchAndDevelopment.Instance);
+
+                foreach (var ptn in protoTechNodes.Values)
+                {
+                    KCTDebug.Log($"Found tech {ptn.techID} | {ptn.state} | {ptn.scienceCost}");
+                    if (ptn.techID == "unlockParts") continue;    // This node in RP-1 is unlocked automatically but has a high science cost
+                    if (ptn.state != RDTech.State.Available) continue;
+
+                    totalSci += ptn.scienceCost;
+                }
+
+                totalSci += ResearchAndDevelopment.Instance.Science;
+
+                KCTDebug.Log("Calculated total: " + totalSci);
+                KCT_GameStates.SciPointsTotal = totalSci;
+            }
         }
 
         public static KCT_BuildListVessel AddVesselToBuildList()

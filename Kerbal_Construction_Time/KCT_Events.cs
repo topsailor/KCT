@@ -44,6 +44,8 @@ namespace KerbalConstructionTime
             GameEvents.OnKSCStructureRepaired.Add(FaciliyRepaired);
             GameEvents.OnKSCStructureCollapsed.Add(FacilityDestroyed);
 
+            GameEvents.Modifiers.OnCurrencyModified.Add(OnCurrenciesModified);
+
             GameEvents.StageManager.OnGUIStageAdded.Add(StageCountChangedEvent);
             GameEvents.StageManager.OnGUIStageRemoved.Add(StageCountChangedEvent);
             GameEvents.StageManager.OnGUIStageSequenceModified.Add(StagingOrderChangedEvent);
@@ -224,6 +226,15 @@ namespace KerbalConstructionTime
                 //KCT_GameStates.ActiveKSC.LaunchPads[KCT_GameStates.ActiveKSC.ActiveLaunchPadID].destroyed = !KCT_Utilities.LaunchFacilityIntact(KCT_BuildListVessel.ListType.VAB);
                 KCT_GameStates.ActiveKSC.ActiveLPInstance.RefreshDestructionNode();
             }
+        }
+
+        private void OnCurrenciesModified(CurrencyModifierQuery query)
+        {
+            float changeDelta = query.GetTotal(Currency.Science);
+            if (changeDelta == 0f) return;
+
+            KCTDebug.Log("Detected sci point change: " + changeDelta);
+            KCT_Utilities.ProcessSciPointTotalChange(changeDelta);
         }
 
         public void RecoveryRequested (Vessel v)

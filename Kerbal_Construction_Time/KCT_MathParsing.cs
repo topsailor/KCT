@@ -16,6 +16,7 @@ namespace KerbalConstructionTime
                 case "Node": return MathParsing.ParseMath("KCT_NODE", KCT_PresetManager.Instance.ActivePreset.formulaSettings.NodeFormula, variables);
                 case "UpgradeFunds": return MathParsing.ParseMath("KCT_UPGRADE_FUNDS", KCT_PresetManager.Instance.ActivePreset.formulaSettings.UpgradeFundsFormula, variables);
                 case "UpgradeScience": return MathParsing.ParseMath("KCT_UPGRADE_SCIENCE", KCT_PresetManager.Instance.ActivePreset.formulaSettings.UpgradeScienceFormula, variables);
+                case "UpgradesForScience": return MathParsing.ParseMath("KCT_UPGRADES_FOR_SCIENCE", KCT_PresetManager.Instance.ActivePreset.formulaSettings.UpgradesForScience, variables);
                 case "Research": return MathParsing.ParseMath("KCT_RESEARCH", KCT_PresetManager.Instance.ActivePreset.formulaSettings.ResearchFormula, variables);
                 case "EffectivePart": return MathParsing.ParseMath("KCT_EFFECTIVE_PART", KCT_PresetManager.Instance.ActivePreset.formulaSettings.EffectivePartFormula, variables);
                 case "ProceduralPart": return MathParsing.ParseMath("KCT_PROCEDURAL_PART", KCT_PresetManager.Instance.ActivePreset.formulaSettings.ProceduralPartFormula, variables);

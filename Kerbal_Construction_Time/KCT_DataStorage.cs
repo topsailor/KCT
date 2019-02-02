@@ -84,7 +84,7 @@ namespace KerbalConstructionTime
         [Persistent] List<String> PartTracker = new List<String>();
         [Persistent] List<String> PartInventory = new List<String>();
         [Persistent] string activeKSC = "";
-        [Persistent] float SalesFigures = 0;
+        [Persistent] float SalesFigures = 0, SciPoints = -1f;
         [Persistent] int UpgradesResetCounter = 0, TechUpgrades = 0, SavedUpgradePointsPreAPI = 0;
 
 
@@ -101,6 +101,7 @@ namespace KerbalConstructionTime
             //KCT_GameStates.InventorySaleUpgrades = (float)KCT_MathParsing.GetStandardFormulaValue("InventorySales", new Dictionary<string, string> { { "V", "0" }, { "P", SalesFigures.ToString() } });
             KCT_GameStates.UpgradesResetCounter = UpgradesResetCounter;
             KCT_GameStates.TechUpgradesTotal = TechUpgrades;
+            KCT_GameStates.SciPointsTotal = SciPoints;
             KCT_GameStates.PermanentModAddedUpgradesButReallyWaitForTheAPI = SavedUpgradePointsPreAPI;
 
             SetSettings();
@@ -117,6 +118,7 @@ namespace KerbalConstructionTime
             RDUpgrades = KCT_GameStates.RDUpgrades;*/
             TechUpgrades = KCT_GameStates.TechUpgradesTotal;
             PurchasedUpgrades = KCT_GameStates.PurchasedUpgrades;
+            SciPoints = KCT_GameStates.SciPointsTotal;
             //firstStart = KCT_GameStates.firstStart;
             activeKSC = KCT_GameStates.ActiveKSC.KSCName;
             SalesFigures = KCT_GameStates.InventorySalesFigures;
