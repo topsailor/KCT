@@ -82,12 +82,70 @@ namespace KerbalConstructionTime
             return default(T);
         }
 
+        protected static Dictionary<string, Dictionary<int, string>> techGatings = null;
+
+        protected static void CheckLoadDict()
+        {
+            if (techGatings != null)
+                return;
+
+            techGatings = new Dictionary<string, Dictionary<int, string>>();
+            ConfigNode node = null;
+            foreach (ConfigNode n in GameDatabase.Instance.GetConfigNodes("KCTBUILDINGTECHS"))
+                node = n;
+
+            if (node == null)
+                return;
+
+            foreach (ConfigNode n in node.nodes)
+            {
+                string fac = "SpaceCenter/" + n.name;
+                Dictionary<int, string> lst = new Dictionary<int, string>();
+
+                foreach (ConfigNode.Value v in n.values)
+                    lst.Add(int.Parse(v.name), v.value);
+
+                techGatings.Add(fac, lst);
+            }
+        }
+
+        protected string GetTechGate(string facId, int level)
+        {
+            CheckLoadDict();
+            if (techGatings == null)
+                return string.Empty;
+
+            if (techGatings.TryGetValue(facId, out var d))
+                if (d.TryGetValue(level, out string node))
+                    return node;
+
+            return string.Empty;
+        }
+
         internal void processUpgrade()
         {
             int oldLevel = getMember<int>("level");
             KCTDebug.Log($"Upgrading from level {oldLevel}");
 
             string facilityID = GetFacilityID();
+
+            string gate = GetTechGate(facilityID, oldLevel + 1);
+            Debug.Log("[KCTT] Gate for " + facilityID + "? " + gate);
+            if (!string.IsNullOrEmpty(gate))
+            {
+                if (ResearchAndDevelopment.GetTechnologyState(gate) != RDTech.State.Available)
+                {
+                    PopupDialog.SpawnPopupDialog(new MultiOptionDialog("kctUpgradePadConfirm",
+                            "Can't upgrade this facility. Requires " + KerbalConstructionTimeData.techNameToTitle[gate] + ".",
+                            "Lack Tech to Upgrade",
+                            HighLogic.UISkin,
+                            new DialogGUIButton("Ok", stub)),
+                            false,
+                            HighLogic.UISkin);
+
+                    return;
+                }
+            }
 
             KCT_UpgradingBuilding upgrading = new KCT_UpgradingBuilding(facilityID, oldLevel + 1, oldLevel, facilityID.Split('/').Last());
 

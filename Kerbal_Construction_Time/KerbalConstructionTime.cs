@@ -37,6 +37,30 @@ namespace KerbalConstructionTime
     [KSPScenario(ScenarioCreationOptions.AddToAllGames, new GameScenes[] { GameScenes.EDITOR, GameScenes.FLIGHT, GameScenes.SPACECENTER, GameScenes.TRACKSTATION})]
     public class KerbalConstructionTimeData : ScenarioModule
     {
+        public static Dictionary<string, string> techNameToTitle = new Dictionary<string, string>();
+
+        protected void LoadTree()
+        {
+            if (HighLogic.CurrentGame.Mode == Game.Modes.SCIENCE_SANDBOX || HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
+            {
+                string fullPath = KSPUtil.ApplicationRootPath + HighLogic.CurrentGame.Parameters.Career.TechTreeUrl;
+
+                ConfigNode fileNode = ConfigNode.Load(fullPath);
+                if (fileNode.HasNode("TechTree"))
+                {
+                    techNameToTitle.Clear();
+
+                    ConfigNode treeNode = fileNode.GetNode("TechTree");
+                    ConfigNode[] ns = treeNode.GetNodes("RDNode");
+                    foreach (ConfigNode n in ns)
+                    {
+                        if (n.HasValue("id") && n.HasValue("title"))
+                            techNameToTitle[n.GetValue("id")] = n.GetValue("title");
+                    }
+                }
+            }
+        }
+
         public override void OnSave(ConfigNode node)
         {
             /* 1.4 Addition
@@ -73,6 +97,7 @@ namespace KerbalConstructionTime
         {
             
             base.OnLoad(node);
+            LoadTree();
             /* 1.4 Addition
             if (KCT_Utilities.CurrentGameIsMission())
             {
