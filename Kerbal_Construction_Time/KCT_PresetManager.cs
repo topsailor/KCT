@@ -85,7 +85,7 @@ namespace KerbalConstructionTime
             }
             else
             {
-                KCT_Preset defaultSettings = FindPresetByShortName("default");
+                KCT_Preset defaultSettings = FindPresetByShortName("RP1") ?? FindPresetByShortName("RP0") ?? FindPresetByShortName("default");
                 if (defaultSettings != null)
                     ActivePreset = defaultSettings;
                 else
