@@ -1871,14 +1871,18 @@ namespace KerbalConstructionTime
         {
             KCT_LaunchPad lp = KCT_GameStates.ActiveKSC.ActiveLPInstance;
             var list = lp.GetUpgradeableFacilityReferences();
-            var padUpgdLvls = list[0].UpgradeLevels;
+            var upgdFacility = list[0];
+            var padUpgdLvls = upgdFacility.UpgradeLevels;
 
             padLvlOptions = new string[padUpgdLvls.Length];
             padCosts = new double[padUpgdLvls.Length];
 
             for (int i = 0; i < padUpgdLvls.Length; i++)
             {
-                padLvlOptions[i] = "Level " + (i + 1);
+                float limit = GameVariables.Instance.GetCraftMassLimit((float)i / (float)upgdFacility.MaxLevel, true);
+                var sLimit = limit == float.MaxValue ? "unlimited" : $"max {limit} tons";
+                padLvlOptions[i] = $"Level {i + 1} ({sLimit})";
+
                 if (i > 0)
                 {
                     var lvl = padUpgdLvls[i];
