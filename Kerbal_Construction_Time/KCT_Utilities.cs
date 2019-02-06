@@ -1581,6 +1581,17 @@ namespace KerbalConstructionTime
                 */
             }
         }
+
+        public static bool IsVabRecoveryAvailable()
+        {
+            string reqTech = KCT_PresetManager.Instance.ActivePreset.generalSettings.VABRecoveryTech;
+            return HighLogic.LoadedSceneIsFlight && FlightGlobals.ActiveVessel != null &&
+                   FlightGlobals.ActiveVessel.IsRecoverable &&
+                   FlightGlobals.ActiveVessel.IsClearToSave() == ClearToSaveStatus.CLEAR && 
+                   (FlightGlobals.ActiveVessel.situation == Vessel.Situations.PRELAUNCH ||
+                    string.IsNullOrEmpty(reqTech) ||
+                    ResearchAndDevelopment.GetTechnologyState(reqTech) == RDTech.State.Available);
+        }
     }
 }
 /*

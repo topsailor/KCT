@@ -399,7 +399,7 @@ namespace KerbalConstructionTime
                     buildList = KCT_GameStates.ActiveKSC.VABWarehouse;
                     GUILayout.Label("__________________________________________________");
                     GUILayout.Label("VAB Storage");
-                    if (HighLogic.LoadedSceneIsFlight && FlightGlobals.ActiveVessel != null && FlightGlobals.ActiveVessel.IsRecoverable && FlightGlobals.ActiveVessel.IsClearToSave() == ClearToSaveStatus.CLEAR && GUILayout.Button("Recover Active Vessel"))
+                    if (KCT_Utilities.IsVabRecoveryAvailable() && GUILayout.Button("Recover Active Vessel"))
                     {
                         if (!KCT_Utilities.RecoverActiveVesselToStorage(KCT_BuildListVessel.ListType.VAB))
                         {
