@@ -691,7 +691,7 @@ namespace KerbalConstructionTime
             // Earned point totals shouldn't decrease. This would only make sense when done through the cheat menu.
             if (changeDelta <= 0f) return;
 
-            EnsureCurrentSaveHasSciTotalsInitialized();
+            EnsureCurrentSaveHasSciTotalsInitialized(changeDelta);
 
             float pointsBef = KCT_GameStates.SciPointsTotal;
             KCT_GameStates.SciPointsTotal += changeDelta;
@@ -710,7 +710,7 @@ namespace KerbalConstructionTime
             }
         }
 
-        public static void EnsureCurrentSaveHasSciTotalsInitialized()
+        public static void EnsureCurrentSaveHasSciTotalsInitialized(float changeDelta)
         {
             if (KCT_GameStates.SciPointsTotal == -1f)
             {
@@ -725,12 +725,16 @@ namespace KerbalConstructionTime
                     totalSci += t.protoNode.scienceCost;
                 }
 
-                // Looks like the KSP API does allow publicly accessing all the science nodes outside the R&D scene
-                var ptnField = typeof(ResearchAndDevelopment).GetField("protoTechNodes", BindingFlags.Instance | BindingFlags.NonPublic);
-                var protoTechNodes = (Dictionary<string, ProtoTechNode>)ptnField.GetValue(ResearchAndDevelopment.Instance);
-
-                foreach (var ptn in protoTechNodes.Values)
+                var techIDs = KerbalConstructionTimeData.techNameToTitle.Keys;
+                foreach (var techId in techIDs)
                 {
+                    var ptn = ResearchAndDevelopment.Instance.GetTechState(techId);
+                    if (ptn == null)
+                    {
+                        KCTDebug.Log($"Failed to find tech with id {techId}");
+                        continue;
+                    }
+
                     KCTDebug.Log($"Found tech {ptn.techID} | {ptn.state} | {ptn.scienceCost}");
                     if (ptn.techID == "unlockParts") continue;    // This node in RP-1 is unlocked automatically but has a high science cost
                     if (ptn.state != RDTech.State.Available) continue;
@@ -738,7 +742,7 @@ namespace KerbalConstructionTime
                     totalSci += ptn.scienceCost;
                 }
 
-                totalSci += ResearchAndDevelopment.Instance.Science;
+                totalSci += ResearchAndDevelopment.Instance.Science - changeDelta;
 
                 KCTDebug.Log("Calculated total: " + totalSci);
                 KCT_GameStates.SciPointsTotal = totalSci;
