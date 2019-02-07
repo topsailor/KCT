@@ -44,6 +44,7 @@ namespace KerbalConstructionTime
             if (HighLogic.CurrentGame.Mode == Game.Modes.SCIENCE_SANDBOX || HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
             {
                 string fullPath = KSPUtil.ApplicationRootPath + HighLogic.CurrentGame.Parameters.Career.TechTreeUrl;
+                KCTDebug.Log($"Loading tech tree from {fullPath}");
 
                 ConfigNode fileNode = ConfigNode.Load(fullPath);
                 if (fileNode.HasNode("TechTree"))
@@ -110,6 +111,7 @@ namespace KerbalConstructionTime
             //KCT_Utilities.SetActiveKSC("Stock");
             KCT_GameStates.TechList.Clear();
             KCT_GameStates.TechUpgradesTotal = 0;
+            KCT_GameStates.SciPointsTotal = -1;
 
             KCT_DataStorage kctVS = new KCT_DataStorage();
             ConfigNode CN = node.GetNode(kctVS.GetType().Name);
