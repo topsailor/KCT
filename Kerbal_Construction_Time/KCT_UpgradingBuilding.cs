@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace KerbalConstructionTime
 {
@@ -17,6 +14,12 @@ namespace KerbalConstructionTime
         public bool UpgradeProcessed = false, isLaunchpad = false;
         //public bool allowUpgrade = false;
         private KCT_KSC _KSC = null;
+
+        public KCT_UpgradingBuilding()
+        {
+
+        }
+
         public KCT_UpgradingBuilding(string facilityID, int newLevel, int oldLevel, string name)
         {
             id = facilityID;
@@ -25,11 +28,6 @@ namespace KerbalConstructionTime
             commonName = name;
 
             KCTDebug.Log(string.Format("Upgrade of {0} requested from {1} to {2}", name, oldLevel, newLevel));
-        }
-
-        public KCT_UpgradingBuilding()
-        {
-
         }
 
         public void Downgrade()
@@ -85,9 +83,7 @@ namespace KerbalConstructionTime
 
         public void SetBP(double cost)
         {
-            // BP = Math.Sqrt(cost) * 2000 * KCT_GameStates.timeSettings.OverallMultiplier;
-            BP = KCT_MathParsing.GetStandardFormulaValue("KSCUpgrade", new Dictionary<string, string>() { { "C", cost.ToString() }, { "O", KCT_PresetManager.Instance.ActivePreset.timeSettings.OverallMultiplier.ToString() } });
-            if (BP <= 0) { BP = 1; }
+            BP = CalculateBP(cost);
         }
 
         public bool AlreadyInProgress()
@@ -114,38 +110,57 @@ namespace KerbalConstructionTime
         {
             return commonName;
         }
+
         public double GetBuildRate()
         {
             double rateTotal = 0;
             if (KSC != null)
             {
-                foreach (double rate in KCT_Utilities.BuildRatesSPH(KSC))
-                    rateTotal += rate;
-                foreach (double rate in KCT_Utilities.BuildRatesVAB(KSC))
-                    rateTotal += rate;
+                rateTotal = KCT_Utilities.GetBothBuildRateSum(KSC);
             }
             return rateTotal;
         }
+
         public double GetTimeLeft()
         {
             return (BP - progress) / ((IKCTBuildItem)this).GetBuildRate();
         }
+
         public bool IsComplete()
         {
             return progress >= BP;
         }
+
         public KCT_BuildListVessel.ListType GetListType()
         {
             return KCT_BuildListVessel.ListType.KSC;
         }
+
         public IKCTBuildItem AsIKCTBuildItem()
         {
             return this;
         }
+
         public void AddProgress(double amt)
         {
             progress += amt;
             if (progress > BP) progress = BP;
+        }
+
+        public static double CalculateBP(double cost)
+        {
+            double bp = KCT_MathParsing.GetStandardFormulaValue("KSCUpgrade", new Dictionary<string, string>() { { "C", cost.ToString() }, { "O", KCT_PresetManager.Instance.ActivePreset.timeSettings.OverallMultiplier.ToString() } });
+            if (bp <= 0) { bp = 1; }
+
+            return bp;
+        }
+
+        public static double CalculateBuildTime(double cost, KCT_KSC KSC = null)
+        {
+            double bp = CalculateBP(cost);
+            double rateTotal = KCT_Utilities.GetBothBuildRateSum(KSC ?? KCT_GameStates.ActiveKSC);
+
+            return bp / rateTotal;
         }
     }
 }

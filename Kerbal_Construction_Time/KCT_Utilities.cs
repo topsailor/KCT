@@ -273,6 +273,38 @@ namespace KerbalConstructionTime
             return KSC.SPHRates;
         }
 
+        public static double GetVABBuildRateSum(KCT_KSC KSC)
+        {
+            double rateTotal = 0;
+            List<double> rates = BuildRatesVAB(KSC);
+            for (int i = 0; i < rates.Count; i++)
+            {
+                double rate = rates[i];
+                rateTotal += rate;
+            }
+            return rateTotal;
+        }
+
+        public static double GetSPHBuildRateSum(KCT_KSC KSC)
+        {
+            double rateTotal = 0;
+            List<double> rates = BuildRatesSPH(KSC);
+            for (int i = 0; i < rates.Count; i++)
+            {
+                double rate = rates[i];
+                rateTotal += rate;
+            }
+            return rateTotal;
+        }
+
+        public static double GetBothBuildRateSum(KCT_KSC KSC)
+        {
+            double rateTotal = rateTotal = GetSPHBuildRateSum(KSC);
+            rateTotal += GetVABBuildRateSum(KSC);
+
+            return rateTotal;
+        }
+
         public static void ProgressBuildTime()
         {
             double UT = 0;

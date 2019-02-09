@@ -221,16 +221,15 @@ namespace KerbalConstructionTime
 
         double IKCTBuildItem.GetBuildRate()
         {
-            List<double> rates = new List<double>();
-            if (associatedBLV != null && associatedBLV.type == KCT_BuildListVessel.ListType.SPH)
-                rates = KCT_Utilities.BuildRatesSPH(KSC);
-            else
-                rates = KCT_Utilities.BuildRatesVAB(KSC);
             double buildRate = 0;
-            foreach (double rate in rates)
-                buildRate += rate;
+            if (associatedBLV != null && associatedBLV.type == KCT_BuildListVessel.ListType.SPH)
+                buildRate = KCT_Utilities.GetSPHBuildRateSum(KSC);
+            else
+                buildRate = KCT_Utilities.GetVABBuildRateSum(KSC);
+
             if (RRType == RolloutReconType.Rollback)
                 buildRate *= -1;
+
             return buildRate;
         }
 
