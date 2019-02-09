@@ -1792,7 +1792,11 @@ namespace KerbalConstructionTime
             selectedPadIdx = GUILayout.SelectionGrid(selectedPadIdx, padLvlOptions, 1);
 
             double curPadCost = padCosts[selectedPadIdx];
-            GUILayout.Label($"It will cost {Math.Round(curPadCost, 2):N} funds to build the new launchpad. Would you like to build it?");
+            double curPadBuildTime = KCT_UpgradingBuilding.CalculateBuildTime(curPadCost);
+            string sBuildTime = KSPUtil.PrintDateDelta(curPadBuildTime, true);
+
+            GUILayout.Label($"It will cost {Math.Round(curPadCost, 2):N} funds to build the new launchpad. " +
+                            $"Estimated construction time is {sBuildTime}. Would you like to build it?");
 
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Yes"))
