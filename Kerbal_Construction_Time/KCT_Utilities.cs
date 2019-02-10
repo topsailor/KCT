@@ -723,9 +723,15 @@ namespace KerbalConstructionTime
             // Earned point totals shouldn't decrease. This would only make sense when done through the cheat menu.
             if (changeDelta <= 0f) return;
 
+            bool addSavePts = KCT_GameStates.SciPointsTotal == -1f;
             EnsureCurrentSaveHasSciTotalsInitialized(changeDelta);
 
-            float pointsBef = KCT_GameStates.SciPointsTotal;
+            float pointsBef;
+            if (addSavePts)
+                pointsBef = 0f;
+            else
+                pointsBef = KCT_GameStates.SciPointsTotal;
+
             KCT_GameStates.SciPointsTotal += changeDelta;
             KCTDebug.Log("Total sci points earned is now: " + KCT_GameStates.SciPointsTotal);
 
@@ -736,7 +742,8 @@ namespace KerbalConstructionTime
             int upgradesToAdd = (int)upgradesAft - (int)upgradesBef;
             if (upgradesToAdd > 0)
             {
-                KCT_GameStates.PurchasedUpgrades[1] += upgradesToAdd;
+                // now done in TotalUpgradePoints
+                //KCT_GameStates.PurchasedUpgrades[1] += upgradesToAdd;
                 KCTDebug.Log($"Added {upgradesToAdd} upgrade points");
                 ScreenMessages.PostScreenMessage($"{upgradesToAdd} KCT Upgrade Point{(upgradesToAdd > 1 ? "s" : string.Empty)} Added!", 8.0f, ScreenMessageStyle.UPPER_LEFT);
             }
@@ -1462,6 +1469,7 @@ namespace KerbalConstructionTime
                 //In progress tech nodes
                 total += KCT_GameStates.TechList.Count;
             }
+            total += (int)KCT_MathParsing.GetStandardFormulaValue("UpgradesForScience", new Dictionary<string, string>() { { "N", KCT_GameStates.SciPointsTotal.ToString() } });
             //Purchased funds
             total += KCT_GameStates.PurchasedUpgrades[0];
             //Purchased science
