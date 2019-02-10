@@ -1067,7 +1067,16 @@ namespace KerbalConstructionTime
                 KCTDebug.Log("Cancelling tech: " + node.techName);
                 if (KCT_Utilities.CurrentGameHasScience())
                 {
-                    ResearchAndDevelopment.Instance.AddScience(node.scienceCost, TransactionReasons.None); //Should maybe do tech research as the reason
+                    bool valBef = KCT_GameStates.isRefunding;
+                    KCT_GameStates.isRefunding = true;
+                    try
+                    {
+                        ResearchAndDevelopment.Instance.AddScience(node.scienceCost, TransactionReasons.None); //Should maybe do tech research as the reason
+                    }
+                    finally
+                    {
+                        KCT_GameStates.isRefunding = valBef;
+                    }
                 }
                 node.DisableTech();
                 KCT_GameStates.TechList.RemoveAt(index);

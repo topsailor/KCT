@@ -44,14 +44,14 @@ namespace KerbalConstructionTime
         public static double KACAlarmUT = 0;
 
         public static KCT_OnLoadError erroredDuringOnLoad = new KCT_OnLoadError();
-
-
+        
         public static int TemporaryModAddedUpgradesButReallyWaitForTheAPI = 0; //Reset when returned to the MainMenu
         public static int PermanentModAddedUpgradesButReallyWaitForTheAPI = 0; //Saved to the save file
 
         public static bool vesselErrorAlerted = false;
-
         public static bool PersistenceLoaded = false;
+        public static bool isRefunding = false;
+
         public static void reset()
         {
             firstStart = false;

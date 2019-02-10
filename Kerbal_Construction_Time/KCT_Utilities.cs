@@ -721,7 +721,7 @@ namespace KerbalConstructionTime
         public static void ProcessSciPointTotalChange(float changeDelta)
         {
             // Earned point totals shouldn't decrease. This would only make sense when done through the cheat menu.
-            if (changeDelta <= 0f) return;
+            if (changeDelta <= 0f || KCT_GameStates.isRefunding) return;
 
             bool addSavePts = KCT_GameStates.SciPointsTotal == -1f;
             EnsureCurrentSaveHasSciTotalsInitialized(changeDelta);
