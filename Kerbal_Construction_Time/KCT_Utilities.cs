@@ -463,10 +463,11 @@ namespace KerbalConstructionTime
                 return dryCost;
         }
 
-        public static float GetPartMassFromNode(ConfigNode part, bool includeFuel = true)
+        public static float GetPartMassFromNode(ConfigNode part, bool includeFuel = true, bool includeClamps = true)
         {
             AvailablePart aPart = GetAvailablePartByName(PartNameFromNode(part));
-            if (aPart == null)
+
+            if (aPart == null || (!includeClamps && aPart.partPrefab != null && aPart.partPrefab.Modules.Contains<LaunchClamp>()))
                 return 0;
             //total = ShipConstruction.GetPartTotalMass(part, aPart, out dry, out wet);
             float dryCost, fuelCost;
@@ -476,6 +477,34 @@ namespace KerbalConstructionTime
                 return dryMass+fuelMass;
             else
                 return dryMass;
+        }
+
+        public static float GetShipMass(this ShipConstruct sc, bool excludeClamps, out float dryMass, out float fuelMass)
+        {
+            dryMass = 0f;
+            fuelMass = 0f;
+            int partCount = sc.parts.Count;
+            while (partCount-- > 0)
+            {
+                Part part = sc.parts[partCount];
+                AvailablePart partInfo = part.partInfo;
+
+                if (excludeClamps && part.partInfo.partPrefab.Modules.Contains<LaunchClamp>())
+                    continue;
+
+                float partDryMass = partInfo.partPrefab.mass + part.GetModuleMass(partInfo.partPrefab.mass, ModifierStagingSituation.CURRENT);
+                float partFuelMass = 0.0f;
+                int resCount = part.Resources.Count;
+                while (resCount-- > 0)
+                {
+                    PartResource resource = part.Resources[resCount];
+                    PartResourceDefinition info = resource.info;
+                    partFuelMass += info.density * (float)resource.amount;
+                }
+                dryMass += partDryMass;
+                fuelMass += partFuelMass;
+            }
+            return dryMass + fuelMass;
         }
 
         public static string GetTweakScaleSize(ProtoPartSnapshot part)

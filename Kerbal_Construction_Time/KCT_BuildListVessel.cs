@@ -105,7 +105,7 @@ namespace KerbalConstructionTime
             //Get total ship cost
             float fuel;
             cost = s.GetShipCosts(out emptyCost, out fuel);
-            TotalMass = s.GetShipMass(out emptyMass, out fuel);
+            TotalMass = s.GetShipMass(true, out emptyMass, out fuel);
 
             HashSet<int> stages = new HashSet<int>();
             numStageParts = 0;
@@ -188,9 +188,11 @@ namespace KerbalConstructionTime
             HashSet<int> stages = new HashSet<int>();
             foreach (ProtoPartSnapshot p in vessel.protoVessel.protoPartSnapshots)
             {
-                string name = p.partInfo.name;
-
                 stages.Add(p.inverseStageIndex);
+
+                if (p.partPrefab != null && p.partPrefab.Modules.Contains<LaunchClamp>())
+                    continue;
+
                 TotalMass += p.mass;
                 emptyMass += p.mass;
                 foreach (ProtoPartResourceSnapshot rsc in p.resources)
@@ -517,10 +519,11 @@ namespace KerbalConstructionTime
             {
                 KCT_LaunchPad selectedPad = highestFacility ? KCT_GameStates.ActiveKSC.GetHighestLevelLaunchPad() : KCT_GameStates.ActiveKSC.ActiveLPInstance;
                 float launchpadNormalizedLevel = 1.0f * selectedPad.level / KCT_GameStates.BuildingMaxLevelCache["LaunchPad"];
-                
-                if (this.GetTotalMass() > GameVariables.Instance.GetCraftMassLimit(launchpadNormalizedLevel, true))
+
+                double totalMass = GetTotalMass();
+                if (totalMass > GameVariables.Instance.GetCraftMassLimit(launchpadNormalizedLevel, true))
                 {
-                    failedReasons.Add("Mass limit exceeded");
+                    failedReasons.Add($"Mass limit exceeded, currently at {totalMass:N} tons");
                 }
                 if (this.ExtractedPartNodes.Count > GameVariables.Instance.GetPartCountLimit(ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.VehicleAssemblyBuilding), true))
                 {
@@ -534,9 +537,10 @@ namespace KerbalConstructionTime
             }
             else if (this.type == KCT_BuildListVessel.ListType.SPH)
             {
-                if (this.GetTotalMass() > GameVariables.Instance.GetCraftMassLimit(ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.Runway), false))
+                double totalMass = GetTotalMass();
+                if (totalMass > GameVariables.Instance.GetCraftMassLimit(ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.Runway), false))
                 {
-                    failedReasons.Add("Mass limit exceeded");
+                    failedReasons.Add($"Mass limit exceeded, currently at {totalMass:N} tons");
                 }
                 if (this.ExtractedPartNodes.Count > GameVariables.Instance.GetPartCountLimit(ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.SpaceplaneHangar), false))
                 {
@@ -587,8 +591,8 @@ namespace KerbalConstructionTime
             emptyMass = 0;
             foreach (ConfigNode p in this.ExtractedPartNodes)
             {
-                TotalMass += KCT_Utilities.GetPartMassFromNode(p, true);
-                emptyMass += KCT_Utilities.GetPartMassFromNode(p, false);
+                TotalMass += KCT_Utilities.GetPartMassFromNode(p, includeFuel: true, includeClamps: false);
+                emptyMass += KCT_Utilities.GetPartMassFromNode(p, includeFuel: false, includeClamps: false);
             }
             if (TotalMass < 0)
                 TotalMass = 0;
