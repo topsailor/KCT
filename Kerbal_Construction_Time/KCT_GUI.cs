@@ -1399,6 +1399,15 @@ namespace KerbalConstructionTime
             GUILayout.Label(KCT_Utilities.SpentUpgradesFor(SpaceCenterFacility.ResearchAndDevelopment).ToString());
             GUILayout.EndHorizontal();
 
+            if (!string.IsNullOrEmpty(KCT_PresetManager.Instance.ActivePreset.formulaSettings.UpgradesForScience) &&
+                KCT_GameStates.SciPointsTotal >= 0)
+            {
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Total science:", GUILayout.Width(90));
+                GUILayout.Label(((int)KCT_GameStates.SciPointsTotal).ToString());
+                GUILayout.EndHorizontal();
+            }
+
             if (KCT_Utilities.CurrentGameHasScience())
             {
                 //int cost = (int)Math.Min(Math.Pow(2, KCT_GameStates.PurchasedUpgrades[0]+2), 512);
