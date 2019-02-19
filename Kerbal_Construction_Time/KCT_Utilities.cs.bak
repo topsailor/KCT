@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using KSP.UI;
 using KSP.UI.Screens;
 using UnityEngine;
 
@@ -152,21 +151,9 @@ namespace KerbalConstructionTime
                 int used = ScrapYardWrapper.GetUseCount(p);
                 //C=cost, c=dry cost, M=wet mass, m=dry mass, U=part tracker, O=overall multiplier, I=inventory effect (0 if not in inv), B=build effect
 
-
-                effectiveCost = KCT_MathParsing.GetStandardFormulaValue("EffectivePart", 
-                    new Dictionary<string, string>() { 
-                        {"C", cost.ToString()}, 
-                        {"c", dryCost.ToString()}, 
-                        {"M",wetMass.ToString()},
-                        {"m", dryMass.ToString()}, 
-                        {"U", builds.ToString()}, 
-                        {"u", used.ToString()}, 
-                        {"O", KCT_PresetManager.Instance.ActivePreset.timeSettings.OverallMultiplier.ToString()}, 
-                        {"I", InvEff.ToString()}, {"B", KCT_PresetManager.Instance.ActivePreset.timeSettings.BuildEffect.ToString()}, 
-                        {"PV", PartMultiplier.ToString()}, 
-                        {"RV", PartMultiplier.ToString()}, 
-                        {"MV", ModuleMultiplier.ToString()}});
-
+                effectiveCost = KCT_MathParsing.GetStandardFormulaValue("EffectivePart", new Dictionary<string, string>() { {"C", cost.ToString()}, {"c", dryCost.ToString()}, {"M",wetMass.ToString()},
+                {"m", dryMass.ToString()}, {"U", builds.ToString()}, {"u", used.ToString()}, {"O", KCT_PresetManager.Instance.ActivePreset.timeSettings.OverallMultiplier.ToString()}, {"I", InvEff.ToString()}, {"B", KCT_PresetManager.Instance.ActivePreset.timeSettings.BuildEffect.ToString()}, 
+                {"PV", PartMultiplier.ToString()}, {"RV", PartMultiplier.ToString()}, {"MV", ModuleMultiplier.ToString()}});
 
                 if (InvEff != 0)
                 {
@@ -636,13 +623,12 @@ namespace KerbalConstructionTime
         {
             return HighLogic.CurrentGame.Mode == Game.Modes.CAREER;
         }
-#if KSP1_4
-        // 1.4 Addition
+        /* 1.4 Addition
         public static bool CurrentGameIsMission()
         {
             return HighLogic.CurrentGame.Mode == Game.Modes.MISSION || HighLogic.CurrentGame.Mode == Game.Modes.MISSION_BUILDER;
         }
-#endif
+        */
 
         public static void AddScienceWithMessage(float science, TransactionReasons reason)
         {
@@ -1079,15 +1065,14 @@ namespace KerbalConstructionTime
             return spentPoints;
         }
 
-#if KSP1_4
-        // 1.4 Addition
+        /* 1.4 Addition
         public static List<string> GetLaunchSites(bool isVAB)
         {
             EditorDriver.editorFacility = isVAB ? EditorFacility.VAB : EditorFacility.SPH;
             typeof(EditorDriver).GetMethod("setupValidLaunchSites", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)?.Invoke(null, null);
             return EditorDriver.ValidLaunchSites;
         }
-#endif
+        */
 
         private static bool? _KSCSwitcherInstalled = null;
         public static bool KSCSwitcherInstalled
@@ -1630,12 +1615,11 @@ namespace KerbalConstructionTime
             {
                 KCTDebug.Log("Attempting to take control of launch button");
 
-                // EditorLogic.fetch.launchBtn.onClick = new UnityEngine.UI.Button.ButtonClickedEvent(); //delete all other listeners (sorry :( )
-                EditorLogic.fetch.launchBtn.onClick.RemoveAllListeners();
+                EditorLogic.fetch.launchBtn.onClick = new UnityEngine.UI.Button.ButtonClickedEvent(); //delete all other listeners (sorry :( )
+
                 EditorLogic.fetch.launchBtn.onClick.AddListener(() => { KerbalConstructionTime.ShowLaunchAlert(null); });
 
-#if KSP1_4
-                // 1.4 Addition
+                /* 1.4 Addition
                 //delete listeners to the launchsite specific buttons
                 UILaunchsiteController controller = UnityEngine.Object.FindObjectOfType<UILaunchsiteController>();
 
@@ -1650,26 +1634,24 @@ namespace KerbalConstructionTime
                         UnityEngine.UI.Button button = site.GetType().GetPublicValue<UnityEngine.UI.Button>("buttonLaunch", site);
                         if (button != null)
                         {
-                            //button.onClick = new UnityEngine.UI.Button.ButtonClickedEvent();
-                            button.onClick.RemoveAllListeners();
+                            button.onClick = new UnityEngine.UI.Button.ButtonClickedEvent();
                             string siteName = site.GetType().GetPublicValue<string>("siteName", site);
                             button.onClick.AddListener(() => { KerbalConstructionTime.ShowLaunchAlert(siteName); });
                         }
                     }
                 }
-#endif
+                */
             }
             else
             {
                 InputLockManager.SetControlLock(ControlTypes.EDITOR_LAUNCH, "KCTLaunchLock");
-#if KSP1_4
-                // 1.4 Addition
+                /* 1.4 Addition
                 UILaunchsiteController controller = UnityEngine.Object.FindObjectOfType<UILaunchsiteController>();
                 if (controller != null)
                 {
                     controller.locked = true;
                 }
-#endif
+                */
             }
         }
 
