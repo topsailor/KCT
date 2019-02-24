@@ -19,9 +19,12 @@ Changes by LinuxGuruGamer
 			KerbalConstructionTime.instance.UpdateTechlistIconColor();
 		to each method in the IList which changes the list.
 
-	Renamed .version to KerbalConstructionTime.version
-	Copied KerbalConstructionTime.version to root directory
-	renamed KerbalConstructionTime.csproj to KerbalConstructionTime-KSP1-4.csproj
-	Put original KerbalConstructionTime.csproj back in place
-	Created stock copy of .version file
-	Copied the assemblyversion.tt to AssemblyVersion-Stock.tt
+	More changes, related to release
+
+	6.  Renamed .version to KerbalConstructionTime.version
+	7.  Copied KerbalConstructionTime.version to root directory
+	8.  Renamed KerbalConstructionTime.csproj to KerbalConstructionTime-KSP1-4.csproj
+	9.  Put original KerbalConstructionTime.csproj back in place
+	10. Created stock copy of .version file
+	11. Copied the assemblyversion.tt to AssemblyVersion-Stock.tt
+	12. Modified AssemblyVersion-Stock.tt to use the Stock.version file
