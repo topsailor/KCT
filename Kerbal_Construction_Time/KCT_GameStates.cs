@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,7 +22,31 @@ namespace KerbalConstructionTime
         public static bool UpdateLaunchpadDestructionState = false;
         public static int TechUpgradesTotal = 0;
         public static float SciPointsTotal = -1f;
-        public static List<KCT_TechItem> TechList = new List<KCT_TechItem>();
+
+        public class KCT_TechItemIlist<T> : IList<T>
+        {
+            List<T> internalList = new List<T>();
+
+            public T this[int index] { get => internalList[index];
+                set  { internalList[index] = value; KerbalConstructionTime.instance.UpdateTechlistIconColor(); } }
+
+            public int Count => internalList.Count;
+            public bool IsReadOnly => false;
+            public void Add(T item) { this.internalList.Add(item); KerbalConstructionTime.instance.UpdateTechlistIconColor(); }
+            public void Clear() { internalList.Clear(); KerbalConstructionTime.instance.UpdateTechlistIconColor(); }
+            public bool Contains(T item) { return internalList.Contains(item); }
+            public void CopyTo(T[] array, int arrayIndex) { internalList.CopyTo(array, arrayIndex); }
+            public IEnumerator<T> GetEnumerator() { return internalList.GetEnumerator(); }
+            public int IndexOf(T item) { return internalList.IndexOf(item); }
+            public void Insert(int index, T item) { internalList.Insert(index,item); KerbalConstructionTime.instance.UpdateTechlistIconColor(); }
+            public bool Remove(T item)  { bool rc = internalList.Remove(item); KerbalConstructionTime.instance.UpdateTechlistIconColor(); return rc;}
+            public void RemoveAt(int index) { internalList.RemoveAt(index); KerbalConstructionTime.instance.UpdateTechlistIconColor(); }
+            IEnumerator IEnumerable.GetEnumerator() { return internalList.GetEnumerator(); }
+        }
+
+        public static KCT_TechItemIlist<KCT_TechItem> TechList = new KCT_TechItemIlist<KCT_TechItem>();
+
+        //public static List<KCT_TechItem> TechList = new List<KCT_TechItem>();
 
         public static List<int> PurchasedUpgrades = new List<int>() { 0, 0 };
         public static int MiscellaneousTempUpgrades = 0, LastKnownTechCount = 0;

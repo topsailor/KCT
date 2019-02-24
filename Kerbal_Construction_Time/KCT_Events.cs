@@ -334,7 +334,7 @@ namespace KerbalConstructionTime
         {
             if (HighLogic.CurrentGame.Parameters.Difficulty.BypassEntryPurchaseAfterResearch)
                 return;
-            KCT_TechItem tech = KCT_GameStates.TechList.Find(t => t.techID == part.TechRequired);
+            KCT_TechItem tech = KCT_GameStates.TechList.OfType<KCT_TechItem>().FirstOrDefault(t => t.techID == part.TechRequired);
             if (tech!= null && tech.isInList())
             {
                 ScreenMessages.PostScreenMessage("[KCT] You must wait until the node is fully researched to purchase parts!", 4.0f, ScreenMessageStyle.UPPER_LEFT);

@@ -1,0 +1,27 @@
+1.4.5
+Changes by LinuxGuruGamer
+
+	1.	Replaced all commented out 1.4 code with #if KSP1_4/#endif blocks
+	2.	Changed the /* 1.4 Addition   to   // 1.4 Addition
+	3.	Added coroutine:  HandleEditorButton_Coroutine() to reset the button 
+		handlers every 1/2 second
+	4.	Added StartCoroutine to end of Start() in KerbalConstructionTime.cs
+
+	The following were done to optimize the code a bit, to remove unnecessary code from a FixedUpdate
+	(I saw a FIXME comment and decided to do so)
+
+	5.	Created new function 
+			KerbalConstructionTime.UpdateTechlistIconColor() 
+		which contains the code which was in the FixedUpdate()
+	6.	Commented out the code in FixedUpdate() which was replaced by new method
+	5.	Changed the TechList from a list to an IList, and in all methods which change the list, 
+		added a call to 
+			KerbalConstructionTime.instance.UpdateTechlistIconColor();
+		to each method in the IList which changes the list.
+
+	Renamed .version to KerbalConstructionTime.version
+	Copied KerbalConstructionTime.version to root directory
+	renamed KerbalConstructionTime.csproj to KerbalConstructionTime-KSP1-4.csproj
+	Put original KerbalConstructionTime.csproj back in place
+	Created stock copy of .version file
+	Copied the assemblyversion.tt to AssemblyVersion-Stock.tt
