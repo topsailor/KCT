@@ -24,6 +24,7 @@ namespace KerbalConstructionTime
 
         public void SubscribeToEvents()
         {
+            Debug.Log("SubscribeToEvents 1");
             GameEvents.onGUILaunchScreenSpawn.Add(launchScreenOpenEvent);
             GameEvents.onVesselRecovered.Add(vesselRecoverEvent);
 
@@ -43,6 +44,7 @@ namespace KerbalConstructionTime
 
             GameEvents.OnKSCStructureRepaired.Add(FaciliyRepaired);
             GameEvents.OnKSCStructureCollapsed.Add(FacilityDestroyed);
+            Debug.Log("SubscribeToEvents 9");
 
             GameEvents.Modifiers.OnCurrencyModified.Add(OnCurrenciesModified);
 
@@ -51,9 +53,14 @@ namespace KerbalConstructionTime
             GameEvents.StageManager.OnGUIStageSequenceModified.Add(StagingOrderChangedEvent);
             GameEvents.StageManager.OnPartUpdateStageability.Add(PartStageabilityChangedEvent);
 
+            Debug.Log("SubscribeToEvents 15");
+
             GameEvents.FindEvent<EventVoid>("OnSYInventoryAppliedToVessel")?.Add(SYInventoryApplied);
+            Debug.Log("SubscribeToEvents 16");
             GameEvents.FindEvent<EventVoid>("OnSYReady")?.Add(SYReady);
+            Debug.Log("SubscribeToEvents 17");
             GameEvents.FindEvent<EventData<Part>>("OnSYInventoryAppliedToPart")?.Add((p) => { KerbalConstructionTime.instance.editorRecalcuationRequired = true; });
+            Debug.Log("SubscribeToEvents 18");
             //     GameEvents.OnKSCStructureRepairing.Add(FacilityRepairingEvent);
             //  GameEvents.onLevelWasLoaded.Add(LevelLoadedEvent);
 
