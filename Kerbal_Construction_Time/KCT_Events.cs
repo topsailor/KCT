@@ -78,16 +78,15 @@ namespace KerbalConstructionTime
               });*/
 
             GameEvents.onGUIAdministrationFacilitySpawn.Add(HideAllGUIs);
-            Debug.Log("SubscribeToEvents 18");
             GameEvents.onGUIAstronautComplexSpawn.Add(HideAllGUIs);
-            Debug.Log("SubscribeToEvents 19");
             GameEvents.onGUIMissionControlSpawn.Add(HideAllGUIs);
-            Debug.Log("SubscribeToEvents 20");
             GameEvents.onGUIRnDComplexSpawn.Add(HideAllGUIs);
-            Debug.Log("SubscribeToEvents 21");
             GameEvents.onGUIKSPediaSpawn.Add(HideAllGUIs);
             Debug.Log("SubscribeToEvents 22");
-            GameEvents.onEditorStarted.Add(() => { KCT_Utilities.HandleEditorButton(); });
+            if (GameEvents.onEditorStarted != null)
+                GameEvents.onEditorStarted.Add(() => { KCT_Utilities.HandleEditorButton(); });
+            else
+                Debug.Log("onEditorStarted is null");
             Debug.Log("SubscribeToEvents 23");
 
             GameEvents.onFacilityContextMenuSpawn.Add(FacilityContextMenuSpawn);
