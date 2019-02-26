@@ -44,7 +44,6 @@ namespace KerbalConstructionTime
 
             GameEvents.OnKSCStructureRepaired.Add(FaciliyRepaired);
             GameEvents.OnKSCStructureCollapsed.Add(FacilityDestroyed);
-            Debug.Log("SubscribeToEvents 9");
 
             GameEvents.Modifiers.OnCurrencyModified.Add(OnCurrenciesModified);
 
@@ -52,13 +51,10 @@ namespace KerbalConstructionTime
             GameEvents.StageManager.OnGUIStageRemoved.Add(StageCountChangedEvent);
             GameEvents.StageManager.OnGUIStageSequenceModified.Add(StagingOrderChangedEvent);
             GameEvents.StageManager.OnPartUpdateStageability.Add(PartStageabilityChangedEvent);
-
-            Debug.Log("SubscribeToEvents 15");
+            
 
             GameEvents.FindEvent<EventVoid>("OnSYInventoryAppliedToVessel")?.Add(SYInventoryApplied);
-            Debug.Log("SubscribeToEvents 16");
             GameEvents.FindEvent<EventVoid>("OnSYReady")?.Add(SYReady);
-            Debug.Log("SubscribeToEvents 17");
             GameEvents.FindEvent<EventData<Part>>("OnSYInventoryAppliedToPart")?.Add((p) => { KerbalConstructionTime.instance.editorRecalcuationRequired = true; });
             Debug.Log("SubscribeToEvents 18");
             //     GameEvents.OnKSCStructureRepairing.Add(FacilityRepairingEvent);
@@ -82,14 +78,20 @@ namespace KerbalConstructionTime
               });*/
 
             GameEvents.onGUIAdministrationFacilitySpawn.Add(HideAllGUIs);
+            Debug.Log("SubscribeToEvents 18");
             GameEvents.onGUIAstronautComplexSpawn.Add(HideAllGUIs);
+            Debug.Log("SubscribeToEvents 19");
             GameEvents.onGUIMissionControlSpawn.Add(HideAllGUIs);
+            Debug.Log("SubscribeToEvents 20");
             GameEvents.onGUIRnDComplexSpawn.Add(HideAllGUIs);
+            Debug.Log("SubscribeToEvents 21");
             GameEvents.onGUIKSPediaSpawn.Add(HideAllGUIs);
+            Debug.Log("SubscribeToEvents 22");
             GameEvents.onEditorStarted.Add(() => { KCT_Utilities.HandleEditorButton(); });
+            Debug.Log("SubscribeToEvents 23");
 
             GameEvents.onFacilityContextMenuSpawn.Add(FacilityContextMenuSpawn);
-            
+            Debug.Log("SubscribeToEvents 24");
             subscribedToEvents = true;
         }
 
