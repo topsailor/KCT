@@ -1638,23 +1638,42 @@ namespace KerbalConstructionTime
                 // 1.4 Addition
                 //delete listeners to the launchsite specific buttons
                 UILaunchsiteController controller = UnityEngine.Object.FindObjectOfType<UILaunchsiteController>();
-
-                //IEnumerable list = controller.GetType().GetField("launchPadItems", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.FlattenHierarchy)?.GetValue(controller) as IEnumerable;
-                IEnumerable list = controller.GetType().GetPrivateMemberValue("launchPadItems", controller, 4) as IEnumerable;
-                if (list != null)
+                if (controller == null)
+                    KCTDebug.Log("HandleEditorButton.controller is null");
+                else
                 {
-                    foreach (object site in list)
+                    //IEnumerable list = controller.GetType().GetField("launchPadItems", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.FlattenHierarchy)?.GetValue(controller) as IEnumerable;
+
+                    //
+                    // Need to use the try/catch because if multiple launch sites are disabled, then this would generate
+                    // the following error:
+                    //                          Cannot cast from source type to destination type
+                    // which happens because the private member "launchPadItems" is a list, and if it is null, then it is
+                    // not castable to a IEnumerable
+                    //
+                    try
                     {
-                        //find and disable the button
-                        //why isn't EditorLaunchPadItem public despite all of its members being public?
-                        UnityEngine.UI.Button button = site.GetType().GetPublicValue<UnityEngine.UI.Button>("buttonLaunch", site);
-                        if (button != null)
+                        IEnumerable list = controller.GetType().GetPrivateMemberValue("launchPadItems", controller, 4) as IEnumerable;
+
+                        if (list != null)
                         {
-                            //button.onClick = new UnityEngine.UI.Button.ButtonClickedEvent();
-                            button.onClick.RemoveAllListeners();
-                            string siteName = site.GetType().GetPublicValue<string>("siteName", site);
-                            button.onClick.AddListener(() => { KerbalConstructionTime.ShowLaunchAlert(siteName); });
+                            foreach (object site in list)
+                            {
+                                //find and disable the button
+                                //why isn't EditorLaunchPadItem public despite all of its members being public?
+                                UnityEngine.UI.Button button = site.GetType().GetPublicValue<UnityEngine.UI.Button>("buttonLaunch", site);
+                                if (button != null)
+                                {
+                                    //button.onClick = new UnityEngine.UI.Button.ButtonClickedEvent();
+                                    button.onClick.RemoveAllListeners();
+                                    string siteName = site.GetType().GetPublicValue<string>("siteName", site);
+                                    button.onClick.AddListener(() => { KerbalConstructionTime.ShowLaunchAlert(siteName); });
+                                }
+                            }
                         }
+                    } catch (Exception ex)
+                    {
+                        KCTDebug.Log("HandleEditorButton: Exception: " + ex.Message);
                     }
                 }
 #endif

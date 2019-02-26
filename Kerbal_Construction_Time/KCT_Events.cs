@@ -24,7 +24,6 @@ namespace KerbalConstructionTime
 
         public void SubscribeToEvents()
         {
-            Debug.Log("SubscribeToEvents 1");
             GameEvents.onGUILaunchScreenSpawn.Add(launchScreenOpenEvent);
             GameEvents.onVesselRecovered.Add(vesselRecoverEvent);
 
@@ -56,7 +55,7 @@ namespace KerbalConstructionTime
             GameEvents.FindEvent<EventVoid>("OnSYInventoryAppliedToVessel")?.Add(SYInventoryApplied);
             GameEvents.FindEvent<EventVoid>("OnSYReady")?.Add(SYReady);
             GameEvents.FindEvent<EventData<Part>>("OnSYInventoryAppliedToPart")?.Add((p) => { KerbalConstructionTime.instance.editorRecalcuationRequired = true; });
-            Debug.Log("SubscribeToEvents 18");
+ 
             //     GameEvents.OnKSCStructureRepairing.Add(FacilityRepairingEvent);
             //  GameEvents.onLevelWasLoaded.Add(LevelLoadedEvent);
 
@@ -82,12 +81,12 @@ namespace KerbalConstructionTime
             GameEvents.onGUIMissionControlSpawn.Add(HideAllGUIs);
             GameEvents.onGUIRnDComplexSpawn.Add(HideAllGUIs);
             GameEvents.onGUIKSPediaSpawn.Add(HideAllGUIs);
-            Debug.Log("SubscribeToEvents 22");
+        
             GameEvents.onEditorStarted.Add(OnEditorStarted);
-            Debug.Log("SubscribeToEvents 23");
+            
 
             GameEvents.onFacilityContextMenuSpawn.Add(FacilityContextMenuSpawn);
-            Debug.Log("SubscribeToEvents 24");
+          
             subscribedToEvents = true;
         }
 
@@ -95,6 +94,7 @@ namespace KerbalConstructionTime
         {
             KCT_Utilities.HandleEditorButton();
         }
+
         public void CreateEvents()
         {
             onTechQueued = new EventData<RDTech>("OnKctTechQueued");

@@ -1,3 +1,8 @@
+1.4.5.2
+	Fixed Exception upon entry into the editor, caused when multiple launch sites are NOT enabled
+	Fixed embedded version number
+	Disabled the KCT_UpdateChecker class
+
 1.4.5.1
 	Rebuild to remove extra dll
 1.4.5
