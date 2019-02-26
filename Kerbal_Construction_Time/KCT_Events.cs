@@ -83,10 +83,7 @@ namespace KerbalConstructionTime
             GameEvents.onGUIRnDComplexSpawn.Add(HideAllGUIs);
             GameEvents.onGUIKSPediaSpawn.Add(HideAllGUIs);
             Debug.Log("SubscribeToEvents 22");
-            if (GameEvents.onEditorStarted != null)
-                GameEvents.onEditorStarted.Add(() => { KCT_Utilities.HandleEditorButton(); });
-            else
-                Debug.Log("onEditorStarted is null");
+            GameEvents.onEditorStarted.Add(OnEditorStarted);
             Debug.Log("SubscribeToEvents 23");
 
             GameEvents.onFacilityContextMenuSpawn.Add(FacilityContextMenuSpawn);
@@ -94,6 +91,10 @@ namespace KerbalConstructionTime
             subscribedToEvents = true;
         }
 
+        void OnEditorStarted()
+        {
+            KCT_Utilities.HandleEditorButton();
+        }
         public void CreateEvents()
         {
             onTechQueued = new EventData<RDTech>("OnKctTechQueued");
