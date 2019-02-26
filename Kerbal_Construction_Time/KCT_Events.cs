@@ -77,7 +77,7 @@ namespace KerbalConstructionTime
             Debug.Log("SubscribeToEvents m");
             GameEvents.FindEvent<EventVoid>("OnSYReady")?.Add(SYReady);
             Debug.Log("SubscribeToEvents n");
-            GameEvents.FindEvent<EventData<Part>>("OnSYInventoryAppliedToPart")?.Add((p) => { KerbalConstructionTime.instance.editorRecalcuationRequired = true; });
+            GameEvents.FindEvent<EventData<Part>>("OnSYInventoryAppliedToPart")?.Add(OnSYInventoryAppliedToPart);
             Debug.Log("SubscribeToEvents o");
 
             //     GameEvents.OnKSCStructureRepairing.Add(FacilityRepairingEvent);
@@ -120,6 +120,10 @@ namespace KerbalConstructionTime
             subscribedToEvents = true;
         }
 
+        void OnSYInventoryAppliedToPart(Part p)
+        {
+            KerbalConstructionTime.instance.editorRecalcuationRequired = true;
+        }
         void OnEditorStarted()
         {
             KCT_Utilities.HandleEditorButton();
