@@ -610,6 +610,7 @@ namespace KerbalConstructionTime
             }
         }
 
+        bool iconUpdated = false;
         public void LateUpdate()
         {
 #if KSP1_4
@@ -641,6 +642,14 @@ namespace KerbalConstructionTime
                     }
                 }
             }
+#else
+            if (KSP.UI.Screens.RDController.Instance != null && !iconUpdated)
+            {
+                UpdateTechlistIconColor();
+                iconUpdated = true;
+            }
+            else
+                iconUpdated = false;
 #endif
         }
 
@@ -648,6 +657,7 @@ namespace KerbalConstructionTime
         {
             if (KSP.UI.Screens.RDController.Instance != null)
             {
+                Debug.Log("UpdateTechlistIconColor");
                 for (int i = KSP.UI.Screens.RDController.Instance.nodes.Count; i-- > 0;)
                 {
                     KSP.UI.Screens.RDNode node = KSP.UI.Screens.RDController.Instance.nodes[i];

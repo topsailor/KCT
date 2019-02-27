@@ -1,3 +1,6 @@
+1.4.5.4
+	Fixed: In the R&D scene all nodes that are being researched are shown in green instead of orange.
+
 1.4.5.3
 	Fixed exception when Scrapyard was installed, caused numerous other issues
 
