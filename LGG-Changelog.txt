@@ -1,3 +1,6 @@
+1.4.5.3
+	Fixed exception when Scrapyard was installed, caused numerous other issues
+
 1.4.5.2
 	Fixed Exception upon entry into the editor, caused when multiple launch sites are NOT enabled
 	Fixed embedded version number
