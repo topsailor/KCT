@@ -104,6 +104,7 @@ namespace KerbalConstructionTime
 
         public static double GetBuildTime(List<ConfigNode> parts)
         {
+
             //get list of parts that are in the inventory
             IList<ConfigNode> inventorySample = ScrapYardWrapper.GetPartsInInventory(parts, ScrapYardWrapper.ComparisonStrength.STRICT) ?? new List<ConfigNode>();
 
@@ -212,6 +213,17 @@ namespace KerbalConstructionTime
 
         public static ConfigNode[] GetModulesFromPartNode(ConfigNode partNode)
         {
+            var n = partNode.GetNodes("MODULE").ToList();
+            for (int i = n.Count - 1; i >= 0; i--)
+            {
+                ConfigNode cn = n[i];
+
+                string s = null;
+                var b = cn.TryGetValue("name", ref s);
+                if (b == false || s == null || s == "")
+                    n.Remove(cn);
+            }
+            return n.ToArray();
             return partNode.GetNodes("MODULE");
         }
 
@@ -1548,6 +1560,8 @@ namespace KerbalConstructionTime
                 //check for symmetry parts and remove those references if they can't be found
                 RemoveMissingSymmetry(KCT_GameStates.recoveredVessel.shipNode);
 
+                // debug, save to a file
+                KCT_GameStates.recoveredVessel.shipNode.Save("KCTVesselSave");
                 //test if we can actually convert it
                 bool success = test.LoadShip(KCT_GameStates.recoveredVessel.shipNode);
                 if (success)
@@ -1559,18 +1573,30 @@ namespace KerbalConstructionTime
                     return false;
                 }
 
+                //
+                // This is the way KSP does it
+                //
+                GameEvents.OnVesselRecoveryRequested.Fire(FlightGlobals.ActiveVessel);
+                return true;
+
+                // Recovering the vessel in a coroutine was generating an exception insideKSP if a mod had added
+                // modules to the vessel or it's parts at runtime.
+#if false
                 KerbalConstructionTime.instance.StartCoroutine(RecoverVessel(FlightGlobals.ActiveVessel));
                 return true;
+#endif
             }
-            catch
+            catch (Exception ex)
             {
                 Debug.LogError("[KCT] Error while recovering craft into inventory.");
+                Debug.LogError("[KCT] error: " + ex.Message);
                 KCT_GameStates.recoveredVessel = null;
                 ShipConstruction.ClearBackups();
                 return false;
             }
         }
 
+#if false
         /// <summary>
         /// Recover the vessel, after the end of the frame. Start it in a coroutine
         /// </summary>
@@ -1581,6 +1607,7 @@ namespace KerbalConstructionTime
             yield return new WaitForEndOfFrame();
             GameEvents.OnVesselRecoveryRequested.Fire(toRecover);
         }
+#endif
 
         public static void RemoveMissingSymmetry(ConfigNode ship)
         {

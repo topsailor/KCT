@@ -1,3 +1,14 @@
+
+1.4.5.5
+	Restored missing presets:
+		7 Days - A strict 7 Kerbin day limit between launches. No other time restrictions or use of upgrades.
+		Default - The Default KCT Settings
+		Upgrade Free - Relies entirely on the Stock building upgrades rather than the KCT upgrade system
+		Rodhern Low-tech - Faster low-tech career values
+
+	Fixed inability of mod to recover vessels when other mods have added partmodules to the vessel or it's parts,
+		tested with ScienceAlert, EVAParachutes&EjectionSeat
+
 1.4.5.4
 	Fixed: In the R&D scene all nodes that are being researched are shown in green instead of orange.
 
@@ -11,9 +22,8 @@
 
 1.4.5.1
 	Rebuild to remove extra dll
-1.4.5
-Changes by LinuxGuruGamer
 
+1.4.5
 	1.	Replaced all commented out 1.4 code with #if KSP1_4/#endif blocks
 	2.	Changed the /* 1.4 Addition   to   // 1.4 Addition
 	3.	Added coroutine:  HandleEditorButton_Coroutine() to reset the button 
