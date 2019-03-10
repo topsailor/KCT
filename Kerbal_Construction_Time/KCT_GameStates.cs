@@ -8,7 +8,7 @@ namespace KerbalConstructionTime
 {
     public static class KCT_GameStates
     {
-        public static double UT, lastUT=0.0;
+        public static double UT, lastUT = 0.0;
         public static bool canWarp = false, warpInitiated = false;
         public static int lastWarpRate = 0;
         public static string lastSOIVessel = "";
@@ -23,28 +23,28 @@ namespace KerbalConstructionTime
         public static int TechUpgradesTotal = 0;
         public static float SciPointsTotal = -1f;
 
-        public class KCT_TechItemIlist<T> : IList<T>
+        public class KCT_TechItemIlist<T> : List<T>
         {
-            List<T> internalList = new List<T>();
+            // public event Action<int> Changed = delegate { };
+            public event Action Updated = delegate { };
 
-            public T this[int index] { get => internalList[index];
-                set  { internalList[index] = value; KerbalConstructionTime.instance.UpdateTechlistIconColor(); } }
+            public new void Add(T item) { base.Add(item); Updated(); }
+            public new void Remove(T item) { base.Remove(item); Updated(); }
+            public new void AddRange(IEnumerable<T> collection) { base.AddRange(collection); Updated(); }
+            public new void RemoveRange(int index, int count) { base.RemoveRange(index, count); Updated(); }
+            public new void Clear() { base.Clear(); Updated(); }
+            public new void Insert(int index, T item) { base.Insert(index, item); Updated(); }
+            public new void InsertRange(int index, IEnumerable<T> collection) { base.InsertRange(index, collection); Updated(); }
+            public new void RemoveAll(Predicate<T> match) { base.RemoveAll(match); Updated(); }
 
-            public int Count => internalList.Count;
-            public bool IsReadOnly => false;
-            public void Add(T item) { this.internalList.Add(item); KerbalConstructionTime.instance.UpdateTechlistIconColor(); }
-            public void Clear() { internalList.Clear(); KerbalConstructionTime.instance.UpdateTechlistIconColor(); }
-            public bool Contains(T item) { return internalList.Contains(item); }
-            public void CopyTo(T[] array, int arrayIndex) { internalList.CopyTo(array, arrayIndex); }
-            public IEnumerator<T> GetEnumerator() { return internalList.GetEnumerator(); }
-            public int IndexOf(T item) { return internalList.IndexOf(item); }
-            public void Insert(int index, T item) { internalList.Insert(index,item); KerbalConstructionTime.instance.UpdateTechlistIconColor(); }
-            public bool Remove(T item)  { bool rc = internalList.Remove(item); KerbalConstructionTime.instance.UpdateTechlistIconColor(); return rc;}
-            public void RemoveAt(int index) { internalList.RemoveAt(index); KerbalConstructionTime.instance.UpdateTechlistIconColor(); }
-            IEnumerator IEnumerable.GetEnumerator() { return internalList.GetEnumerator(); }
+            public new T this[int index]
+            {
+                get { return base[index]; }
+                set { base[index] = value; Updated(); } // Changed(index); }
+            }
         }
 
-        public static KCT_TechItemIlist<KCT_TechItem> TechList = new KCT_TechItemIlist<KCT_TechItem>();
+        public static KCT_TechItemIlist<KCT_TechItem> TechList;
 
         //public static List<KCT_TechItem> TechList = new List<KCT_TechItem>();
 
@@ -69,7 +69,7 @@ namespace KerbalConstructionTime
         public static double KACAlarmUT = 0;
 
         public static KCT_OnLoadError erroredDuringOnLoad = new KCT_OnLoadError();
-        
+
         public static int TemporaryModAddedUpgradesButReallyWaitForTheAPI = 0; //Reset when returned to the MainMenu
         public static int PermanentModAddedUpgradesButReallyWaitForTheAPI = 0; //Saved to the save file
 
@@ -95,8 +95,18 @@ namespace KerbalConstructionTime
             BuildingMaxLevelCache.Clear();
 
             lastUT = 0;
+
+            InitAndClearTechList();        
         }
 
+        public static void InitAndClearTechList()
+        {
+            if (TechList != null)
+                TechList.Clear();
+            else
+                TechList = new KCT_TechItemIlist<KCT_TechItem>();
+            TechList.Updated += KerbalConstructionTime.instance.UpdateTechlistIconColor;
+        }
     }
 
     public class CrewedPart

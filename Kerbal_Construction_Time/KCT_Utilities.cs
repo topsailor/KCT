@@ -1573,18 +1573,15 @@ namespace KerbalConstructionTime
                     return false;
                 }
 
+                // Recovering the vessel in a coroutine was generating an exception insideKSP if a mod had added
+                // modules to the vessel or it's parts at runtime.
                 //
                 // This is the way KSP does it
                 //
                 GameEvents.OnVesselRecoveryRequested.Fire(FlightGlobals.ActiveVessel);
                 return true;
 
-                // Recovering the vessel in a coroutine was generating an exception insideKSP if a mod had added
-                // modules to the vessel or it's parts at runtime.
-#if false
-                KerbalConstructionTime.instance.StartCoroutine(RecoverVessel(FlightGlobals.ActiveVessel));
-                return true;
-#endif
+                
             }
             catch (Exception ex)
             {
@@ -1595,19 +1592,6 @@ namespace KerbalConstructionTime
                 return false;
             }
         }
-
-#if false
-        /// <summary>
-        /// Recover the vessel, after the end of the frame. Start it in a coroutine
-        /// </summary>
-        /// <param name="toRecover"></param>
-        /// <returns></returns>
-        public static IEnumerator RecoverVessel(Vessel toRecover)
-        {
-            yield return new WaitForEndOfFrame();
-            GameEvents.OnVesselRecoveryRequested.Fire(toRecover);
-        }
-#endif
 
         public static void RemoveMissingSymmetry(ConfigNode ship)
         {
@@ -1669,8 +1653,6 @@ namespace KerbalConstructionTime
                     KCTDebug.Log("HandleEditorButton.controller is null");
                 else
                 {
-                    //IEnumerable list = controller.GetType().GetField("launchPadItems", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.FlattenHierarchy)?.GetValue(controller) as IEnumerable;
-
                     //
                     // Need to use the try/catch because if multiple launch sites are disabled, then this would generate
                     // the following error:

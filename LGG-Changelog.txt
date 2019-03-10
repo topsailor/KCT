@@ -1,3 +1,9 @@
+1.4.5.6
+	Added #if/#endif around the AssemblyVersion lines
+	Replaced KCT_TechItemIlist Ilist with an ObservableList, thanks @MikeOnTea for the suggestion
+	Moved initialization of the TechList into a method, which is called when the list needs to be initted or cleared
+	Changed hard-coded #if false in KST_UpdateChecker with an #if !KSP1_4
+	Removed old code per RO requests
 
 1.4.5.5
 	Restored missing presets:

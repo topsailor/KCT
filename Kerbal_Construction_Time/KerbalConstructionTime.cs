@@ -111,7 +111,7 @@ namespace KerbalConstructionTime
             KCT_GameStates.KSCs.Clear();
             KCT_GameStates.ActiveKSC = null;
             //KCT_Utilities.SetActiveKSC("Stock");
-            KCT_GameStates.TechList.Clear();
+            KCT_GameStates.InitAndClearTechList(); 
             KCT_GameStates.TechUpgradesTotal = 0;
             KCT_GameStates.SciPointsTotal = -1;
 
@@ -621,28 +621,6 @@ namespace KerbalConstructionTime
             }
 #endif
 
-#if false
-            // Fixed by replacing the list with an iList, and then calling  the new function:  UpdateTechlistIconColor()
-            // whenever an item is added, removed or changed;
-
-            // FIXME really should run this only once, and then again on techlist change.
-            // For now, spam per frame
-            if (KSP.UI.Screens.RDController.Instance != null)
-            {
-                for (int i = KSP.UI.Screens.RDController.Instance.nodes.Count; i-- > 0;)
-                {
-                    KSP.UI.Screens.RDNode node = KSP.UI.Screens.RDController.Instance.nodes[i];
-                    if (node?.tech != null)
-                    {
-                        if (HasTechInList(node.tech.techID))
-                        {
-                            node.graphics?.SetIconColor(XKCDColors.KSPNotSoGoodOrange);
-                        }
-                        // else reset? Bleh, why bother.
-                    }
-                }
-            }
-#else
             if (KSP.UI.Screens.RDController.Instance != null && !iconUpdated)
             {
                 UpdateTechlistIconColor();
@@ -650,7 +628,6 @@ namespace KerbalConstructionTime
             }
             else
                 iconUpdated = false;
-#endif
         }
 
         public void UpdateTechlistIconColor()
