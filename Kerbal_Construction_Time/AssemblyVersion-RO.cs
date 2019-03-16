@@ -6,5 +6,5 @@
  #if KSP1_4
  using System.Reflection;
 
- [assembly: AssemblyVersion("1.4.0.0")]
+ [assembly: AssemblyFileVersion("1.4.0.0")]
  #endif
