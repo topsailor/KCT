@@ -1,3 +1,11 @@
+1.4.5.7 (unreleased)
+	Added AssemblyVersion-RO.tt for the RO build
+	Modified AssemblyVersion-RO.tt to write AssemblyFileVersion instead of AssemblyVersion
+	Commented out the AssemblyFileVersion in VersionInfo.cs
+	Renamed KerbalConstructionTime.version to KerbalConstructionTime-RO.version
+	Added Pre-build steps to run the TextTemplate
+	Added a new directory called SpecialSurprise to hold code not being used for now
+
 1.4.5.6
 	Added #if/#endif around the AssemblyVersion lines
 	Replaced KCT_TechItemIlist Ilist with an ObservableList, thanks @MikeOnTea for the suggestion
