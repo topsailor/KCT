@@ -64,12 +64,13 @@ namespace KerbalConstructionTime
 
         public override void OnSave(ConfigNode node)
         {
-            /* 1.4 Addition
+#if KSP1_4
+            // 1.4 Addition
             if (KCT_Utilities.CurrentGameIsMission())
             {
                 return;
             }
-            */
+#endif
             // Boolean error = false;
             KCTDebug.Log("Writing to persistence.");
             base.OnSave(node);
@@ -99,17 +100,18 @@ namespace KerbalConstructionTime
             
             base.OnLoad(node);
             LoadTree();
-            /* 1.4 Addition
+#if KSP1_4
+            // 1.4 Addition
             if (KCT_Utilities.CurrentGameIsMission())
             {
                 return;
             }
-            */
+#endif
             KCTDebug.Log("Reading from persistence.");
             KCT_GameStates.KSCs.Clear();
             KCT_GameStates.ActiveKSC = null;
             //KCT_Utilities.SetActiveKSC("Stock");
-            KCT_GameStates.TechList.Clear();
+            KCT_GameStates.InitAndClearTechList(); 
             KCT_GameStates.TechUpgradesTotal = 0;
             KCT_GameStates.SciPointsTotal = -1;
 
@@ -182,23 +184,25 @@ namespace KerbalConstructionTime
 
         private void OnGUI()
         {
-            /* 1.4 Addition
+#if KSP1_4
+            // 1.4 Addition
             if (KCT_Utilities.CurrentGameIsMission())
             {
                 return;
             }
-            */
+#endif
             KCT_GUI.SetGUIPositions();
         }
 
         public void Awake()
         {
-            /* 1.4 Addition
+#if KSP1_4
+            // 1.4 Addition
             if (KCT_Utilities.CurrentGameIsMission())
             {
                 return;
             }
-            */
+#endif
             KCTDebug.Log("Awake called");
             KCT_GameStates.erroredDuringOnLoad.OnLoadStart();
             KCT_GameStates.PersistenceLoaded = false;
@@ -247,12 +251,13 @@ namespace KerbalConstructionTime
 
         public void Start()
         {
-            /* 1.4 Addition
+#if KSP1_4
+            // 1.4 Addition
             if (KCT_Utilities.CurrentGameIsMission())
             {
                 return;
             }
-            */
+#endif
 
             KCTDebug.Log("Start called");
 
@@ -408,6 +413,10 @@ namespace KerbalConstructionTime
             ratesUpdated = false;
             KCTDebug.Log("Start finished");
             DelayedStart();
+#if KSP1_4
+            UpdateTechlistIconColor();
+            StartCoroutine(HandleEditorButton_Coroutine());
+#endif
         }
 
         private void EditorRecalculation()
@@ -420,16 +429,34 @@ namespace KerbalConstructionTime
         }
 
 
+#if KSP1_4
+        /// <summary>
+        /// Coroutine to reset the launch button handlers every 1/2 second
+        /// Needed because KSP seems to change them behind the scene sometimes
+        /// </summary>
+        /// <returns></returns>
+        IEnumerator HandleEditorButton_Coroutine()
+        {
+            while (true)
+            {
+                if (HighLogic.LoadedSceneIsEditor)
+                    KCT_Utilities.HandleEditorButton();
+                yield return new WaitForSeconds(0.5f);
+            }
+        }
+#endif
+
         private static int lvlCheckTimer = 0;
         private static bool ratesUpdated = false;
         public void FixedUpdate()
         {
-            /* 1.4 Addition
+#if KSP1_4
+            // 1.4 Addition
             if (KCT_Utilities.CurrentGameIsMission())
             {
                 return;
             }
-            */
+#endif
 
             double lastUT = KCT_GameStates.UT > 0 ? KCT_GameStates.UT : Planetarium.GetUniversalTime();
             KCT_GameStates.UT = Planetarium.GetUniversalTime();
@@ -583,18 +610,31 @@ namespace KerbalConstructionTime
             }
         }
 
+        bool iconUpdated = false;
         public void LateUpdate()
         {
-            /* 1.4 Addition
+#if KSP1_4
+            // 1.4 Addition
             if (KCT_Utilities.CurrentGameIsMission())
             {
                 return;
             }
-            */
-            // FIXME really should run this only once, and then again on techlist change.
-            // For now, spam per frame
+#endif
+
+            if (KSP.UI.Screens.RDController.Instance != null && !iconUpdated)
+            {
+                UpdateTechlistIconColor();
+                iconUpdated = true;
+            }
+            else
+                iconUpdated = false;
+        }
+
+        public void UpdateTechlistIconColor()
+        {
             if (KSP.UI.Screens.RDController.Instance != null)
             {
+                Debug.Log("UpdateTechlistIconColor");
                 for (int i = KSP.UI.Screens.RDController.Instance.nodes.Count; i-- > 0;)
                 {
                     KSP.UI.Screens.RDNode node = KSP.UI.Screens.RDController.Instance.nodes[i];
@@ -621,12 +661,13 @@ namespace KerbalConstructionTime
 
         public static void DelayedStart()
         {
-            /* 1.4 Addition
+#if KSP1_4
+            // 1.4 Addition
             if (KCT_Utilities.CurrentGameIsMission())
             {
                 return;
             }
-            */
+#endif
             KCTDebug.Log("DelayedStart start");
             if (KCT_PresetManager.Instance?.ActivePreset == null || !KCT_PresetManager.Instance.ActivePreset.generalSettings.Enabled)
                 return;

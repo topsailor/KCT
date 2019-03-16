@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,7 @@ namespace KerbalConstructionTime
 {
     public static class KCT_GameStates
     {
-        public static double UT, lastUT=0.0;
+        public static double UT, lastUT = 0.0;
         public static bool canWarp = false, warpInitiated = false;
         public static int lastWarpRate = 0;
         public static string lastSOIVessel = "";
@@ -21,7 +22,31 @@ namespace KerbalConstructionTime
         public static bool UpdateLaunchpadDestructionState = false;
         public static int TechUpgradesTotal = 0;
         public static float SciPointsTotal = -1f;
-        public static List<KCT_TechItem> TechList = new List<KCT_TechItem>();
+
+        public class KCT_TechItemIlist<T> : List<T>
+        {
+            // public event Action<int> Changed = delegate { };
+            public event Action Updated = delegate { };
+
+            public new void Add(T item) { base.Add(item); Updated(); }
+            public new void Remove(T item) { base.Remove(item); Updated(); }
+            public new void AddRange(IEnumerable<T> collection) { base.AddRange(collection); Updated(); }
+            public new void RemoveRange(int index, int count) { base.RemoveRange(index, count); Updated(); }
+            public new void Clear() { base.Clear(); Updated(); }
+            public new void Insert(int index, T item) { base.Insert(index, item); Updated(); }
+            public new void InsertRange(int index, IEnumerable<T> collection) { base.InsertRange(index, collection); Updated(); }
+            public new void RemoveAll(Predicate<T> match) { base.RemoveAll(match); Updated(); }
+
+            public new T this[int index]
+            {
+                get { return base[index]; }
+                set { base[index] = value; Updated(); } // Changed(index); }
+            }
+        }
+
+        public static KCT_TechItemIlist<KCT_TechItem> TechList;
+
+        //public static List<KCT_TechItem> TechList = new List<KCT_TechItem>();
 
         public static List<int> PurchasedUpgrades = new List<int>() { 0, 0 };
         public static int MiscellaneousTempUpgrades = 0, LastKnownTechCount = 0;
@@ -44,7 +69,7 @@ namespace KerbalConstructionTime
         public static double KACAlarmUT = 0;
 
         public static KCT_OnLoadError erroredDuringOnLoad = new KCT_OnLoadError();
-        
+
         public static int TemporaryModAddedUpgradesButReallyWaitForTheAPI = 0; //Reset when returned to the MainMenu
         public static int PermanentModAddedUpgradesButReallyWaitForTheAPI = 0; //Saved to the save file
 
@@ -70,8 +95,18 @@ namespace KerbalConstructionTime
             BuildingMaxLevelCache.Clear();
 
             lastUT = 0;
+
+            InitAndClearTechList();        
         }
 
+        public static void InitAndClearTechList()
+        {
+            if (TechList != null)
+                TechList.Clear();
+            else
+                TechList = new KCT_TechItemIlist<KCT_TechItem>();
+            TechList.Updated += KerbalConstructionTime.instance.UpdateTechlistIconColor;
+        }
     }
 
     public class CrewedPart

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using KSP.UI;
 using KSP.UI.Screens;
 using UnityEngine;
 
@@ -103,6 +104,7 @@ namespace KerbalConstructionTime
 
         public static double GetBuildTime(List<ConfigNode> parts)
         {
+
             //get list of parts that are in the inventory
             IList<ConfigNode> inventorySample = ScrapYardWrapper.GetPartsInInventory(parts, ScrapYardWrapper.ComparisonStrength.STRICT) ?? new List<ConfigNode>();
 
@@ -151,9 +153,21 @@ namespace KerbalConstructionTime
                 int used = ScrapYardWrapper.GetUseCount(p);
                 //C=cost, c=dry cost, M=wet mass, m=dry mass, U=part tracker, O=overall multiplier, I=inventory effect (0 if not in inv), B=build effect
 
-                effectiveCost = KCT_MathParsing.GetStandardFormulaValue("EffectivePart", new Dictionary<string, string>() { {"C", cost.ToString()}, {"c", dryCost.ToString()}, {"M",wetMass.ToString()},
-                {"m", dryMass.ToString()}, {"U", builds.ToString()}, {"u", used.ToString()}, {"O", KCT_PresetManager.Instance.ActivePreset.timeSettings.OverallMultiplier.ToString()}, {"I", InvEff.ToString()}, {"B", KCT_PresetManager.Instance.ActivePreset.timeSettings.BuildEffect.ToString()}, 
-                {"PV", PartMultiplier.ToString()}, {"RV", PartMultiplier.ToString()}, {"MV", ModuleMultiplier.ToString()}});
+
+                effectiveCost = KCT_MathParsing.GetStandardFormulaValue("EffectivePart", 
+                    new Dictionary<string, string>() { 
+                        {"C", cost.ToString()}, 
+                        {"c", dryCost.ToString()}, 
+                        {"M",wetMass.ToString()},
+                        {"m", dryMass.ToString()}, 
+                        {"U", builds.ToString()}, 
+                        {"u", used.ToString()}, 
+                        {"O", KCT_PresetManager.Instance.ActivePreset.timeSettings.OverallMultiplier.ToString()}, 
+                        {"I", InvEff.ToString()}, {"B", KCT_PresetManager.Instance.ActivePreset.timeSettings.BuildEffect.ToString()}, 
+                        {"PV", PartMultiplier.ToString()}, 
+                        {"RV", PartMultiplier.ToString()}, 
+                        {"MV", ModuleMultiplier.ToString()}});
+
 
                 if (InvEff != 0)
                 {
@@ -199,6 +213,17 @@ namespace KerbalConstructionTime
 
         public static ConfigNode[] GetModulesFromPartNode(ConfigNode partNode)
         {
+            var n = partNode.GetNodes("MODULE").ToList();
+            for (int i = n.Count - 1; i >= 0; i--)
+            {
+                ConfigNode cn = n[i];
+
+                string s = null;
+                var b = cn.TryGetValue("name", ref s);
+                if (b == false || s == null || s == "")
+                    n.Remove(cn);
+            }
+            return n.ToArray();
             return partNode.GetNodes("MODULE");
         }
 
@@ -623,12 +648,13 @@ namespace KerbalConstructionTime
         {
             return HighLogic.CurrentGame.Mode == Game.Modes.CAREER;
         }
-        /* 1.4 Addition
+#if KSP1_4
+        // 1.4 Addition
         public static bool CurrentGameIsMission()
         {
             return HighLogic.CurrentGame.Mode == Game.Modes.MISSION || HighLogic.CurrentGame.Mode == Game.Modes.MISSION_BUILDER;
         }
-        */
+#endif
 
         public static void AddScienceWithMessage(float science, TransactionReasons reason)
         {
@@ -1065,14 +1091,15 @@ namespace KerbalConstructionTime
             return spentPoints;
         }
 
-        /* 1.4 Addition
+#if KSP1_4
+        // 1.4 Addition
         public static List<string> GetLaunchSites(bool isVAB)
         {
             EditorDriver.editorFacility = isVAB ? EditorFacility.VAB : EditorFacility.SPH;
             typeof(EditorDriver).GetMethod("setupValidLaunchSites", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)?.Invoke(null, null);
             return EditorDriver.ValidLaunchSites;
         }
-        */
+#endif
 
         private static bool? _KSCSwitcherInstalled = null;
         public static bool KSCSwitcherInstalled
@@ -1533,6 +1560,8 @@ namespace KerbalConstructionTime
                 //check for symmetry parts and remove those references if they can't be found
                 RemoveMissingSymmetry(KCT_GameStates.recoveredVessel.shipNode);
 
+                // debug, save to a file
+                KCT_GameStates.recoveredVessel.shipNode.Save("KCTVesselSave");
                 //test if we can actually convert it
                 bool success = test.LoadShip(KCT_GameStates.recoveredVessel.shipNode);
                 if (success)
@@ -1544,27 +1573,24 @@ namespace KerbalConstructionTime
                     return false;
                 }
 
-                KerbalConstructionTime.instance.StartCoroutine(RecoverVessel(FlightGlobals.ActiveVessel));
+                // Recovering the vessel in a coroutine was generating an exception insideKSP if a mod had added
+                // modules to the vessel or it's parts at runtime.
+                //
+                // This is the way KSP does it
+                //
+                GameEvents.OnVesselRecoveryRequested.Fire(FlightGlobals.ActiveVessel);
                 return true;
+
+                
             }
-            catch
+            catch (Exception ex)
             {
                 Debug.LogError("[KCT] Error while recovering craft into inventory.");
+                Debug.LogError("[KCT] error: " + ex.Message);
                 KCT_GameStates.recoveredVessel = null;
                 ShipConstruction.ClearBackups();
                 return false;
             }
-        }
-
-        /// <summary>
-        /// Recover the vessel, after the end of the frame. Start it in a coroutine
-        /// </summary>
-        /// <param name="toRecover"></param>
-        /// <returns></returns>
-        public static IEnumerator RecoverVessel(Vessel toRecover)
-        {
-            yield return new WaitForEndOfFrame();
-            GameEvents.OnVesselRecoveryRequested.Fire(toRecover);
         }
 
         public static void RemoveMissingSymmetry(ConfigNode ship)
@@ -1615,43 +1641,63 @@ namespace KerbalConstructionTime
             {
                 KCTDebug.Log("Attempting to take control of launch button");
 
-                EditorLogic.fetch.launchBtn.onClick = new UnityEngine.UI.Button.ButtonClickedEvent(); //delete all other listeners (sorry :( )
-
+                // EditorLogic.fetch.launchBtn.onClick = new UnityEngine.UI.Button.ButtonClickedEvent(); //delete all other listeners (sorry :( )
+                EditorLogic.fetch.launchBtn.onClick.RemoveAllListeners();
                 EditorLogic.fetch.launchBtn.onClick.AddListener(() => { KerbalConstructionTime.ShowLaunchAlert(null); });
 
-                /* 1.4 Addition
+#if KSP1_4
+                // 1.4 Addition
                 //delete listeners to the launchsite specific buttons
                 UILaunchsiteController controller = UnityEngine.Object.FindObjectOfType<UILaunchsiteController>();
-
-                //IEnumerable list = controller.GetType().GetField("launchPadItems", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.FlattenHierarchy)?.GetValue(controller) as IEnumerable;
-                IEnumerable list = controller.GetType().GetPrivateMemberValue("launchPadItems", controller, 4) as IEnumerable;
-                if (list != null)
+                if (controller == null)
+                    KCTDebug.Log("HandleEditorButton.controller is null");
+                else
                 {
-                    foreach (object site in list)
+                    //
+                    // Need to use the try/catch because if multiple launch sites are disabled, then this would generate
+                    // the following error:
+                    //                          Cannot cast from source type to destination type
+                    // which happens because the private member "launchPadItems" is a list, and if it is null, then it is
+                    // not castable to a IEnumerable
+                    //
+                    try
                     {
-                        //find and disable the button
-                        //why isn't EditorLaunchPadItem public despite all of its members being public?
-                        UnityEngine.UI.Button button = site.GetType().GetPublicValue<UnityEngine.UI.Button>("buttonLaunch", site);
-                        if (button != null)
+                        IEnumerable list = controller.GetType().GetPrivateMemberValue("launchPadItems", controller, 4) as IEnumerable;
+
+                        if (list != null)
                         {
-                            button.onClick = new UnityEngine.UI.Button.ButtonClickedEvent();
-                            string siteName = site.GetType().GetPublicValue<string>("siteName", site);
-                            button.onClick.AddListener(() => { KerbalConstructionTime.ShowLaunchAlert(siteName); });
+                            foreach (object site in list)
+                            {
+                                //find and disable the button
+                                //why isn't EditorLaunchPadItem public despite all of its members being public?
+                                UnityEngine.UI.Button button = site.GetType().GetPublicValue<UnityEngine.UI.Button>("buttonLaunch", site);
+                                if (button != null)
+                                {
+                                    //button.onClick = new UnityEngine.UI.Button.ButtonClickedEvent();
+                                    button.onClick.RemoveAllListeners();
+                                    string siteName = site.GetType().GetPublicValue<string>("siteName", site);
+                                    button.onClick.AddListener(() => { KerbalConstructionTime.ShowLaunchAlert(siteName); });
+                                }
+                            }
                         }
+                    } catch (Exception ex)
+                    {
+                        KCTDebug.Log("HandleEditorButton: Exception: " + ex.Message);
                     }
                 }
-                */
+#endif
             }
             else
             {
                 InputLockManager.SetControlLock(ControlTypes.EDITOR_LAUNCH, "KCTLaunchLock");
-                /* 1.4 Addition
+#if KSP1_4
+                // 1.4 Addition
                 UILaunchsiteController controller = UnityEngine.Object.FindObjectOfType<UILaunchsiteController>();
                 if (controller != null)
                 {
                     controller.locked = true;
                 }
-                */
+#endif
             }
         }
 

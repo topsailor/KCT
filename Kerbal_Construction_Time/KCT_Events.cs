@@ -51,9 +51,14 @@ namespace KerbalConstructionTime
             GameEvents.StageManager.OnGUIStageSequenceModified.Add(StagingOrderChangedEvent);
             GameEvents.StageManager.OnPartUpdateStageability.Add(PartStageabilityChangedEvent);
 
+
             GameEvents.FindEvent<EventVoid>("OnSYInventoryAppliedToVessel")?.Add(SYInventoryApplied);
             GameEvents.FindEvent<EventVoid>("OnSYReady")?.Add(SYReady);
-            GameEvents.FindEvent<EventData<Part>>("OnSYInventoryAppliedToPart")?.Add((p) => { KerbalConstructionTime.instance.editorRecalcuationRequired = true; });
+
+            // The following was changed to a function because the Mono compiler available on Linux was causing errors with this call
+            // GameEvents.FindEvent<EventData<Part>>("OnSYInventoryAppliedToPart")?.Add((p) => { KerbalConstructionTime.instance.editorRecalcuationRequired = true; });
+            GameEvents.FindEvent<EventData<Part>>("OnSYInventoryAppliedToPart")?.Add(OnSYInventoryAppliedToPart);
+
             //     GameEvents.OnKSCStructureRepairing.Add(FacilityRepairingEvent);
             //  GameEvents.onLevelWasLoaded.Add(LevelLoadedEvent);
 
@@ -79,11 +84,27 @@ namespace KerbalConstructionTime
             GameEvents.onGUIMissionControlSpawn.Add(HideAllGUIs);
             GameEvents.onGUIRnDComplexSpawn.Add(HideAllGUIs);
             GameEvents.onGUIKSPediaSpawn.Add(HideAllGUIs);
-            GameEvents.onEditorStarted.Add(() => { KCT_Utilities.HandleEditorButton(); });
+
+            // The following was changed to a function because the Mono compiler available on Linux was causing errors with this call
+            // GameEvents.onEditorStarted.Add(() => { KCT_Utilities.HandleEditorButton(); });
+            GameEvents.onEditorStarted.Add(OnEditorStarted);
+
 
             GameEvents.onFacilityContextMenuSpawn.Add(FacilityContextMenuSpawn);
-            
+
             subscribedToEvents = true;
+        }
+
+        // The following was changed to a function because the Mono compiler available on Linux was causing errors with this call
+        void OnSYInventoryAppliedToPart(Part p)
+        {
+            KerbalConstructionTime.instance.editorRecalcuationRequired = true;
+        }
+
+        // The following was changed to a function because the Mono compiler available on Linux was causing errors with this call
+        void OnEditorStarted()
+        {
+            KCT_Utilities.HandleEditorButton();
         }
 
         public void CreateEvents()
@@ -334,7 +355,7 @@ namespace KerbalConstructionTime
         {
             if (HighLogic.CurrentGame.Parameters.Difficulty.BypassEntryPurchaseAfterResearch)
                 return;
-            KCT_TechItem tech = KCT_GameStates.TechList.Find(t => t.techID == part.TechRequired);
+            KCT_TechItem tech = KCT_GameStates.TechList.OfType<KCT_TechItem>().FirstOrDefault(t => t.techID == part.TechRequired);
             if (tech!= null && tech.isInList())
             {
                 ScreenMessages.PostScreenMessage("[KCT] You must wait until the node is fully researched to purchase parts!", 4.0f, ScreenMessageStyle.UPPER_LEFT);
