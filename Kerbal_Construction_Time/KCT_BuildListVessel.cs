@@ -169,13 +169,6 @@ namespace KerbalConstructionTime
 
         public KCT_BuildListVessel(Vessel vessel) //For recovered vessels
         {
-           /* if (KCT_GameStates.recoveryRequestVessel == null)
-            {
-                KCTDebug.Log("Somehow tried to recover something that was null!");
-                return;
-            }*/
-
-
             id = Guid.NewGuid();
             shipName = vessel.vesselName;
             shipNode = FromInFlightVessel(vessel);
@@ -300,39 +293,6 @@ namespace KerbalConstructionTime
 
             foreach (ConfigNode node in module.GetNodes("MODULE"))
                 SanitizeNode(partName, node, templates);
-
-
-            /*
-            if (name.Contains("ModuleEngines"))
-            {
-                module.SetValue("staged", "False");
-                module.SetValue("flameout", "False");
-                module.SetValue("EngineIgnited", "False");
-                module.SetValue("engineShutdown", "False");
-                module.SetValue("currentThrottle", "0");
-                module.SetValue("manuallyOverridden", "False");
-            }
-            else if (name == "ModuleScienceExperiment")
-            {
-                module.SetValue("Deployed", "False");
-                module.SetValue("Inoperable", "False");
-            }
-            else if (name == "ModuleParachute")
-            {
-                module.SetValue("staged", "False");
-                module.SetValue("persistentState", "STOWED");
-            }
-            else if (name == "Log")
-            {
-                module.ClearValues();
-            }
-
-            if (module.HasNode("ScienceData"))
-            {
-                module.RemoveNodes("ScienceData");
-            }
-            */
-
         }
 
         private void CreateInitialTemplates()
@@ -488,7 +448,7 @@ namespace KerbalConstructionTime
             return ship;
         }
 
-        public void Launch()
+        public void Launch(bool fillFuel = false)
         {
             if (GetEditorFacility() == EditorFacilities.VAB)
             {
@@ -501,6 +461,8 @@ namespace KerbalConstructionTime
 
             string tempFile = KSPUtil.ApplicationRootPath + "saves/" + HighLogic.SaveFolder + "/Ships/temp.craft";
             UpdateRFTanks();
+            if (fillFuel)
+                FillUnlockedFuelTanks();
             shipNode.Save(tempFile);
             FlightDriver.StartWithNewLaunch(tempFile, flag, launchSite, new VesselCrewManifest());
             KCT_GameStates.LaunchFromTS = false;
@@ -584,6 +546,40 @@ namespace KerbalConstructionTime
             }
         }
 
+        private void FillUnlockedFuelTanks()
+        {
+            foreach (ConfigNode p in shipNode.GetNodes("PART"))
+            {
+                //fill as part prefab would be filled?
+                if (KCT_Utilities.PartIsProcedural(p))
+                {
+                    var resList = p.GetNodes("RESOURCE");
+                    foreach (var res in resList)
+                    {
+                        bool flowState = bool.Parse(res.GetValue("flowState"));
+                        if (flowState)
+                        {
+                            var maxAmt = res.GetValue("maxAmount");
+                            res.SetValue("amount", maxAmt);
+                        }
+                    }
+                }
+                else
+                {
+                    var resList = p.GetNodes("RESOURCE");
+                    foreach (var res in resList)
+                    {
+                        var name = res.GetValue("name");
+                        bool flowState = bool.Parse(res.GetValue("flowState"));
+                        if (flowState)
+                        {
+                            var maxAmt = res.GetValue("maxAmount");
+                            res.SetValue("amount", maxAmt);
+                        }
+                    }
+                }
+            }
+        }
         public double GetTotalMass()
         {
             if (TotalMass != 0 && emptyMass != 0) return TotalMass;

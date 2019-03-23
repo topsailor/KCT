@@ -17,6 +17,7 @@ namespace KerbalConstructionTime
         private static Vector2 presetScrollView, presetMainScroll;
         private static bool changed = false, showFormula = false;
         private static string OMultTmp = "", BEffTmp = "", IEffTmp = "", ReEffTmp = "", MaxReTmp = "";
+
         public static void DrawPresetWindow(int windowID)
         {
             GUIStyle yellowText = new GUIStyle(GUI.skin.label);
@@ -40,24 +41,12 @@ namespace KerbalConstructionTime
             if (presetIndex == -1)
             {
                 SetNewWorkingPreset(null, true);
-                /*presetIndex = presetShortNames.Length - 1;
-                WorkingPreset.name = "Custom";
-                WorkingPreset.shortName = "Custom";
-                WorkingPreset.description = "A custom set of configs.";
-                WorkingPreset.author = HighLogic.SaveFolder;*/
             }
             if (changed && presetIndex < presetShortNames.Length - 1 && !KCT_Utilities.ConfigNodesAreEquivalent(WorkingPreset.AsConfigNode(), KCT_PresetManager.Instance.Presets[presetIndex].AsConfigNode())) //!KCT_PresetManager.Instance.PresetsEqual(WorkingPreset, KCT_PresetManager.Instance.Presets[presetIndex], true)
             {
                 SetNewWorkingPreset(null, true);
-                /*presetIndex = presetShortNames.Length - 1; //Custom preset
-                WorkingPreset.name = "Custom";
-                WorkingPreset.shortName = "Custom";
-                WorkingPreset.description = "A custom set of configs.";
-                WorkingPreset.author = HighLogic.SaveFolder;*/
             }
-           /* presetIndex = KCT_PresetManager.Instance.GetIndex(WorkingPreset); //Check that the current preset is equal to the expected one
-            if (presetIndex == -1) 
-                presetIndex = presetNames.Length - 1;*/
+
             int prev = presetIndex;
             presetIndex = GUILayout.SelectionGrid(presetIndex, presetShortNames, 1);
             if (prev != presetIndex) //If a new preset was selected
@@ -69,10 +58,6 @@ namespace KerbalConstructionTime
                 else
                 {
                     SetNewWorkingPreset(null, true);
-                    /*WorkingPreset.name = "Custom";
-                    WorkingPreset.shortName = "Custom";
-                    WorkingPreset.description = "A custom set of configs.";
-                    WorkingPreset.author = HighLogic.SaveFolder;*/
                 }
             }
 

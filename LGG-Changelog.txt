@@ -1,10 +1,28 @@
 1.4.5.7 (unreleased)
-	Added AssemblyVersion-RO.tt for the RO build
-	Modified AssemblyVersion-RO.tt to write AssemblyFileVersion instead of AssemblyVersion
-	Commented out the AssemblyFileVersion in VersionInfo.cs
-	Renamed KerbalConstructionTime.version to KerbalConstructionTime-RO.version
-	Added Pre-build steps to run the TextTemplate
-	Added a new directory called SpecialSurprise to hold code not being used for now
+	This first group was merged to the RO branch:
+		Added AssemblyVersion-RO.tt for the RO build
+		Modified AssemblyVersion-RO.tt to write AssemblyFileVersion instead of AssemblyVersion
+		Commented out the AssemblyFileVersion in VersionInfo.cs
+		Renamed KerbalConstructionTime.version to KerbalConstructionTime-RO.version
+		Added Pre-build steps to run the TextTemplate
+		Added a new directory called SpecialSurprise to hold code not being used for now
+
+	Moved several GUIStyle vars out of DrawBuildListWindow(), made them static and initted them one time only
+	Thanks to @JadeOfMaar for this:
+		Added buttons for the stock toolbar, not fuzzy anymore
+	Renamed existing button files to indicate the size of the icon
+	Added code to deal with "Important" for stock toolbar
+	Changed Fill Tank to ignore locked tanks
+	Added new button on launch dialog:  Fill tanks & Launch, ignores locked tanks
+	Added support for Community Trait Icons for the crew selection. It's optional, but really looks nice
+	Replaced level number by itself with the number in parens, followed by stars in the crew selection 
+	Make crew selection window a bit wider to accomodate the icons
+	Added a Building Plans window
+	New button on top bar in Editor to open up the Building Plans window
+		Will not save a vessel as a plan without a name.
+		Saving a vessel with the same name as an existing one will overwrite the old one
+	Removed all blocks of commented-out code 
+	Fixed jenkins to define the KSP1_4 flag 
 
 1.4.5.6
 	Added #if/#endif around the AssemblyVersion lines

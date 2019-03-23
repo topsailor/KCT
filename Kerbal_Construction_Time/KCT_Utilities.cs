@@ -224,7 +224,7 @@ namespace KerbalConstructionTime
                     n.Remove(cn);
             }
             return n.ToArray();
-            return partNode.GetNodes("MODULE");
+            //return partNode.GetNodes("MODULE");
         }
 
         public static ConfigNode[] GetResourcesFromPartNode(ConfigNode partNode)
@@ -613,27 +613,47 @@ namespace KerbalConstructionTime
         }
 
         private static DateTime startedFlashing;
-        public static String GetButtonTexture()
+        static string ReturnString(string st, bool stock)
+        {
+            st += stock ? "-38" : "-24";
+            return st;
+        }
+        public static String GetButtonTexture(bool stock = false)
         {
             String textureReturn;
 
-            if (!KCT_PresetManager.Instance.ActivePreset.generalSettings.Enabled)
-                return "KerbalConstructionTime/Icons/KCT_off";
-
-            //Flash for up to 3 seconds, at half second intervals per icon
-            if (KCT_GameStates.kctToolbarButton.Important && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(3))) < 0 && DateTime.Now.Millisecond < 500)
-                textureReturn = "KerbalConstructionTime/Icons/KCT_off";
-            //If it's been longer than 3 seconds, set Important to false and stop flashing
-            else if (KCT_GameStates.kctToolbarButton.Important && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(3))) > 0)
+            if (stock)
             {
-                KCT_GameStates.kctToolbarButton.Important = false;
-                textureReturn = "KerbalConstructionTime/Icons/KCT_on";
+                if (KCT_Events.instance.KCTButtonStockImportant && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(0))) > 0 && DateTime.Now.Millisecond < 500)
+                    textureReturn = "KerbalConstructionTime/Icons/KCT_off";
+                else if (KCT_Events.instance.KCTButtonStockImportant && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(3))) > 0)
+                {
+                    KCT_Events.instance.KCTButtonStockImportant = false;
+                    textureReturn = "KerbalConstructionTime/Icons/KCT_on";
+                }
+                //The normal icon
+                else
+                    textureReturn = "KerbalConstructionTime/Icons/KCT_on";
             }
-            //The normal icon
             else
-                textureReturn = "KerbalConstructionTime/Icons/KCT_on";
+            {
+                if (!KCT_PresetManager.Instance.ActivePreset.generalSettings.Enabled)
+                    return ReturnString("KerbalConstructionTime/Icons/KCT_off", stock);
 
-            return textureReturn;
+                //Flash for up to 3 seconds, at half second intervals per icon
+                if (KCT_GameStates.kctToolbarButton.Important && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(3))) < 0 && DateTime.Now.Millisecond < 500)
+                    textureReturn = "KerbalConstructionTime/Icons/KCT_off";
+                //If it's been longer than 3 seconds, set Important to false and stop flashing
+                else if (KCT_GameStates.kctToolbarButton.Important && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(3))) > 0)
+                {
+                    KCT_GameStates.kctToolbarButton.Important = false;
+                    textureReturn = "KerbalConstructionTime/Icons/KCT_on";
+                }
+                //The normal icon
+                else
+                    textureReturn = "KerbalConstructionTime/Icons/KCT_on";
+            }
+            return ReturnString(textureReturn, stock);
         }
 
         public static bool CurrentGameHasScience()
@@ -673,6 +693,11 @@ namespace KerbalConstructionTime
             if (KCT_GameStates.kctToolbarButton != null)
             {
                 KCT_GameStates.kctToolbarButton.Important = true; //Show the button if it is hidden away
+                startedFlashing = DateTime.Now; //Set the time to start flashing
+            }
+            else
+            {
+                KCT_Events.instance.KCTButtonStockImportant = true;
                 startedFlashing = DateTime.Now; //Set the time to start flashing
             }
 
@@ -1128,18 +1153,6 @@ namespace KerbalConstructionTime
         public static string GetActiveRSSKSC()
         {
             if (!KSCSwitcherInstalled) return "Stock";
-            /*Type Switcher = null;
-            AssemblyLoader.loadedAssemblies.TypeOperation(t =>
-            {
-                if (t.FullName == "regexKSP.KSCSwitcher")
-                {
-                    Switcher = t;
-                }
-            });
-
-            UnityEngine.Object KSCSwitcherInstance = GameObject.FindObjectOfType(Switcher);
-
-            return (string)GetMemberInfoValue(Switcher.GetMember("activeSite")[0], KSCSwitcherInstance);*/
 
             //get the LastKSC.KSCLoader.instance object
             //check the Sites object (KSCSiteManager) for the lastSite, if "" then get defaultSite
@@ -1169,24 +1182,6 @@ namespace KerbalConstructionTime
         {
             string site = GetActiveRSSKSC();
             SetActiveKSC(site);
-            /*
-            if (site == "") site = "Stock";
-            if (KCT_GameStates.ActiveKSC == null || site != KCT_GameStates.ActiveKSC.KSCName)
-            {
-                KCTDebug.Log("Setting active site to " + site);
-                KCT_KSC setActive = KCT_GameStates.KSCs.FirstOrDefault(ksc => ksc.KSCName == site);
-                if (setActive != null)
-                {
-                    KCT_GameStates.ActiveKSC = setActive;
-                }
-                else
-                {
-                    setActive = new KCT_KSC(site);
-                    KCT_GameStates.KSCs.Add(setActive);
-                    KCT_GameStates.ActiveKSC = setActive;
-                }
-                KCT_GameStates.activeKSCName = site;
-            }*/
         }
 
         public static void SetActiveKSC(string site)
@@ -1229,20 +1224,6 @@ namespace KerbalConstructionTime
             }
             else if (type == KCT_BuildListVessel.ListType.SPH)
             {
-               /* if (!new PreFlightTests.FacilityOperational("Runway", "End09").Test())
-                    intact = false;
-                if (!new PreFlightTests.FacilityOperational("Runway", "End27").Test())
-                    intact = false;*/
-               /* if (!new PreFlightTests.FacilityOperational("Runway", "Section1").Test())
-                    intact = false;
-                if (!new PreFlightTests.FacilityOperational("Runway", "Section2").Test())
-                    intact = false;
-                if (!new PreFlightTests.FacilityOperational("Runway", "Section3").Test())
-                    intact = false;
-                if (!new PreFlightTests.FacilityOperational("Runway", "Section4").Test())
-                    intact = false;
-                if (!new PreFlightTests.FacilityOperational("Runway", "Section5").Test())
-                    intact = false;*/
                 if (!new PreFlightTests.FacilityOperational("Runway", "Runway").Test())
                     intact = false;
             }

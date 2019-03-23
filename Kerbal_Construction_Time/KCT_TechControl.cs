@@ -100,12 +100,6 @@ namespace KerbalConstructionTime
         public bool isInList()
         {
             return KCT_GameStates.TechList.FirstOrDefault(t => t.techID == this.techID) != null;
-           /* foreach (KCT_TechItem tech in KCT_GameStates.TechList)
-            {
-                if (tech.techID == this.techID)
-                    return true;
-            }
-            return false;*/
         }
 
         string IKCTBuildItem.GetItemName()

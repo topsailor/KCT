@@ -16,6 +16,11 @@ namespace KerbalConstructionTime
         List<BuildListItem> VABWarehouse = new List<BuildListItem>();
         [Persistent]
         List<BuildListItem> SPHWarehouse = new List<BuildListItem>();
+        [Persistent]
+        List<BuildListItem> VABPlans = new List<BuildListItem>();
+        [Persistent]
+        List<BuildListItem> SPHPlans = new List<BuildListItem>();
+
 
         [Persistent]KCT_Recon_Rollout LPRecon = new KCT_Recon_Rollout();
 
@@ -26,6 +31,8 @@ namespace KerbalConstructionTime
             KCT_GameStates.ActiveKSC.SPHList.Clear();
             KCT_GameStates.ActiveKSC.VABWarehouse.Clear();
             KCT_GameStates.ActiveKSC.SPHWarehouse.Clear();
+            KCT_GameStates.ActiveKSC.VABPlans.Clear();
+            KCT_GameStates.ActiveKSC.SPHPlans.Clear();
             KCT_GameStates.ActiveKSC.Recon_Rollout.Clear();
 
             foreach (BuildListItem b in VABBuildList)
@@ -52,6 +59,24 @@ namespace KerbalConstructionTime
                // if (ListContains(blv, KCT_GameStates.SPHWarehouse) < 0)
                 KCT_GameStates.ActiveKSC.SPHWarehouse.Add(blv);
             }
+
+            foreach (BuildListItem b in VABPlans)
+            {
+                KCT_BuildListVessel blv = b.ToBuildListVessel();
+                if (KCT_GameStates.ActiveKSC.VABPlans.ContainsKey(blv.shipName))
+                    KCT_GameStates.ActiveKSC.VABPlans.Remove(blv.shipName);
+
+                KCT_GameStates.ActiveKSC.VABPlans.Add(blv.shipName, blv);
+            }
+            foreach (BuildListItem b in SPHPlans)
+            {
+                KCT_BuildListVessel blv = b.ToBuildListVessel();
+                if (KCT_GameStates.ActiveKSC.SPHPlans.ContainsKey(blv.shipName))
+                    KCT_GameStates.ActiveKSC.SPHPlans.Remove(blv.shipName);
+
+                KCT_GameStates.ActiveKSC.SPHPlans.Add(blv.shipName, blv);
+            }
+
             KCT_GameStates.ActiveKSC.Recon_Rollout.Add(LPRecon);
         }
 
@@ -61,51 +86,8 @@ namespace KerbalConstructionTime
             SPHBuildList.Clear();
             VABWarehouse.Clear();
             SPHWarehouse.Clear();
-           /* foreach (KCT_BuildListVessel b in KCT_GameStates.VABList)
-            {
-                if (b.shipNode == null)
-                {
-                    Debug.LogError("[KCT] WARNING! DATA LOSS EVENT ON " + b.shipName + " IN VABList");
-                    continue;
-                }
-                BuildListItem bls = new BuildListItem();
-                bls.FromBuildListVessel(b);
-                VABBuildList.Add(bls);
-            }
-            foreach (KCT_BuildListVessel b in KCT_GameStates.SPHList)
-            {
-                if (b.shipNode == null)
-                {
-                    Debug.LogError("[KCT] WARNING! DATA LOSS EVENT ON " + b.shipName + " IN SPHList");
-                    continue;
-                }
-                BuildListItem bls = new BuildListItem();
-                bls.FromBuildListVessel(b);
-                SPHBuildList.Add(bls);
-            }
-            foreach (KCT_BuildListVessel b in KCT_GameStates.VABWarehouse)
-            {
-                if (b.shipNode == null)
-                {
-                    Debug.LogError("[KCT] WARNING! DATA LOSS EVENT ON " + b.shipName + " IN VABWarehouse");
-                    continue;
-                }
-                BuildListItem bls = new BuildListItem();
-                bls.FromBuildListVessel(b);
-                VABWarehouse.Add(bls);
-            }
-            foreach (KCT_BuildListVessel b in KCT_GameStates.SPHWarehouse)
-            {
-                if (b.shipNode == null)
-                {
-                    Debug.LogError("[KCT] WARNING! DATA LOSS EVENT ON " + b.shipName + " IN SPHWarehouse");
-                    continue;
-                }
-                BuildListItem bls = new BuildListItem();
-                bls.FromBuildListVessel(b);
-                SPHWarehouse.Add(bls);
-            }
-            LPRecon = KCT_GameStates.LaunchPadReconditioning;*/
+            VABPlans.Clear();
+            SPHPlans.Clear();           
         }
 
         public class BuildListItem
