@@ -1,4 +1,4 @@
-1.4.5.7 (unreleased)
+1.4.5.7
 	This first group was merged to the RO branch:
 		Added AssemblyVersion-RO.tt for the RO build
 		Modified AssemblyVersion-RO.tt to write AssemblyFileVersion instead of AssemblyVersion
