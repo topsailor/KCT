@@ -1,3 +1,5 @@
+1.4.5.8
+	Updated stock version file download link
 1.4.5.7
 	This first group was merged to the RO branch:
 		Added AssemblyVersion-RO.tt for the RO build
