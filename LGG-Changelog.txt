@@ -1,3 +1,6 @@
+1.4.5.9
+	Added dynamic window ids, determined at runtime.  Avoids duplicates which lead to strange errors
+
 1.4.5.8
 	Updated stock version file download link
 	Fixed main skin button being changed in the new Build Plans window, was 
