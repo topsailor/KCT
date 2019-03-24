@@ -29,7 +29,7 @@ namespace KerbalConstructionTime
             if (!buildPlansInitted)
             {
                 
-                buildPlansbutton = HighLogic.Skin.button;
+                buildPlansbutton = new GUIStyle(HighLogic.Skin.button);
                 buildPlansbutton.margin = new RectOffset(0, 0, 0, 0);
                 buildPlansbutton.padding = new RectOffset(0, 0, 0, 0);
                 buildPlansbutton.border = new RectOffset(0, 0, 0, 0);
@@ -71,6 +71,8 @@ namespace KerbalConstructionTime
                 content = hoverContent;
             else
                 content = upContent;
+            // When this is true, and the mouse is NOT over the toggle, the toggle code is making the toggle active
+            // which is showing the corners of the button as unfilled
             showBuildPlansWindow = GUI.Toggle(rect, showBuildPlansWindow, content, buildPlansbutton);
         }
 
@@ -84,12 +86,33 @@ namespace KerbalConstructionTime
                 if (EditorLogic.fetch.ship != null && EditorLogic.fetch.ship.Parts != null && EditorLogic.fetch.ship.Parts.Count > 0)
                 {
                     if (EditorLogic.fetch.ship.shipName == "Untitled Space Craft" || EditorLogic.fetch.ship.shipName == "")
-                        GUI.enabled = false;
-                    if (GUILayout.Button("Add To Building Plans", GUILayout.Height(2 * 22)))
                     {
-                        AddVesselToPlansList();
+                        
+                        if (GUILayout.Button("Cannot Add a Plan Without a Valid Name", GUILayout.Height(2 * 22)))
+                        {
+                            if (EditorLogic.fetch.ship.shipName == "Untitled Space Craft")
+                            {
+                                var message = new ScreenMessage("[KCT] Vessel must have a name other than 'Untitled Space Craft'.", 4.0f, ScreenMessageStyle.UPPER_CENTER);
+                                ScreenMessages.PostScreenMessage(message);
+                            } else
+                            {
+                                var message = new ScreenMessage("[KCT] Vessel must have a name", 4.0f, ScreenMessageStyle.UPPER_CENTER);
+                                ScreenMessages.PostScreenMessage(message);
+                            }
+                        }
+                        
                     }
-                    GUI.enabled = true;
+                    else
+                    {
+                        if (GUILayout.Button("Add To Building Plans", GUILayout.Height(2 * 22)))
+                        {
+                            AddVesselToPlansList();
+                        }
+                    }
+                }
+                else
+                {
+                    GUILayout.Button("No vessel available", GUILayout.Height(2 * 22));
                 }
             }
             GUILayout.BeginHorizontal();

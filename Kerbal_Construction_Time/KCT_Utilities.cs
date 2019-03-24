@@ -1537,7 +1537,7 @@ namespace KerbalConstructionTime
                     KCT_GameStates.recoveredVessel.launchSite = "LaunchPad";
                 else
                     KCT_GameStates.recoveredVessel.launchSite = "Runway";
-
+                
                 //check for symmetry parts and remove those references if they can't be found
                 RemoveMissingSymmetry(KCT_GameStates.recoveredVessel.shipNode);
 

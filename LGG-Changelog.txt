@@ -1,5 +1,10 @@
 1.4.5.8
 	Updated stock version file download link
+	Fixed main skin button being changed in the new Build Plans window, was 
+		messing up all other windows after it had been opened one time
+	Updated button to add to building plans to show message if vessel not named or if it is 'Untitled Space Vessel'
+	Added message if no vessel in editor
+
 1.4.5.7
 	This first group was merged to the RO branch:
 		Added AssemblyVersion-RO.tt for the RO build

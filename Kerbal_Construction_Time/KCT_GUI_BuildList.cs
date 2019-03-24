@@ -46,20 +46,6 @@ namespace KerbalConstructionTime
                         TechSelected = false;
                     }
                     break;
-                case "Tech":
-                    if (TechSelected)
-                    {
-                        listWindow = -1;
-                        TechSelected = false;
-                    }
-                    else
-                    {
-                        listWindow = 2;
-                        VABSelected = false;
-                        SPHSelected = false;
-                        TechSelected = true;
-                    }
-                    break;
                 default:
                     listWindow = -1;
                     TechSelected = false;
@@ -1106,7 +1092,7 @@ namespace KerbalConstructionTime
                 InputLockManager.SetControlLock(ControlTypes.EDITOR_LOAD, "KCTEditLoad");
                 InputLockManager.SetControlLock(ControlTypes.EDITOR_NEW, "KCTEditNew");
                 InputLockManager.SetControlLock(ControlTypes.EDITOR_LAUNCH, "KCTEditLaunch");
-
+                Debug.Log("b.type: " + b.type);
                 EditorDriver.StartAndLoadVessel(tempFile, b.type == KCT_BuildListVessel.ListType.VAB ? EditorFacility.VAB : EditorFacility.SPH);
             }
             if (GUILayout.Button("Rename"))
