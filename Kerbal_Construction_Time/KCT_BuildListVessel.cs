@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
 using System.IO;
+using System.Linq;
 using KSP.UI;
+using PreFlightTests;
+using UnityEngine;
 
 namespace KerbalConstructionTime
 {
@@ -483,6 +483,7 @@ namespace KerbalConstructionTime
             }
             else if (shipNode != null) //Otherwise load the ship from the ConfigNode
             {
+                if (ship == null) ship = new ShipConstruct();
                 ship.LoadShip(shipNode);
             }
             return ship;
@@ -552,6 +553,14 @@ namespace KerbalConstructionTime
                     failedReasons.Add("Size limits exceeded");
                 }
             }
+
+            var partCheck = new ExperimentalPartsAvailable(GetShip());
+            if (!partCheck.Test())
+            {
+                var msg = partCheck.GetWarningDescription();
+                failedReasons.Add(msg);
+            }
+
             return failedReasons;
         }
 
