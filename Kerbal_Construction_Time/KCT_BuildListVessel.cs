@@ -10,7 +10,7 @@ namespace KerbalConstructionTime
 {
     public class KCT_BuildListVessel : IKCTBuildItem
     {
-        internal ShipConstruct ship;
+        private ShipConstruct ship;
         public double progress, buildPoints;
         public String launchSite, flag, shipName;
         public int launchSiteID = -1;
