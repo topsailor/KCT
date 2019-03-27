@@ -172,8 +172,8 @@ namespace KerbalConstructionTime
             id = Guid.NewGuid();
             shipName = vessel.vesselName;
             shipNode = FromInFlightVessel(vessel, listType);
-
-            this.type = listType;
+            if (listType != ListType.None)
+                this.type = listType;
 
             cost = KCT_Utilities.GetTotalVesselCost(shipNode);
             emptyCost = KCT_Utilities.GetTotalVesselCost(shipNode, false);
@@ -238,9 +238,9 @@ namespace KerbalConstructionTime
             ConfigNode CN = new ConfigNode("ShipConstruct");
             CN = ConstructToSave.SaveShip();
             SanitizeShipNode(CN);
-
-            //VesselToSave.SetRotation(OriginalRotation);
-            //VesselToSave.SetPosition(OriginalPosition);
+            // These are actually needed, do not comment them out
+            VesselToSave.SetRotation(OriginalRotation);
+            VesselToSave.SetPosition(OriginalPosition);
             //End of Claw's code. Thanks Claw!
             return CN;
         }

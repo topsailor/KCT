@@ -1,3 +1,6 @@
+1.4.6.1
+	Fixed rockets turning 90 degrees at launch, result of an over-enthusiastic fix for the previous bugfix 
+
 1.4.6
 	Fixed the longstanding bug of recovering a vessel via the SPH would rotate it by 90 degrees
 
