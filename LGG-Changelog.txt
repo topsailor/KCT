@@ -1,3 +1,6 @@
+1.4.6
+	Fixed the longstanding bug of recovering a vessel via the SPH would rotate it by 90 degrees
+
 1.4.5.10
 	Fixed new bug created when cleaning up some code, the Tech window wasn't appearing.
 

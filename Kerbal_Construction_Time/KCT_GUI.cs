@@ -1147,13 +1147,23 @@ namespace KerbalConstructionTime
             CenterWindow(ref crewListWindowPosition);
         }
 
+        static int cnt = 0;
         static void CheckTanksAndLaunch(bool fillTanks)
         {
             KCT_GameStates.settings.RandomizeCrew = randomCrew;
             KCT_GameStates.settings.AutoHireCrew = autoHire;
+            cnt++;
 
+            if (KCT_GameStates.launchedVessel.ship != null)
+            {
+                var n = KCT_GameStates.launchedVessel.ship.SaveShip();
+                if (n != null)
+                    n.Save("ship_" + cnt.ToString());
+            }
+            if (KCT_GameStates.launchedVessel.shipNode != null)
+                KCT_GameStates.launchedVessel.shipNode.Save("shipNode_" + cnt.ToString());
             KCT_GameStates.launchedVessel.Launch(fillTanks);
-
+            
             showShipRoster = false;
             crewListWindowPosition.height = 1;
         }

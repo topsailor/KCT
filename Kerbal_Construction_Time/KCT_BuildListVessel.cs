@@ -10,7 +10,7 @@ namespace KerbalConstructionTime
 {
     public class KCT_BuildListVessel : IKCTBuildItem
     {
-        private ShipConstruct ship;
+        internal ShipConstruct ship;
         public double progress, buildPoints;
         public String launchSite, flag, shipName;
         public int launchSiteID = -1;
@@ -167,11 +167,13 @@ namespace KerbalConstructionTime
 
         //private ProtoVessel recovered;
 
-        public KCT_BuildListVessel(Vessel vessel) //For recovered vessels
+        public KCT_BuildListVessel(Vessel vessel, KCT_BuildListVessel.ListType listType = ListType.None) //For recovered vessels
         {
             id = Guid.NewGuid();
             shipName = vessel.vesselName;
-            shipNode = FromInFlightVessel(vessel);
+            shipNode = FromInFlightVessel(vessel, listType);
+
+            this.type = listType;
 
             cost = KCT_Utilities.GetTotalVesselCost(shipNode);
             emptyCost = KCT_Utilities.GetTotalVesselCost(shipNode, false);
@@ -208,7 +210,7 @@ namespace KerbalConstructionTime
             rushBuildClicks = 0;
         }
 
-        private ConfigNode FromInFlightVessel(Vessel VesselToSave)
+        private ConfigNode FromInFlightVessel(Vessel VesselToSave, KCT_BuildListVessel.ListType listType)
         {
             //This code is taken from InflightShipSave by Claw, using the CC-BY-NC-SA license.
             //This code thus is licensed under the same license, despite the GPLv3 license covering original KCT code
@@ -222,9 +224,9 @@ namespace KerbalConstructionTime
             Quaternion OriginalRotation = VesselToSave.vesselTransform.rotation;
             Vector3 OriginalPosition = VesselToSave.vesselTransform.position;
 
-            if (type == ListType.SPH)
+            if (listType == ListType.SPH)
             {
-                VesselToSave.SetRotation(new Quaternion(0, 0, 0, 1)); //TODO: Figure out the orientation this should be
+                VesselToSave.SetRotation(new Quaternion((float)Math.Sqrt(0.5), 0, 0, (float)Math.Sqrt(0.5))); 
             }
             else
             {
@@ -237,8 +239,8 @@ namespace KerbalConstructionTime
             CN = ConstructToSave.SaveShip();
             SanitizeShipNode(CN);
 
-            VesselToSave.SetRotation(OriginalRotation);
-            VesselToSave.SetPosition(OriginalPosition);
+            //VesselToSave.SetRotation(OriginalRotation);
+            //VesselToSave.SetPosition(OriginalPosition);
             //End of Claw's code. Thanks Claw!
             return CN;
         }

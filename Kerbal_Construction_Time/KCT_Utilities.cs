@@ -1529,10 +1529,11 @@ namespace KerbalConstructionTime
             ShipConstruct test = new ShipConstruct();
             try
             {
-                KCTDebug.Log("Attempting to recover active vessel to storage.");
+                KCTDebug.Log("Attempting to recover active vessel to storage.  listType: " + listType);
                 GamePersistence.SaveGame("KCT_Backup", HighLogic.SaveFolder, SaveMode.OVERWRITE);
-                KCT_GameStates.recoveredVessel = new KCT_BuildListVessel(FlightGlobals.ActiveVessel);
-                KCT_GameStates.recoveredVessel.type = listType;
+
+                KCT_GameStates.recoveredVessel = new KCT_BuildListVessel(FlightGlobals.ActiveVessel, listType);
+                //KCT_GameStates.recoveredVessel.type = listType;
                 if (listType == KCT_BuildListVessel.ListType.VAB)
                     KCT_GameStates.recoveredVessel.launchSite = "LaunchPad";
                 else
