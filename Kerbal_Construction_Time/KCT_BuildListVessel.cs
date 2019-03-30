@@ -475,6 +475,13 @@ namespace KerbalConstructionTime
             }
         }
 
+        /// <summary>
+        /// Use this only within the Editor scene. Otherwise it can cause issues with other mods
+        /// because initializing the ShipConstruct will cause the OnLoad for Parts and PartModules to be called.
+        /// Some mods (like FAR for example) assume that this can only happen during the LoadScreen or Editor scene
+        /// and freak out.
+        /// </summary>
+        /// <returns></returns>
         public ShipConstruct GetShip()
         {
             if (ship != null && ship.Parts != null && ship.Parts.Count > 0) //If the parts are there, then the ship is loaded
@@ -516,7 +523,7 @@ namespace KerbalConstructionTime
             ShipTemplate template = new ShipTemplate();
             template.LoadShip(shipNode);
 
-            if (this.type == KCT_BuildListVessel.ListType.VAB)
+            if (this.type == ListType.VAB)
             {
                 KCT_LaunchPad selectedPad = highestFacility ? KCT_GameStates.ActiveKSC.GetHighestLevelLaunchPad() : KCT_GameStates.ActiveKSC.ActiveLPInstance;
                 float launchpadNormalizedLevel = 1.0f * selectedPad.level / KCT_GameStates.BuildingMaxLevelCache["LaunchPad"];
@@ -530,13 +537,13 @@ namespace KerbalConstructionTime
                 {
                     failedReasons.Add("Part Count limit exceeded");
                 }
-                PreFlightTests.CraftWithinSizeLimits sizeCheck = new PreFlightTests.CraftWithinSizeLimits(template, SpaceCenterFacility.LaunchPad, GameVariables.Instance.GetCraftSizeLimit(launchpadNormalizedLevel, true));
+                CraftWithinSizeLimits sizeCheck = new CraftWithinSizeLimits(template, SpaceCenterFacility.LaunchPad, GameVariables.Instance.GetCraftSizeLimit(launchpadNormalizedLevel, true));
                 if (!sizeCheck.Test())
                 {
                     failedReasons.Add("Size limits exceeded");
                 }
             }
-            else if (this.type == KCT_BuildListVessel.ListType.SPH)
+            else if (this.type == ListType.SPH)
             {
                 double totalMass = GetTotalMass();
                 if (totalMass > GameVariables.Instance.GetCraftMassLimit(ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.Runway), false))
@@ -547,17 +554,17 @@ namespace KerbalConstructionTime
                 {
                     failedReasons.Add("Part Count limit exceeded");
                 }
-                PreFlightTests.CraftWithinSizeLimits sizeCheck = new PreFlightTests.CraftWithinSizeLimits(template, SpaceCenterFacility.Runway, GameVariables.Instance.GetCraftSizeLimit(ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.Runway), false));
+                CraftWithinSizeLimits sizeCheck = new CraftWithinSizeLimits(template, SpaceCenterFacility.Runway, GameVariables.Instance.GetCraftSizeLimit(ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.Runway), false));
                 if (!sizeCheck.Test())
                 {
                     failedReasons.Add("Size limits exceeded");
                 }
             }
 
-            var partCheck = new ExperimentalPartsAvailable(GetShip());
-            if (!partCheck.Test())
+            Dictionary<AvailablePart, int> lockedParts = GetLockedParts();
+            if (lockedParts?.Count > 0)
             {
-                var msg = partCheck.GetWarningDescription();
+                var msg = KCT_Utilities.ConstructLockedPartsWarning(lockedParts);
                 failedReasons.Add(msg);
             }
 
@@ -764,6 +771,43 @@ namespace KerbalConstructionTime
                 }
             }
             return missing;
+        }
+
+        public bool CheckPartsUnlocked()
+        {
+            if (ResearchAndDevelopment.Instance == null)
+                return true;
+
+            foreach (ConfigNode pNode in shipNode.GetNodes("PART"))
+            {
+                if (!KCT_Utilities.PartIsUnlocked(pNode))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public Dictionary<AvailablePart, int> GetLockedParts()
+        {
+            var lockedPartsOnShip = new Dictionary<AvailablePart, int>();
+
+            if (ResearchAndDevelopment.Instance == null)
+                return lockedPartsOnShip;
+
+            foreach (ConfigNode pNode in shipNode.GetNodes("PART"))
+            {
+                string partName = KCT_Utilities.PartNameFromNode(pNode);
+                if (!KCT_Utilities.PartIsUnlocked(partName))
+                {
+                    AvailablePart partInfoByName = PartLoader.getPartInfoByName(partName);
+                    if (!lockedPartsOnShip.ContainsKey(partInfoByName))
+                        lockedPartsOnShip.Add(partInfoByName, 1);
+                    else
+                        ++lockedPartsOnShip[partInfoByName];
+                }
+            }
+
+            return lockedPartsOnShip;
         }
 
         public double AddProgress(double toAdd)
