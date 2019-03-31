@@ -103,6 +103,7 @@
     <Compile Include="KCT_BuildListVessel.cs" />
     <Compile Include="KCT_BuildPlans.cs" />
     <Compile Include="KCT_Events.cs" />
+    <Compile Include="KCT_FuelWhitelistLoader.cs" />
     <Compile Include="KCT_GameStates.cs" />
     <Compile Include="KCT_GUI.cs" />
     <Compile Include="KCT_DataStorage.cs" />
@@ -150,8 +151,6 @@
 
 
 start /D D:\Users\jbb\github\KCT /WAIT deploy.bat  $(TargetDir) $(TargetFileName)
-
-
 
 
 if $(ConfigurationName) == Release (

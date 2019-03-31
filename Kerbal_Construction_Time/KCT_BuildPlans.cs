@@ -21,51 +21,56 @@ namespace KerbalConstructionTime
         static SortedList<string, KCT_BuildListVessel> plansList = null;
         static int planToDelete;
 
+        internal static void InitBuildPlans()
+        {
+            buildPlansInitted = true;
+            buildPlansbutton = new GUIStyle(HighLogic.Skin.button);
+            buildPlansbutton.margin = new RectOffset(0, 0, 0, 0);
+            buildPlansbutton.padding = new RectOffset(0, 0, 0, 0);
+            buildPlansbutton.border = new RectOffset(0, 0, 0, 0);
+            buildPlansbutton.normal = buildPlansbutton.hover;
+            buildPlansbutton.active = buildPlansbutton.hover;
+
+            background = new Texture2D(2, 2);
+            Color[] color = new Color[4];
+            color[0] = new Color(1, 1, 1, 0);
+            color[1] = color[0];
+            color[2] = color[0];
+            color[3] = color[0];
+            background.SetPixels(color);
+
+            buildPlansbutton.normal.background = background;
+            buildPlansbutton.hover.background = background;
+            buildPlansbutton.onHover.background = background;
+            buildPlansbutton.active.background = background;
+            buildPlansbutton.onActive.background = background;
+
+            // rect = new Rect(Screen.width - 260, 0, 34, 34);
+
+            //ALPresent = AssemblyLoader.loadedAssemblies.Any(a => a.assembly.GetName().Name == "AviationLights");
+
+            int offset = 0;
+            bool steamPresent = AssemblyLoader.loadedAssemblies.Any(a => a.assembly.GetName().Name == "KSPSteamCtrlr");
+            bool mechjebPresent = AssemblyLoader.loadedAssemblies.Any(a => a.assembly.GetName().Name == "MechJeb2");
+            if (steamPresent)
+                offset = 46;
+            if (mechjebPresent)
+                offset = 140;
+
+            rect = new Rect(Screen.width - (260 + offset), 0, 42, 38);
+            upContent = new GUIContent("", GameDatabase.Instance.GetTexture("KerbalConstructionTime/Icons/KCT_add_normal", false), "");
+            hoverContent = new GUIContent("", GameDatabase.Instance.GetTexture("KerbalConstructionTime/Icons/KCT_add_hover", false), "");
+        }
+
         private static void DoBuildPlansList()
         {
+#if false
             if (!buildListVarsInitted)
                 InitBuildListVars();
-
+#endif
             if (!buildPlansInitted)
-            {
-                
-                buildPlansbutton = new GUIStyle(HighLogic.Skin.button);
-                buildPlansbutton.margin = new RectOffset(0, 0, 0, 0);
-                buildPlansbutton.padding = new RectOffset(0, 0, 0, 0);
-                buildPlansbutton.border = new RectOffset(0, 0, 0, 0);
-                buildPlansbutton.normal = buildPlansbutton.hover;
-                buildPlansbutton.active = buildPlansbutton.hover;
+                InitBuildPlans();                
 
-                background = new Texture2D(2, 2);
-                Color[] color = new Color[4];
-                color[0] = new Color(1, 1, 1, 0);
-                color[1] = color[0];
-                color[2] = color[0];
-                color[3] = color[0];
-                background.SetPixels(color);
-
-                buildPlansbutton.normal.background = background;
-                buildPlansbutton.hover.background = background;
-                buildPlansbutton.onHover.background = background;
-                buildPlansbutton.active.background = background;
-                buildPlansbutton.onActive.background = background;
-
-                // rect = new Rect(Screen.width - 260, 0, 34, 34);
-
-                //ALPresent = AssemblyLoader.loadedAssemblies.Any(a => a.assembly.GetName().Name == "AviationLights");
-
-                int offset = 0;
-                bool steamPresent = AssemblyLoader.loadedAssemblies.Any(a => a.assembly.GetName().Name == "KSPSteamCtrlr");
-                bool mechjebPresent = AssemblyLoader.loadedAssemblies.Any(a => a.assembly.GetName().Name == "MechJeb2");
-                if (steamPresent)
-                    offset = 46;
-                if (mechjebPresent)
-                    offset = 140;
-
-                rect = new Rect(Screen.width - (260 + offset) , 0, 42,  38);
-                upContent = new GUIContent("", GameDatabase.Instance.GetTexture("KerbalConstructionTime/Icons/KCT_add_normal", false), "");
-                hoverContent = new GUIContent("", GameDatabase.Instance.GetTexture("KerbalConstructionTime/Icons/KCT_add_hover", false), "");
-            }
 
             if (rect.Contains(Mouse.screenPos))
                 content = hoverContent;

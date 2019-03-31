@@ -1,3 +1,11 @@
+
+1.4.6.2 (beta)
+	Optimized the stock toolbar button texture setting (for the flashing of the button)
+	Removed log spam: UpdateTechlistIconColor
+	Added whitelist of fuels for the "Fill Tanks" & "Fill Tanks and Launch"
+	Moved initialization of static GUI stuff into the loader
+	Fixed memory leak and cause of stuttering in the editor
+
 1.4.6.1
 	Fixed rockets turning 90 degrees at launch, result of an over-enthusiastic fix for the previous bugfix 
 

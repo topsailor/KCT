@@ -634,7 +634,6 @@ namespace KerbalConstructionTime
         {
             if (KSP.UI.Screens.RDController.Instance != null)
             {
-                Debug.Log("UpdateTechlistIconColor");
                 for (int i = KSP.UI.Screens.RDController.Instance.nodes.Count; i-- > 0;)
                 {
                     KSP.UI.Screens.RDNode node = KSP.UI.Screens.RDController.Instance.nodes[i];

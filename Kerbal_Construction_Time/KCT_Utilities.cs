@@ -613,47 +613,50 @@ namespace KerbalConstructionTime
         }
 
         private static DateTime startedFlashing;
-        static string ReturnString(string st, bool stock)
+
+        static Texture2D KCT_Off_38, KCT_On_38;
+        static bool textureInited = false;
+
+        public static Texture2D GetStockButtonTexture()
         {
-            st += stock ? "-38" : "-24";
-            return st;
+            if (!textureInited)
+            {
+                KCT_Off_38 = GameDatabase.Instance.GetTexture("KerbalConstructionTime/Icons/KCT_off-38", false);
+                KCT_On_38 = GameDatabase.Instance.GetTexture("KerbalConstructionTime/Icons/KCT_on-38", false);
+            }
+            if (KCT_Events.instance.KCTButtonStockImportant && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(0))) > 0 && DateTime.Now.Millisecond < 500)
+                return KCT_Off_38;
+            else if (KCT_Events.instance.KCTButtonStockImportant && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(3))) > 0)
+            {
+                KCT_Events.instance.KCTButtonStockImportant = false;
+                return KCT_On_38;
+            }
+            //The normal icon
+            else
+                return KCT_On_38;
         }
-        public static String GetButtonTexture(bool stock = false)
+
+        public static String GetButtonTexture()
         {
             String textureReturn;
+           
+            if (!KCT_PresetManager.Instance.ActivePreset.generalSettings.Enabled)
+                return "KerbalConstructionTime/Icons/KCT_off-24";
 
-            if (stock)
+            //Flash for up to 3 seconds, at half second intervals per icon
+            if (KCT_GameStates.kctToolbarButton.Important && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(3))) < 0 && DateTime.Now.Millisecond < 500)
+                textureReturn = "KerbalConstructionTime/Icons/KCT_off";
+            //If it's been longer than 3 seconds, set Important to false and stop flashing
+            else if (KCT_GameStates.kctToolbarButton.Important && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(3))) > 0)
             {
-                if (KCT_Events.instance.KCTButtonStockImportant && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(0))) > 0 && DateTime.Now.Millisecond < 500)
-                    textureReturn = "KerbalConstructionTime/Icons/KCT_off";
-                else if (KCT_Events.instance.KCTButtonStockImportant && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(3))) > 0)
-                {
-                    KCT_Events.instance.KCTButtonStockImportant = false;
-                    textureReturn = "KerbalConstructionTime/Icons/KCT_on";
-                }
-                //The normal icon
-                else
-                    textureReturn = "KerbalConstructionTime/Icons/KCT_on";
+                KCT_GameStates.kctToolbarButton.Important = false;
+                textureReturn = "KerbalConstructionTime/Icons/KCT_on";
             }
+            //The normal icon
             else
-            {
-                if (!KCT_PresetManager.Instance.ActivePreset.generalSettings.Enabled)
-                    return ReturnString("KerbalConstructionTime/Icons/KCT_off", stock);
-
-                //Flash for up to 3 seconds, at half second intervals per icon
-                if (KCT_GameStates.kctToolbarButton.Important && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(3))) < 0 && DateTime.Now.Millisecond < 500)
-                    textureReturn = "KerbalConstructionTime/Icons/KCT_off";
-                //If it's been longer than 3 seconds, set Important to false and stop flashing
-                else if (KCT_GameStates.kctToolbarButton.Important && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(3))) > 0)
-                {
-                    KCT_GameStates.kctToolbarButton.Important = false;
-                    textureReturn = "KerbalConstructionTime/Icons/KCT_on";
-                }
-                //The normal icon
-                else
-                    textureReturn = "KerbalConstructionTime/Icons/KCT_on";
-            }
-            return ReturnString(textureReturn, stock);
+                textureReturn = "KerbalConstructionTime/Icons/KCT_on";
+            
+            return textureReturn + "-24";
         }
 
         public static bool CurrentGameHasScience()

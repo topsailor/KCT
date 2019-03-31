@@ -558,11 +558,14 @@ namespace KerbalConstructionTime
                     var resList = p.GetNodes("RESOURCE");
                     foreach (var res in resList)
                     {
-                        bool flowState = bool.Parse(res.GetValue("flowState"));
-                        if (flowState)
+                        if (KCT_GuiDataAndWhitelistItemsDatabase.validFuelRes.Contains(res.GetValue("name")))
                         {
-                            var maxAmt = res.GetValue("maxAmount");
-                            res.SetValue("amount", maxAmt);
+                            bool flowState = bool.Parse(res.GetValue("flowState"));
+                            if (flowState)
+                            {
+                                var maxAmt = res.GetValue("maxAmount");
+                                res.SetValue("amount", maxAmt);
+                            }
                         }
                     }
                 }
@@ -572,11 +575,14 @@ namespace KerbalConstructionTime
                     foreach (var res in resList)
                     {
                         var name = res.GetValue("name");
-                        bool flowState = bool.Parse(res.GetValue("flowState"));
-                        if (flowState)
+                        if (KCT_GuiDataAndWhitelistItemsDatabase.validFuelRes.Contains(name))
                         {
-                            var maxAmt = res.GetValue("maxAmount");
-                            res.SetValue("amount", maxAmt);
+                            bool flowState = bool.Parse(res.GetValue("flowState"));
+                            if (flowState)
+                            {
+                                var maxAmt = res.GetValue("maxAmount");
+                                res.SetValue("amount", maxAmt);
+                            }
                         }
                     }
                 }

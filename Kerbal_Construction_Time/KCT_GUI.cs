@@ -59,19 +59,17 @@ namespace KerbalConstructionTime
 
             if (validScenes.Contains(HighLogic.LoadedScene)) //&& KCT_GameStates.settings.enabledForSave)//!(HighLogic.CurrentGame.Mode == Game.Modes.SANDBOX && !KCT_GameStates.settings.SandboxEnabled))
             {
+                
                 if (ToolbarManager.ToolbarAvailable && KCT_GameStates.kctToolbarButton != null)
                 {
                     KCT_GameStates.kctToolbarButton.TexturePath = KCT_Utilities.GetButtonTexture(); //Set texture, allowing for flashing of icon.
                 }
                 else
                 {
-                    var tex = GameDatabase.Instance.GetTexture(KCT_Utilities.GetButtonTexture(true), false);
-
-                    if (tex != null)
-                    {
-                        if (KCT_Events.instance != null && KCT_Events.instance.KCTButtonStock != null)                      
+                    Texture2D tex = KCT_Utilities.GetStockButtonTexture();
+                        
+                    if (tex != null && KCT_Events.instance != null && KCT_Events.instance.KCTButtonStock != null)
                             KCT_Events.instance.KCTButtonStock.SetTexture(tex);
-                    }
                 }
 
                 if (showSettings)
@@ -325,12 +323,6 @@ namespace KerbalConstructionTime
 
         public static void DrawMainGUI(int windowID) //Deprecated to all hell now I think
         {
-            //GUIStyle mySty = new GUIStyle(GUI.skin.button);
-            //mySty.normal.textColor = mySty.focused.textColor = Color.white;
-            //mySty.hover.textColor = mySty.active.textColor = Color.yellow;
-            //mySty.onNormal.textColor = mySty.onFocused.textColor = mySty.onHover.textColor = mySty.onActive.textColor = Color.green;
-            //mySty.padding = new RectOffset(16, 16, 8, 8);
-
             //sets the layout for the GUI, which is pretty much just some debug stuff for me.
             GUILayout.BeginHorizontal();
 
@@ -341,20 +333,12 @@ namespace KerbalConstructionTime
             GUILayout.Label("UT: ", GUILayout.ExpandHeight(true));
             if (GUILayout.Button("Warp until ready."))
             {
-                //    if (FlightGlobals.ActiveVessel.id != KCT_GameStates.activeVessel.vessel.id)
-                {
-                    //        FlightGlobals.SetActiveVessel(KCT_GameStates.activeVessel.vessel);
-                }
                 KCT_GameStates.canWarp = true;
-
             }
             GUILayout.EndVertical();
 
             GUILayout.BeginVertical();
-            //GUILayout.Label(KCT_GameStates.activeVessel.vessel.Parts.Count.ToString(), GUILayout.ExpandHeight(true));
-            // GUILayout.Label(KCT_GameStates.activeVessel.buildTime.ToString(), GUILayout.ExpandHeight(true));
-            //GUILayout.Label(KCT_Utilities.GetFormatedTime(KCT_GameStates.activeVessel.finishDate - KCT_GameStates.UT), GUILayout.ExpandHeight(true));
-            // GUILayout.Label(MagiCore.Utilities.GetFormattedTime(KCT_GameStates.activeVessel.buildTime - KCT_GameStates.activeVessel.progress), GUILayout.ExpandHeight(true));
+
             GUILayout.Label(MagiCore.Utilities.GetFormattedTime(KCT_GameStates.UT).ToString(), GUILayout.ExpandHeight(true));
             if (GUILayout.Button("Stop warp"))
             {
@@ -568,15 +552,17 @@ namespace KerbalConstructionTime
                         {
                             foreach (PartResource rsc in p.Resources)
                             {
-                                if (rsc.flowState)
+                                if (KCT_GuiDataAndWhitelistItemsDatabase.validFuelRes.Contains(rsc.resourceName) && rsc.flowState)
+                                {
                                     rsc.amount = rsc.maxAmount;
+                                }
                             }
                         }
                         else
                         {
                             foreach (PartResource rsc in p.Resources)
                             {
-                                if (rsc.flowState)
+                                if (KCT_GuiDataAndWhitelistItemsDatabase.validFuelRes.Contains(rsc.resourceName) && rsc.flowState)
                                 {
                                     PartResource templateRsc = p.partInfo.partPrefab.Resources.FirstOrDefault(r => r.resourceName == rsc.resourceName);
                                     if (templateRsc != null)

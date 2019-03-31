@@ -73,12 +73,13 @@ namespace KerbalConstructionTime
         private static double costOfNewLP = -13;
 
         // these are private/static for efficiency, this way it only initialized them one time
-        private static bool buildListVarsInitted = false;
+        //private static bool buildListVarsInitted = false;
         private static GUIStyle redText, yellowText, greenText, normalButton, yellowButton, redButton, greenButton;
 
-        private static void InitBuildListVars()
+        internal static void InitBuildListVars()
         {
-            buildListVarsInitted = true;
+            Debug.Log("[KCT] InitBuildListVars");
+            //buildListVarsInitted = true;
             redText = new GUIStyle(GUI.skin.label);
             redText.normal.textColor = Color.red;
             yellowText = new GUIStyle(GUI.skin.label);
@@ -104,15 +105,10 @@ namespace KerbalConstructionTime
 
         public static void DrawBuildListWindow(int windowID)
         {
-            //if (buildListWindowPosition.xMax > Screen.width)
-            //    buildListWindowPosition.x = Screen.width - buildListWindowPosition.width;
-
-            //if (Input.touchCount == 0) MouseOnRolloutButton = false;
-
-            //GUI.skin = HighLogic.UISkin;
+#if false
             if (!buildListVarsInitted)
                 InitBuildListVars();
-
+#endif
             int width1 = 120;
             int width2 = 100;
             int butW = 20;

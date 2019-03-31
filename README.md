@@ -13,4 +13,4 @@ Check out the development forum for additional details and pre-built binaries: h
 * Assembly-CSharp.dll (from KSP)
 * UnityEngine.dll (from KSP)
 
-I use Visual Studio Express 2013.
+I use Visual Studio Express 2017.
