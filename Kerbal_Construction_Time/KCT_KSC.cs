@@ -186,9 +186,12 @@ namespace KerbalConstructionTime
         public KCT_LaunchPad GetHighestLevelLaunchPad()
         {
             KCT_LaunchPad highest = LaunchPads[0];
-
-            foreach (KCT_LaunchPad pad in LaunchPads)
+            for (int i = LaunchPads.Count - 1; i >= 0; i--)
             {
+                KCT_LaunchPad pad = LaunchPads[i];
+            
+            //foreach (KCT_LaunchPad pad in LaunchPads)
+            //{
                 if (pad.level > highest.level)
                 {
                     highest = pad;

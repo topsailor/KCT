@@ -654,7 +654,7 @@ namespace KerbalConstructionTime
             if (TotalMass != 0 && emptyMass != 0) return TotalMass;
             TotalMass = 0;
             emptyMass = 0;
-            for (int i = this.ExtractedPartNodes.Count - 1; i >= 0; i++)
+            for (int i = this.ExtractedPartNodes.Count - 1; i >= 0; i--)
             {
                 ConfigNode p = ExtractedPartNodes[i];
             //foreach (ConfigNode p in this.ExtractedPartNodes)
