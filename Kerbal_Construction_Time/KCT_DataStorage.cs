@@ -115,8 +115,12 @@ namespace KerbalConstructionTime
 
         private bool VesselIsInWorld(Guid id)
         {
-            foreach (Vessel vssl in FlightGlobals.Vessels)
+            for (int i = FlightGlobals.Vessels.Count - 1; i >= 0; i--)
             {
+                Vessel vssl = FlightGlobals.Vessels[i];
+            
+            //foreach (Vessel vssl in FlightGlobals.Vessels)
+            //{
                 if (vssl.id == id)
                     return true;
             }

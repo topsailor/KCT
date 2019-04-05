@@ -40,8 +40,11 @@ namespace KerbalConstructionTime
             get
             {
                 List<Part> temp = new List<Part>();
-                foreach (PseudoPart PP in this.GetPseudoParts())
+                for (int i = this.GetPseudoParts().Count - 1; i >= 0; i--)
                 {
+                    PseudoPart PP = this.GetPseudoParts()[i];
+                //foreach (PseudoPart PP in this.GetPseudoParts())
+                //{
                     Part p = KCT_Utilities.GetAvailablePartByName(PP.name).partPrefab;
                     p.craftID = PP.uid;
                     temp.Add(p);
@@ -110,8 +113,12 @@ namespace KerbalConstructionTime
             HashSet<int> stages = new HashSet<int>();
             numStageParts = 0;
             stagePartCost = 0d;
-            foreach (Part p in s.Parts)
+            for (int i = s.Parts.Count - 1; i >= 0; i--)
             {
+                Part p = s.Parts[i];
+            
+            //foreach (Part p in s.Parts)
+            //{
                 if (p.stagingOn)
                 {
                     stages.Add(p.inverseStage);
@@ -138,8 +145,12 @@ namespace KerbalConstructionTime
             DesiredManifest = new List<string>();
             if (CrewAssignmentDialog.Instance?.GetManifest()?.CrewCount > 0)
             {
-                foreach (ProtoCrewMember crew in CrewAssignmentDialog.Instance.GetManifest().GetAllCrew(true) ?? new List<ProtoCrewMember>())
+                var pcm = CrewAssignmentDialog.Instance.GetManifest().GetAllCrew(true) ?? new List<ProtoCrewMember>();
+                for (int i = pcm.Count - 1; i >= 0; i--)
                 {
+                    ProtoCrewMember crew = pcm[i];
+                //foreach (ProtoCrewMember crew in CrewAssignmentDialog.Instance.GetManifest().GetAllCrew(true) ?? new List<ProtoCrewMember>())
+                //{
                    
                         DesiredManifest.Add(crew?.name ?? string.Empty);
                     
@@ -181,8 +192,12 @@ namespace KerbalConstructionTime
             emptyMass = 0;
 
             HashSet<int> stages = new HashSet<int>();
-            foreach (ProtoPartSnapshot p in vessel.protoVessel.protoPartSnapshots)
+            for (int i = vessel.protoVessel.protoPartSnapshots.Count - 1; i >= 0; i--)
             {
+                ProtoPartSnapshot p = vessel.protoVessel.protoPartSnapshots[i];
+            
+            //foreach (ProtoPartSnapshot p in vessel.protoVessel.protoPartSnapshots)
+            //{
                 stages.Add(p.inverseStageIndex);
 
                 if (p.partPrefab != null && p.partPrefab.Modules.Contains<LaunchClamp>())
@@ -190,8 +205,12 @@ namespace KerbalConstructionTime
 
                 TotalMass += p.mass;
                 emptyMass += p.mass;
-                foreach (ProtoPartResourceSnapshot rsc in p.resources)
+                for (int i1 = p.resources.Count - 1; i1 >= 0; i1--)
                 {
+                    ProtoPartResourceSnapshot rsc = p.resources[i1];
+                
+                //foreach (ProtoPartResourceSnapshot rsc in p.resources)
+                //{
                     PartResourceDefinition def = PartResourceLibrary.Instance.GetDefinition(rsc.resourceName);
                     if (def != null)
                         TotalMass += def.density * (float)rsc.amount;
@@ -255,10 +274,20 @@ namespace KerbalConstructionTime
             }
             ConfigNode ModuleTemplates = ConfigNode.Load(filePath);
             ConfigNode[] templates = ModuleTemplates.GetNodes("MODULE");
-            foreach(ConfigNode part in node.GetNodes("PART"))
+
+            var nodes = node.GetNodes("PART");
+            for (int i = nodes.Count() - 1; i >= 0; i--)
             {
-                foreach(ConfigNode module in part.GetNodes("MODULE"))
+                ConfigNode part = nodes[i];
+                //foreach(ConfigNode part in node.GetNodes("PART"))
+                //{
+                var modules = part.GetNodes("MODULES");
+                for (int i1 = modules.Count() - 1; i1 >= 0; i1--)
                 {
+                    ConfigNode module = modules[i1];
+                
+                //foreach(ConfigNode module in part.GetNodes("MODULE"))
+                //{
                     SanitizeNode(KCT_Utilities.PartNameFromNode(part), module, templates);
                 }
             }
@@ -279,22 +308,40 @@ namespace KerbalConstructionTime
             ConfigNode template = templates.FirstOrDefault(t => t.GetValue("name") == name && (!t.HasValue("parts") || t.GetValue("parts").Split(',').Contains(partName)));
             if (template == null) return;
             ConfigNode.ValueList values = template.values;
-            foreach (ConfigNode.Value val in values)
+            for (int i = values.Count - 1; i >= 0; i--)
             {
+                ConfigNode.Value val = values[i];
+            
+            //foreach (ConfigNode.Value val in values)
+            //{
                 module.SetValue(val.name, val.value);
             }
 
-            foreach (ConfigNode node in template.GetNodes()) //This should account for nested nodes, like RealChutes' PARACHUTE node
+            ConfigNode[] nodes = template.GetNodes();
+            for (int i = nodes.Length -1; i >= 0; i--)
             {
+                ConfigNode node = nodes[i];
+            //foreach (ConfigNode node in template.GetNodes()) //This should account for nested nodes, like RealChutes' PARACHUTE node
+            //{
                 if (module.HasNode(node.name))
                 {
-                    foreach (ConfigNode.Value val in node.values)
+                    for (int i1 = node.values.Count - 1; i >= 0; i--)
+                    {
+                        ConfigNode.Value val = node.values[i1];
+                        //foreach (ConfigNode.Value val in node.values)
                         module.GetNode(node.name).SetValue(val.name, val.value);
+                    }
                 }
             }
 
-            foreach (ConfigNode node in module.GetNodes("MODULE"))
+            nodes = module.GetNodes("MODULE");
+            for (int i = nodes.Count() - 1; i >= 0; i--)
+            {
+                ConfigNode node = nodes[i];
+
+                //foreach (ConfigNode node in module.GetNodes("MODULE"))
                 SanitizeNode(partName, node, templates);
+            }
         }
 
         private void CreateInitialTemplates()
@@ -380,8 +427,12 @@ namespace KerbalConstructionTime
             ret.shipNode = this.shipNode.CreateCopy();
 
             //refresh all inventory parts to new
-            foreach (ConfigNode part in ret.ExtractedPartNodes)
+            for (int i = ret.ExtractedPartNodes.Count - 1; i >= 0; i--)
             {
+                ConfigNode part = ret.ExtractedPartNodes[i];
+            
+            //foreach (ConfigNode part in ret.ExtractedPartNodes)
+            //{
                 ScrapYardWrapper.RefreshPart(part);
             }
 
@@ -532,10 +583,20 @@ namespace KerbalConstructionTime
 
         private void UpdateRFTanks()
         {
-            foreach (ConfigNode cn in shipNode.GetNodes("PART"))
+            var nodes = shipNode.GetNodes("PART");
+            for (int i = nodes.Count() - 1; i >= 0; i--)
             {
-                foreach (ConfigNode module in cn.GetNodes("MODULE"))
+                ConfigNode cn = nodes[i];
+
+                //foreach (ConfigNode cn in shipNode.GetNodes("PART"))
+                //{
+                var modules = cn.GetNodes("MODULE");
+                for (int im = modules.Count() - 1; im >= 0; im--)
                 {
+                    ConfigNode module = modules[im];
+                
+                    //foreach (ConfigNode module in cn.GetNodes("MODULE"))
+                    //{
                     if (module.GetValue("name") == "ModuleFuelTanks")
                     {
                         if (module.HasValue("timestamp"))
@@ -593,8 +654,11 @@ namespace KerbalConstructionTime
             if (TotalMass != 0 && emptyMass != 0) return TotalMass;
             TotalMass = 0;
             emptyMass = 0;
-            foreach (ConfigNode p in this.ExtractedPartNodes)
+            for (int i = this.ExtractedPartNodes.Count - 1; i >= 0; i++)
             {
+                ConfigNode p = ExtractedPartNodes[i];
+            //foreach (ConfigNode p in this.ExtractedPartNodes)
+            //{
                 TotalMass += KCT_Utilities.GetPartMassFromNode(p, includeFuel: true, includeClamps: false);
                 emptyMass += KCT_Utilities.GetPartMassFromNode(p, includeFuel: false, includeClamps: false);
             }

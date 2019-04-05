@@ -142,8 +142,12 @@ namespace KerbalConstructionTime
                 ksc.RecalculateBuildRates();
                 ksc.RecalculateUpgradedBuildRates();
             }
-            foreach (KCT_TechItem tech in KCT_GameStates.TechList)
+            for (int i = KCT_GameStates.TechList.Count - 1; i >= 0; i--)
             {
+                KCT_TechItem tech = KCT_GameStates.TechList[i];
+
+            //foreach (KCT_TechItem tech in KCT_GameStates.TechList)
+            //{
                 tech.UpdateBuildRate(KCT_GameStates.TechList.IndexOf(tech));
             }
         }

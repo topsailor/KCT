@@ -15,11 +15,14 @@ namespace KerbalConstructionTime
         static GUIContent upContent;
         static GUIContent hoverContent;
         static Rect rect;
+        static float scale;
         static GUIContent content;
         static bool buildPlansInitted = false;
 
         static SortedList<string, KCT_BuildListVessel> plansList = null;
         static int planToDelete;
+        static Texture2D up;
+        static Texture2D hover;
 
         internal static void InitBuildPlans()
         {
@@ -49,6 +52,17 @@ namespace KerbalConstructionTime
 
             //ALPresent = AssemblyLoader.loadedAssemblies.Any(a => a.assembly.GetName().Name == "AviationLights");
 
+
+
+            up = GameDatabase.Instance.GetTexture("KerbalConstructionTime/Icons/KCT_add_normal", false);
+            hover = GameDatabase.Instance.GetTexture("KerbalConstructionTime/Icons/KCT_add_hover", false);
+            PositionAndSizeIcon();
+        }
+        static void PositionAndSizeIcon()
+        {
+            Texture2D upTex = Texture2D.Instantiate(up);
+            Texture2D hoverTex = Texture2D.Instantiate(hover);
+
             int offset = 0;
             bool steamPresent = AssemblyLoader.loadedAssemblies.Any(a => a.assembly.GetName().Name == "KSPSteamCtrlr");
             bool mechjebPresent = AssemblyLoader.loadedAssemblies.Any(a => a.assembly.GetName().Name == "MechJeb2");
@@ -56,12 +70,15 @@ namespace KerbalConstructionTime
                 offset = 46;
             if (mechjebPresent)
                 offset = 140;
-
-            rect = new Rect(Screen.width - (260 + offset), 0, 42, 38);
-            upContent = new GUIContent("", GameDatabase.Instance.GetTexture("KerbalConstructionTime/Icons/KCT_add_normal", false), "");
-            hoverContent = new GUIContent("", GameDatabase.Instance.GetTexture("KerbalConstructionTime/Icons/KCT_add_hover", false), "");
+            scale = GameSettings.UI_SCALE;
+            rect = new Rect(Screen.width - (260 + offset) * scale, 0, 42 * scale, 38 * scale);
+            {
+                TextureScale.Bilinear(upTex, (int)(up.width * scale), (int)(up.height * scale));
+                TextureScale.Bilinear(hoverTex, (int)(hover.width * scale), (int)(hover.height * scale));
+            }
+            upContent = new GUIContent("", upTex, "");
+            hoverContent = new GUIContent("", hoverTex, "");
         }
-
         private static void DoBuildPlansList()
         {
 #if false
@@ -71,11 +88,15 @@ namespace KerbalConstructionTime
             if (!buildPlansInitted)
                 InitBuildPlans();                
 
-
+            
             if (rect.Contains(Mouse.screenPos))
                 content = hoverContent;
             else
                 content = upContent;
+            if (scale != GameSettings.UI_SCALE)
+            {
+                PositionAndSizeIcon();
+            }
             // When this is true, and the mouse is NOT over the toggle, the toggle code is making the toggle active
             // which is showing the corners of the button as unfilled
             showBuildPlansWindow = GUI.Toggle(rect, showBuildPlansWindow, content, buildPlansbutton);

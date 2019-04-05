@@ -932,8 +932,12 @@ namespace KerbalConstructionTime
             }
             GUILayout.EndHorizontal();
             int numberItems = 0;
-            foreach (Part p in parts)
+            for (int i = parts.Count - 1; i >= 0; i--)
             {
+                Part p = parts[i];
+            
+            //foreach (Part p in parts)
+            //{
                 //Part p = KCT_Utilities.GetAvailablePartByName(s).partPrefab;
                 if (p.CrewCapacity > 0)
                 {
