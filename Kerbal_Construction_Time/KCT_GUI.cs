@@ -508,6 +508,7 @@ namespace KerbalConstructionTime
 
                     ship.RemoveFromBuildList();
                     newShip.progress = newProgress;
+                    newShip.rushBuildClicks = ship.rushBuildClicks;
                     KCTDebug.Log("Finished? " + ship.isFinished);
                     if (ship.isFinished)
                         newShip.cannotEarnScience = true;
