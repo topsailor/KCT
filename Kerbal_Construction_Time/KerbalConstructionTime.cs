@@ -340,10 +340,12 @@ namespace KerbalConstructionTime
                     {
                         Part p = FlightGlobals.ActiveVessel.parts[i];
                         //KCTDebug.Log("craft: " + p.craftID);
+                        KCTDebug.LogError("Part being tested: " + p.partInfo.title);
                         {
                             CrewedPart cP = KCT_GameStates.launchedCrew.Find(part => part.partID == p.craftID);
-                            if (cP == null) continue;
+                            if (cP == null) continue;                        
                             List<ProtoCrewMember> crewList = cP.crewList;
+                            KCTDebug.LogError("cP.crewList.Count: " + cP.crewList.Count);
                             foreach (ProtoCrewMember crewMember in crewList)
                             {
                                 if (crewMember != null)
@@ -359,7 +361,7 @@ namespace KerbalConstructionTime
                                     }
                                     if (finalCrewMember == null)
                                     {
-                                        Debug.LogError("Error when assigning " + crewMember.name + " to " + p.partInfo.name +". Cannot find Kerbal in list.");
+                                        KCTDebug.LogError("Error when assigning " + crewMember.name + " to " + p.partInfo.name +". Cannot find Kerbal in list.");
                                         continue;
                                     }
                                     try
@@ -373,14 +375,14 @@ namespace KerbalConstructionTime
                                         }
                                         else
                                         {
-                                            Debug.LogError("Error when assigning " + crewMember.name + " to " + p.partInfo.name);
+                                            KCTDebug.LogError("Error when assigning " + crewMember.name + " to " + p.partInfo.name);
                                             finalCrewMember.rosterStatus = ProtoCrewMember.RosterStatus.Available;
                                             continue;
                                         }
                                     }
                                     catch
                                     {
-                                        Debug.LogError("Error when assigning " + crewMember.name + " to " + p.partInfo.name);
+                                        KCTDebug.LogError("Error when assigning " + crewMember.name + " to " + p.partInfo.name);
                                         finalCrewMember.rosterStatus = ProtoCrewMember.RosterStatus.Available;
                                         continue;
                                     }

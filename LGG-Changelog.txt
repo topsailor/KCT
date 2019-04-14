@@ -7,6 +7,9 @@
 	Fixed memory leak and cause of stuttering in the editor
 	Added automatic sizing and placement to Build Plans button for UI scaling
 	Added TextureScale.cs to support sizing & placement of the buttons
+	Fixed error in loop, was doing a ++ instead of a --
+	Converted many foreach into for loops
+	Fixed issue where launching vessel would not properly load kerbals into crewed part
 
 1.4.6.1
 	Fixed rockets turning 90 degrees at launch, result of an over-enthusiastic fix for the previous bugfix 

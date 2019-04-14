@@ -40,11 +40,12 @@ namespace KerbalConstructionTime
             get
             {
                 List<Part> temp = new List<Part>();
-                for (int i = this.GetPseudoParts().Count - 1; i >= 0; i--)
+                //
+                // Trying to change the following to a simple (for int i = ...
+                // doesn't work for some reason
+                //
+                foreach (PseudoPart PP in this.GetPseudoParts())
                 {
-                    PseudoPart PP = this.GetPseudoParts()[i];
-                //foreach (PseudoPart PP in this.GetPseudoParts())
-                //{
                     Part p = KCT_Utilities.GetAvailablePartByName(PP.name).partPrefab;
                     p.craftID = PP.uid;
                     temp.Add(p);

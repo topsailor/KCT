@@ -693,9 +693,9 @@ namespace KerbalConstructionTime
         {
             for (int i = 0; i < ship.Count; i++)
             {
-                Part p = ship[i];
+                //Part p = ship[i];
                 //Debug.Log(p.partInfo.name+":"+p.CrewCapacity);
-                if (p.CrewCapacity > 0) return i;
+                if (ship[i].CrewCapacity > 0) return i;
             }
             return -1;
         }
