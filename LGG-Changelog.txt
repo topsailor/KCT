@@ -1,5 +1,5 @@
 
-1.4.6.2 (beta)
+1.4.6.4
 	Optimized the stock toolbar button texture setting (for the flashing of the button)
 	Removed log spam: UpdateTechlistIconColor
 	Added whitelist of fuels for the "Fill Tanks" & "Fill Tanks and Launch"
