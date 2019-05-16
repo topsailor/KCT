@@ -1301,6 +1301,33 @@ namespace KerbalConstructionTime
             return size.x;
         }
 
+        public static Texture2D GetKerbalIcon(ProtoCrewMember pcm)
+        {
+            String type = "suit";
+            switch (pcm.type)
+            {
+                case (ProtoCrewMember.KerbalType.Applicant):
+                    type = "recruit";
+                    break;
+                case (ProtoCrewMember.KerbalType.Tourist):
+                    type = "tourist";
+                    break;
+                default:
+                    if (pcm.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && pcm.KerbalRef.InVessel.vesselType == VesselType.EVA)
+                        type = "eva";
+                    else if (pcm.veteran)
+                        type += "_orange";
+                    break;
+            }
+            String textureName = "kerbalicon_" + type + (pcm.gender == ProtoCrewMember.Gender.Female ? "_female" : String.Empty);
+            
+            String suffix = pcm.GetKerbalIconSuitSuffix();
+            if (String.IsNullOrEmpty(suffix))
+                return AssetBase.GetTexture(textureName);
+            else
+                return Expansions.Missions.MissionsUtils.METexture("Kerbals/Textures/kerbalIcons/" + textureName + suffix + ".tif");
+        }
+
         public static void DrawCrewSelect(int windowID)
         {
             //List<ProtoCrewMember> availableCrew = CrewAvailable();
