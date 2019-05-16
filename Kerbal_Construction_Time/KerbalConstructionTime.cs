@@ -182,6 +182,7 @@ namespace KerbalConstructionTime
             KCT_GUI.guiDataSaver.Save();
         }
 
+        static bool GuiInit = false;
         private void OnGUI()
         {
 #if KSP1_4
@@ -191,6 +192,12 @@ namespace KerbalConstructionTime
                 return;
             }
 #endif
+            if (!GuiInit)
+            {
+                KCT_GUI.InitBuildListVars();
+                KCT_GUI.InitBuildPlans();
+                GuiInit = true;
+            }
             KCT_GUI.SetGUIPositions();
         }
 

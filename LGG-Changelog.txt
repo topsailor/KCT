@@ -1,3 +1,6 @@
+1.4.6.5
+	Fixed initialization of the CTIWrapper
+	Merged PR by @cakepie for fetching the kerbal icon
 
 1.4.6.4
 	Optimized the stock toolbar button texture setting (for the flashing of the button)

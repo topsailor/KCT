@@ -79,15 +79,13 @@ namespace KerbalConstructionTime
             upContent = new GUIContent("", upTex, "");
             hoverContent = new GUIContent("", hoverTex, "");
         }
+
         private static void DoBuildPlansList()
         {
 #if false
-            if (!buildListVarsInitted)
-                InitBuildListVars();
-#endif
             if (!buildPlansInitted)
                 InitBuildPlans();                
-
+#endif
             
             if (rect.Contains(Mouse.screenPos))
                 content = hoverContent;

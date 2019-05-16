@@ -44,7 +44,7 @@ namespace KerbalConstructionTime
 
     public class KCT_FuelWhitelistLoader : LoadingSystem
     {
-        public bool Done = false, GuiInit = false;
+        public bool Done = false;
         
         private IEnumerator LoadCustomItems()
         {
@@ -76,15 +76,6 @@ namespace KerbalConstructionTime
             Done = true;
         }
 
-        void OnGUI()
-        {
-            if (!GuiInit)
-            {
-                KCT_GUI.InitBuildListVars();
-                //KCT_GUI.InitBuildPlans();
-                GuiInit = true;
-            }
-        }
         public override bool IsReady()
         {
             return Done;
