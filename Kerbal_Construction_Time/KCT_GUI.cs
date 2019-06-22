@@ -38,8 +38,8 @@ namespace KerbalConstructionTime
         private static Rect upgradePosition = new Rect((Screen.width - 260) / 2, (Screen.height / 4), 260, 1);
         private static Rect bLPlusPosition = new Rect(Screen.width - 500, 40, 100, 1);
 
-        public static GUISkin windowSkin;// = HighLogic.UISkin;// = new GUIStyle(HighLogic.Skin.window);
-        //public static UISkinDef windowSkin;
+        public static GUISkin windowSkin;
+        public static GUIStyle orangeText;
 
         private static bool isKSCLocked = false, isEditorLocked = false;
 
@@ -817,7 +817,11 @@ namespace KerbalConstructionTime
             GUILayout.BeginVertical(GUILayout.ExpandHeight(true), GUILayout.MaxHeight(Screen.height / 2));
             GUILayout.BeginHorizontal();
             randomCrew = GUILayout.Toggle(randomCrew, " Randomize Filling");
-            autoHire = GUILayout.Toggle(autoHire, " Auto-Hire Applicants");
+            if (!UseAvailabilityChecker)
+            {
+                // Don't allow auto-hiring because the Availability Checker wouldn't allow assigining the new crewmember anyway
+                autoHire = GUILayout.Toggle(autoHire, " Auto-Hire Applicants");
+            }
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             if (AvailableCrew == null)
@@ -932,6 +936,7 @@ namespace KerbalConstructionTime
                     }
                 }
             }
+
             if (GUILayout.Button("Clear All"))
             {
                 foreach (CrewedPart cP in KCT_GameStates.launchedCrew)
@@ -951,6 +956,8 @@ namespace KerbalConstructionTime
                     numberItems += 1 + p.CrewCapacity;
                 }
             }
+
+            bool foundAssignableCrew = false;
             scrollPos = GUILayout.BeginScrollView(scrollPos, GUILayout.Height(numberItems * 25 + 10), GUILayout.MaxHeight(Screen.height / 2));
             for (int j = 0; j < parts.Count; j++)
             {
@@ -967,6 +974,8 @@ namespace KerbalConstructionTime
                     }
                     else
                         PossibleCrewForPart = AvailableCrew;
+
+                    foundAssignableCrew |= PossibleCrewForPart.Count > 0;
 
                     GUILayout.BeginHorizontal();
                     GUILayout.Label(p.partInfo.title.Length <= 25 ? p.partInfo.title : p.partInfo.title.Substring(0, 25));
@@ -1054,6 +1063,7 @@ namespace KerbalConstructionTime
                             }
                         }
                     }
+
                     if (GUILayout.Button("Clear", GUILayout.Width(75)))
                     {
                         KCT_GameStates.launchedCrew[j].crewList.Clear();
@@ -1061,11 +1071,13 @@ namespace KerbalConstructionTime
                         AvailableCrew = GetAvailableCrew(string.Empty);
                     }
                     GUILayout.EndHorizontal();
+
                     for (int i = 0; i < p.CrewCapacity; i++)
                     {
                         GUILayout.BeginHorizontal();
                         if (i < KCT_GameStates.launchedCrew[j].crewList.Count && KCT_GameStates.launchedCrew[j].crewList[i] != null)
                         {
+                            foundAssignableCrew = true;
                             ProtoCrewMember kerbal = KCT_GameStates.launchedCrew[j].crewList[i];
                             GUILayout.Label(kerbal.name + ", " + kerbal.experienceTrait.Title + " " + kerbal.experienceLevel); //Display the kerbal currently in the seat, followed by occupation and level
                             if (GUILayout.Button("Remove", GUILayout.Width(120)))
@@ -1121,6 +1133,17 @@ namespace KerbalConstructionTime
                 }
             }
             GUILayout.EndScrollView();
+
+            if (UseAvailabilityChecker && !foundAssignableCrew)
+            {
+                if (orangeText == null)
+                {
+                    orangeText = new GUIStyle(GUI.skin.label);
+                    orangeText.normal.textColor = XKCDColors.Orange;
+                }
+                GUILayout.Label("No assignable crewmembers found, did you remember to train them?", orangeText);
+            }
+
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Launch"))
             {
@@ -1139,6 +1162,7 @@ namespace KerbalConstructionTime
                 crewListWindowPosition.height = 1;
 
             }
+
             if (GUILayout.Button("Cancel"))
             {
                 showShipRoster = false;
