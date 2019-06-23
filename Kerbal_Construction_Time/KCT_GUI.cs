@@ -1141,7 +1141,7 @@ namespace KerbalConstructionTime
                     orangeText = new GUIStyle(GUI.skin.label);
                     orangeText.normal.textColor = XKCDColors.Orange;
                 }
-                GUILayout.Label("No assignable crewmembers found, did you remember to train them?", orangeText);
+                GUILayout.Label("No trained crew found for this cockpit or capsule. Check proficiency and mission training status of your astronauts.", orangeText);
             }
 
             GUILayout.BeginHorizontal();
