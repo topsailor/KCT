@@ -56,14 +56,14 @@
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>R:\KSP_1.6.1_dev\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>R:\KSP_1.7.2_dev\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>R:\KSP_1.6.1_dev\KSP_x64_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>R:\KSP_1.7.2_dev\KSP_x64_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="MagiCore">
-      <HintPath>R:\KSP_1.6.1_dev\GameData\MagiCore\Plugins\MagiCore.dll</HintPath>
+      <HintPath>R:\KSP_1.7.2_dev\GameData\MagiCore\Plugins\MagiCore.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Private>False</Private>
@@ -81,11 +81,11 @@
     </Reference>
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>R:\KSP_1.6.1_dev\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>R:\KSP_1.7.2_dev\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>R:\KSP_1.6.1_dev\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>R:\KSP_1.7.2_dev\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -151,14 +151,22 @@
 
 
 
+
+
 start /D D:\Users\jbb\github\KCT /WAIT deploy.bat  $(TargetDir) $(TargetFileName)
 
 
-if $(ConfigurationName) == Release (
+
+
+if $(ConfigurationName) == Release-1.4 (
+
+
 
 
 
 	start /D D:\Users\jbb\github\KCT /WAIT buildRelease.bat $(TargetDir) $(TargetFileName)
+
+
 
 
 
@@ -170,6 +178,8 @@ if $(ConfigurationName) == Release (
 
 
 set textTemplatingPath="%25ProgramFiles(x86)%25\Microsoft Visual Studio\2017\Community\Common7\IDE\texttransform.exe"
+
+
 
 
 

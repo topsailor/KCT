@@ -1,3 +1,19 @@
+Issues
+I was fixing up my damaged plane using the edit craft after I recovered it. When I hit the "Save edits" button and got back to the KSC scene I could't find the plane anywhere in KCT's SPH storage. It just disappeared entirely.
+
+
+Enhancement
+Add info about science to message window #6
+would it be possible to add information about science gain after building a rocket in the message window? I know it shows up on the screen, but I always forget to take a look.
+
+1.4.6.6 (unreleased)
+	Merged PR from RCrockford:
+		Fixes #17 filling tanks doesn't fill EC.
+		Added missing fuels: EC, various RF monoprops, RF solids, TAC-LS resources.
+	Fixed issue of recovered crafts not resetting (#9)
+	Fixed issue of edited craft not being saved (#10)
+	Added line showing science earned to the vessel Complete message (#6)
+
 1.4.6.5
 	Fixed initialization of the CTIWrapper
 	Merged PR by @cakepie for fetching the kerbal icon
@@ -81,6 +97,8 @@
 
 1.4.5.3
 	Fixed exception when Scrapyard was installed, caused numerous other issues
+
+
 
 1.4.5.2
 	Fixed Exception upon entry into the editor, caused when multiple launch sites are NOT enabled

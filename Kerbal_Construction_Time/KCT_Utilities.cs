@@ -679,7 +679,7 @@ namespace KerbalConstructionTime
         }
 #endif
 
-        public static void AddScienceWithMessage(float science, TransactionReasons reason)
+        public static string AddScienceWithMessage(float science, TransactionReasons reason)
         {
             if (science > 0)
             {
@@ -687,7 +687,9 @@ namespace KerbalConstructionTime
                 ResearchAndDevelopment.Instance.AddScience(science, reason);
                 var message = new ScreenMessage("[KCT] " + science + " science added.", 4.0f, ScreenMessageStyle.UPPER_LEFT);
                 ScreenMessages.PostScreenMessage(message);
+                return message.ToString();
             }
+            return "";
         }
 
         public static void MoveVesselToWarehouse(int ListIdentifier, int index, KCT_KSC KSC)
@@ -741,7 +743,7 @@ namespace KerbalConstructionTime
                 double rate = KCT_MathParsing.GetStandardFormulaValue("Research", new Dictionary<string, string>() { { "N", KSC.RDUpgrades[0].ToString() }, { "R", KCT_Utilities.BuildingUpgradeLevel(SpaceCenterFacility.ResearchAndDevelopment).ToString() } });
                 if (rate > 0)
                 {
-                    AddScienceWithMessage((float)(rate * vessel.buildPoints), TransactionReasons.None);
+                    Message.AppendLine(AddScienceWithMessage((float)(rate * vessel.buildPoints), TransactionReasons.None));
                 }
             }
 
