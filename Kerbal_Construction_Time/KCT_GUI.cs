@@ -391,7 +391,7 @@ namespace KerbalConstructionTime
             //GUILayout.Label("Current KSC: " + KCT_GameStates.ActiveKSC.KSCName);
             if (!KCT_GameStates.EditorShipEditingMode) //Build mode
             {
-                double buildTime = KCT_GameStates.EditorBuildTime;
+                double buildTime = KCT_GameStates.EditorBuildTime + KCT_GameStates.EditorIntegrationTime;
                 KCT_BuildListVessel.ListType type = EditorLogic.fetch.launchSiteName == "LaunchPad" ? KCT_BuildListVessel.ListType.VAB : KCT_BuildListVessel.ListType.SPH;
                 //GUILayout.Label("Total Build Points (BP):", GUILayout.ExpandHeight(true));
                 //GUILayout.Label(Math.Round(buildTime, 2).ToString(), GUILayout.ExpandHeight(true));
@@ -427,9 +427,6 @@ namespace KerbalConstructionTime
                     GUILayout.EndHorizontal();
                     GUILayout.Label("Invalid Build Rate");
                 }
-
-                if (KCT_GameStates.EditorIntegrationTime > 0)
-                    GUILayout.Label("Integration Time: " + MagiCore.Utilities.GetFormattedTime(KCT_GameStates.EditorIntegrationTime / bR));
 
                 if (KCT_GameStates.EditorRolloutTime > 0)
                 {
