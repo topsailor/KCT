@@ -615,7 +615,28 @@ namespace KerbalConstructionTime
         private static DateTime startedFlashing;
 
         static Texture2D KCT_Off_38, KCT_On_38;
+        static string KCT_OFF_38_str, KCT_On_38_str;
         static bool textureInited = false;
+
+        public static string GetStockButtonTexturePath()
+        {
+            if (!textureInited)
+            {
+                KCT_OFF_38_str = "KerbalConstructionTime/Icons/KCT_off-38";
+                KCT_On_38_str = "KerbalConstructionTime/Icons/KCT_on-38";
+            }
+            if (KCT_Events.instance.KCTButtonStockImportant && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(0))) > 0 && DateTime.Now.Millisecond < 500)
+                return KCT_OFF_38_str;
+            else if (KCT_Events.instance.KCTButtonStockImportant && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(3))) > 0)
+            {
+                KCT_Events.instance.KCTButtonStockImportant = false;
+                return KCT_On_38_str;
+            }
+            //The normal icon
+            else
+                return KCT_On_38_str;
+        }
+
 
         public static Texture2D GetStockButtonTexture()
         {
@@ -643,13 +664,15 @@ namespace KerbalConstructionTime
             if (!KCT_PresetManager.Instance.ActivePreset.generalSettings.Enabled)
                 return "KerbalConstructionTime/Icons/KCT_off-24";
 
+            // replace KCT_GameStates.kctToolbarButton.Important with KCT_Events.instance.KCTButtonStockImportant
+            
             //Flash for up to 3 seconds, at half second intervals per icon
-            if (KCT_GameStates.kctToolbarButton.Important && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(3))) < 0 && DateTime.Now.Millisecond < 500)
+            if (KCT_Events.instance.KCTButtonStockImportant && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(3))) < 0 && DateTime.Now.Millisecond < 500)
                 textureReturn = "KerbalConstructionTime/Icons/KCT_off";
             //If it's been longer than 3 seconds, set Important to false and stop flashing
-            else if (KCT_GameStates.kctToolbarButton.Important && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(3))) > 0)
+            else if (KCT_Events.instance.KCTButtonStockImportant && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(3))) > 0)
             {
-                KCT_GameStates.kctToolbarButton.Important = false;
+                KCT_Events.instance.KCTButtonStockImportant = false;
                 textureReturn = "KerbalConstructionTime/Icons/KCT_on";
             }
             //The normal icon
@@ -695,12 +718,14 @@ namespace KerbalConstructionTime
         public static void MoveVesselToWarehouse(int ListIdentifier, int index, KCT_KSC KSC)
         {
             if (KSC == null) KSC = KCT_GameStates.ActiveKSC;
+#if false
             if (KCT_GameStates.kctToolbarButton != null)
             {
                 KCT_GameStates.kctToolbarButton.Important = true; //Show the button if it is hidden away
                 startedFlashing = DateTime.Now; //Set the time to start flashing
             }
             else
+#endif
             {
                 KCT_Events.instance.KCTButtonStockImportant = true;
                 startedFlashing = DateTime.Now; //Set the time to start flashing
@@ -1529,6 +1554,74 @@ namespace KerbalConstructionTime
             return total;
         }
 
+        public static bool RecoverVesselToStorage(KCT_BuildListVessel.ListType listType, Vessel v)
+        {
+            Debug.Log("RecoverVesselToStorage 1");
+
+            ConfigNode nodeToSave = new ConfigNode();
+            //save vessel
+            ConfigNode vesselNode = new ConfigNode("VESSEL");
+            ProtoVessel pVessel = v.BackupVessel();
+            pVessel.Save(vesselNode);
+            nodeToSave.AddNode("VESSEL", vesselNode);
+            nodeToSave.Save("vesselToSave");
+
+            ShipConstruct test = new ShipConstruct();
+            try
+            {
+                KCTDebug.Log("Attempting to recover active vessel to storage.  listType: " + listType);
+                GamePersistence.SaveGame("KCT_Backup", HighLogic.SaveFolder, SaveMode.OVERWRITE);
+
+                KCT_GameStates.recoveredVessel = new KCT_BuildListVessel(pVessel, vesselNode, listType);
+
+
+                //KCT_GameStates.recoveredVessel.type = listType;
+                if (listType == KCT_BuildListVessel.ListType.VAB)
+                    KCT_GameStates.recoveredVessel.launchSite = "LaunchPad";
+                else
+                    KCT_GameStates.recoveredVessel.launchSite = "Runway";
+
+                //check for symmetry parts and remove those references if they can't be found
+                RemoveMissingSymmetry(KCT_GameStates.recoveredVessel.shipNode);
+
+                // debug, save to a file
+                KCT_GameStates.recoveredVessel.shipNode.Save("KCTVesselSave");
+
+
+
+                //test if we can actually convert it
+                bool success = test.LoadShip(KCT_GameStates.recoveredVessel.shipNode);
+ return false;
+                if (success)
+                    ShipConstruction.CreateBackup(test);
+                KCTDebug.Log("Load test reported success = " + success);
+                if (!success)
+                {
+                    KCT_GameStates.recoveredVessel = null;
+                    return false;
+                }
+
+               
+
+                // Recovering the vessel in a coroutine was generating an exception insideKSP if a mod had added
+                // modules to the vessel or it's parts at runtime.
+                //
+                // This is the way KSP does it
+                //
+                GameEvents.OnVesselRecoveryRequested.Fire(FlightGlobals.ActiveVessel);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("[KCT] Error while recovering craft into inventory.");
+                Debug.LogError("[KCT] error: " + ex.Message);
+                KCT_GameStates.recoveredVessel = null;
+                ShipConstruction.ClearBackups();
+                return false;
+            }
+            return false;
+        }
+
         public static bool RecoverActiveVesselToStorage(KCT_BuildListVessel.ListType listType)
         {
             ShipConstruct test = new ShipConstruct();
@@ -1536,21 +1629,24 @@ namespace KerbalConstructionTime
             {
                 KCTDebug.Log("Attempting to recover active vessel to storage.  listType: " + listType);
                 GamePersistence.SaveGame("KCT_Backup", HighLogic.SaveFolder, SaveMode.OVERWRITE);
-
+  
                 KCT_GameStates.recoveredVessel = new KCT_BuildListVessel(FlightGlobals.ActiveVessel, listType);
+  
                 //KCT_GameStates.recoveredVessel.type = listType;
                 if (listType == KCT_BuildListVessel.ListType.VAB)
                     KCT_GameStates.recoveredVessel.launchSite = "LaunchPad";
                 else
                     KCT_GameStates.recoveredVessel.launchSite = "Runway";
-                
+
                 //check for symmetry parts and remove those references if they can't be found
                 RemoveMissingSymmetry(KCT_GameStates.recoveredVessel.shipNode);
 
                 // debug, save to a file
                 KCT_GameStates.recoveredVessel.shipNode.Save("KCTVesselSave");
+
                 //test if we can actually convert it
                 bool success = test.LoadShip(KCT_GameStates.recoveredVessel.shipNode);
+
                 if (success)
                     ShipConstruction.CreateBackup(test);
                 KCTDebug.Log("Load test reported success = " + success);
@@ -1567,8 +1663,6 @@ namespace KerbalConstructionTime
                 //
                 GameEvents.OnVesselRecoveryRequested.Fire(FlightGlobals.ActiveVessel);
                 return true;
-
-                
             }
             catch (Exception ex)
             {

@@ -7,9 +7,15 @@ using KSP;
 using System.Collections;
 using KSP.UI.Screens;
 using KSP.UI;
+using ToolbarControl_NS;
+
+using UnityEngine.UI;
+using KSP.Localization;
+
 
 namespace KerbalConstructionTime
 {
+#if false
     [KSPAddon(KSPAddon.Startup.TrackingStation, false)]
     public class KCT_Tracking_Station : KerbalConstructionTime
     {
@@ -21,6 +27,7 @@ namespace KerbalConstructionTime
     {
 
     }
+#endif
 
     [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
     public class KCT_SpaceCenter : KerbalConstructionTime
@@ -34,7 +41,7 @@ namespace KerbalConstructionTime
 
     }
 
-    [KSPScenario(ScenarioCreationOptions.AddToAllGames, new GameScenes[] { GameScenes.EDITOR, GameScenes.FLIGHT, GameScenes.SPACECENTER, GameScenes.TRACKSTATION})]
+    [KSPScenario(ScenarioCreationOptions.AddToAllGames, new GameScenes[] { GameScenes.EDITOR, GameScenes.FLIGHT, GameScenes.SPACECENTER, GameScenes.TRACKSTATION })]
     public class KerbalConstructionTimeData : ScenarioModule
     {
         public static Dictionary<string, string> techNameToTitle = new Dictionary<string, string>();
@@ -47,7 +54,7 @@ namespace KerbalConstructionTime
                 KCTDebug.Log($"Loading tech tree from {fullPath}");
 
                 ConfigNode fileNode = ConfigNode.Load(fullPath);
-                if (fileNode.HasNode("TechTree"))
+                if (fileNode != null && fileNode.HasNode("TechTree"))
                 {
                     techNameToTitle.Clear();
 
@@ -97,7 +104,7 @@ namespace KerbalConstructionTime
         }
         public override void OnLoad(ConfigNode node)
         {
-            
+
             base.OnLoad(node);
             LoadTree();
 #if KSP1_4
@@ -111,7 +118,7 @@ namespace KerbalConstructionTime
             KCT_GameStates.KSCs.Clear();
             KCT_GameStates.ActiveKSC = null;
             //KCT_Utilities.SetActiveKSC("Stock");
-            KCT_GameStates.InitAndClearTechList(); 
+            KCT_GameStates.InitAndClearTechList();
             KCT_GameStates.TechUpgradesTotal = 0;
             KCT_GameStates.SciPointsTotal = -1;
 
@@ -134,7 +141,7 @@ namespace KerbalConstructionTime
             }
             KCT_Utilities.SetActiveKSCToRSS();
 
-            
+
             ConfigNode tmp = node.GetNode("TechList");
             if (tmp != null)
             {
@@ -170,6 +177,7 @@ namespace KerbalConstructionTime
 
         public void OnDestroy()//more toolbar stuff
         {
+#if false
             if (KCT_GameStates.kctToolbarButton != null)
             {
                 KCT_GameStates.kctToolbarButton.Destroy();
@@ -178,7 +186,12 @@ namespace KerbalConstructionTime
             {
                 KSP.UI.Screens.ApplicationLauncher.Instance.RemoveModApplication(KCT_Events.instance.KCTButtonStock);
             }
-
+#endif
+            if (KCT_GameStates.toolbarControl != null)
+            {
+                KCT_GameStates.toolbarControl.OnDestroy();
+                Destroy(KCT_GameStates.toolbarControl);
+            }
             KCT_GUI.guiDataSaver.Save();
         }
 
@@ -236,6 +249,20 @@ namespace KerbalConstructionTime
                 KCT_Events.instance.CreateEvents();
             }
 
+            var go = new GameObject();
+            KCT_GameStates.toolbarControl = go.AddComponent<ToolbarControl>();
+            KCT_GameStates.toolbarControl.AddToAllToolbars(KCT_GUI.ClickOn, KCT_GUI.ClickOff,
+                KCT_GUI.onHoverOn, KCT_GUI.onHoverOff, null, null,
+                ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW | ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.TRACKSTATION | ApplicationLauncher.AppScenes.VAB,
+                KCT_GameStates.MODID,
+                "MainButton",
+                "KerbalConstructionTime/Icons/KCT_on-38",
+                "KerbalConstructionTime/Icons/KCT_off-38",
+                "KerbalConstructionTime/Icons/KCT_on-24",
+                "KerbalConstructionTime/Icons/KCT_off-24",
+                KCT_GameStates.MODNAME
+                );
+#if false
             //Add the toolbar button
             if (ToolbarManager.ToolbarAvailable && ToolbarManager.Instance != null && KCT_GameStates.settings.PreferBlizzyToolbar)
             {
@@ -253,6 +280,7 @@ namespace KerbalConstructionTime
                     });
                 }
             }
+#endif
             KCTDebug.Log("Awake finished");
         }
 
@@ -350,7 +378,7 @@ namespace KerbalConstructionTime
                         KCTDebug.LogError("Part being tested: " + p.partInfo.title);
                         {
                             CrewedPart cP = KCT_GameStates.launchedCrew.Find(part => part.partID == p.craftID);
-                            if (cP == null) continue;                        
+                            if (cP == null) continue;
                             List<ProtoCrewMember> crewList = cP.crewList;
                             KCTDebug.LogError("cP.crewList.Count: " + cP.crewList.Count);
                             foreach (ProtoCrewMember crewMember in crewList)
@@ -368,7 +396,7 @@ namespace KerbalConstructionTime
                                     }
                                     if (finalCrewMember == null)
                                     {
-                                        KCTDebug.LogError("Error when assigning " + crewMember.name + " to " + p.partInfo.name +". Cannot find Kerbal in list.");
+                                        KCTDebug.LogError("Error when assigning " + crewMember.name + " to " + p.partInfo.name + ". Cannot find Kerbal in list.");
                                         continue;
                                     }
                                     try
@@ -471,11 +499,18 @@ namespace KerbalConstructionTime
             KCT_GameStates.UT = Planetarium.GetUniversalTime();
             try
             {
+                //
+#if false
                 if (KCT_Events.instance != null && KCT_Events.instance.KCTButtonStock != null)
                     if (KCT_GUI.clicked)
                         KCT_Events.instance.KCTButtonStock.SetTrue(false);
                     else
                         KCT_Events.instance.KCTButtonStock.SetFalse(false);
+#endif
+                if (KCT_GUI.clicked && KCT_GameStates.toolbarControl != null)
+                    KCT_GameStates.toolbarControl.SetTrue(false);
+                else
+                    KCT_GameStates.toolbarControl.SetFalse(false);
 
                 if (!KCT_PresetManager.Instance.ActivePreset.generalSettings.Enabled)
                     return;
@@ -502,7 +537,7 @@ namespace KerbalConstructionTime
 
                 if (!ratesUpdated)
                 {
-                    if (HighLogic.LoadedScene == GameScenes.SPACECENTER) 
+                    if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
                     {
                         if (ScenarioUpgradeableFacilities.GetFacilityLevelCount(SpaceCenterFacility.VehicleAssemblyBuilding) >= 0)
                         {
@@ -569,8 +604,8 @@ namespace KerbalConstructionTime
                                 while (newRate > 0)
                                 {
                                     if (TimeWarp.fetch.warpRates[newRate] * dT * nBuffers < remaining)
-                                    break;
-                                newRate--;
+                                        break;
+                                    newRate--;
                                 }
                                 KCTDebug.Log("Warping down to " + newRate + " (delta: " + (TimeWarp.fetch.warpRates[newRate] * dT) + ")");
                                 TimeWarp.SetRate(newRate, true); //hopefully a faster warp down than before
@@ -737,7 +772,7 @@ namespace KerbalConstructionTime
                     PopUpVesselError(erroredVessels);
                 KCT_GameStates.vesselErrorAlerted = true;
             }
-           
+
             if (HighLogic.LoadedSceneIsEditor)
             {
                 if (KCT_GameStates.EditorShipEditingMode)
@@ -754,14 +789,16 @@ namespace KerbalConstructionTime
                     if (ToolbarManager.ToolbarAvailable && KCT_GameStates.settings.PreferBlizzyToolbar)
                         if (KCT_GameStates.showWindows[0])
                             KCT_GUI.ClickOn();
-                    else
-                    {
-                        if (KCT_Events.instance != null && KCT_Events.instance.KCTButtonStock != null)
+                        else
                         {
-                            if (KCT_GameStates.showWindows[0])
-                                KCT_GUI.ClickOn();
+                            //if (KCT_Events.instance != null && KCT_Events.instance.KCTButtonStock != null)
+                            if (KCT_Events.instance != null && KCT_GameStates.toolbarControl != null)
+
+                            {
+                                if (KCT_GameStates.showWindows[0])
+                                    KCT_GUI.ClickOn();
+                            }
                         }
-                    }
                     KCT_GUI.ResetBLWindow();
                 }
                 else
@@ -776,7 +813,7 @@ namespace KerbalConstructionTime
                     KCTDebug.Log("Showing first start.");
                     KCT_GameStates.firstStart = false;
                     KCT_GUI.showFirstRun = true;
-                    
+
                     //initialize the proper launchpad
                     KCT_GameStates.ActiveKSC.ActiveLPInstance.level = KCT_Utilities.BuildingUpgradeLevel(SpaceCenterFacility.LaunchPad);
 
@@ -809,7 +846,7 @@ namespace KerbalConstructionTime
         {
             DialogGUIBase[] options = new DialogGUIBase[2];
             options[0] = new DialogGUIButton("Understood", () => { });
-           // new DialogGUIBase("Understood", () => { }); //do nothing and close the window
+            // new DialogGUIBase("Understood", () => { }); //do nothing and close the window
             options[1] = new DialogGUIButton("Delete Vessels", () =>
             {
                 foreach (KCT_BuildListVessel blv in errored)
@@ -825,7 +862,7 @@ namespace KerbalConstructionTime
             foreach (KCT_BuildListVessel blv in errored)
             {
                 txt += blv.shipName + "\n";
-                txtToWrite += blv.shipName+"\n";
+                txtToWrite += blv.shipName + "\n";
                 txtToWrite += String.Join("\n", blv.MissingParts().ToArray());
                 txtToWrite += "\n\n";
             }

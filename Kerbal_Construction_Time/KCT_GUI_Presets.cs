@@ -265,7 +265,7 @@ namespace KerbalConstructionTime
                 KCT_GameStates.settings.OverrideLaunchButton = overrideLaunchBtn;
                 KCT_GameStates.settings.Debug = debug;
                 KCT_GameStates.settings.AutoKACAlarms = autoAlarms;
-                KCT_GameStates.settings.PreferBlizzyToolbar = useBlizzyToolbar;
+                // KCT_GameStates.settings.PreferBlizzyToolbar = useBlizzyToolbar;
                 KCT_GameStates.settings.CheckForDebugUpdates = debugUpdateChecking;
 
                 KCT_GameStates.settings.Save();
@@ -273,8 +273,12 @@ namespace KerbalConstructionTime
                 if (!PrimarilyDisabled && !showFirstRun)
                 {
                     ResetBLWindow();
-                    if (KCT_Events.instance.KCTButtonStock != null)
-                        KCT_Events.instance.KCTButtonStock.SetTrue();
+                   
+                    //if (KCT_Events.instance.KCTButtonStock != null)
+                    //    KCT_Events.instance.KCTButtonStock.SetTrue();
+                    if (KCT_GameStates.toolbarControl != null)
+                        KCT_GameStates.toolbarControl.SetTrue();
+
                     else
                     {
                         showBuildList = true;
@@ -299,8 +303,12 @@ namespace KerbalConstructionTime
                 if (!PrimarilyDisabled && !showFirstRun)
                 {
                     ResetBLWindow();
-                    if (KCT_Events.instance.KCTButtonStock != null)
-                        KCT_Events.instance.KCTButtonStock.SetTrue();
+                    
+                    //if (KCT_Events.instance.KCTButtonStock != null)
+                    //    KCT_Events.instance.KCTButtonStock.SetTrue();
+                    if (KCT_GameStates.toolbarControl != null)
+                        KCT_GameStates.toolbarControl.SetTrue();
+
                     else
                         showBuildList = true;
                 }
@@ -334,12 +342,14 @@ namespace KerbalConstructionTime
             forceStopWarp = GUILayout.Toggle(forceStopWarp, "Auto Stop TimeWarp", HighLogic.Skin.button);
             autoAlarms = GUILayout.Toggle(autoAlarms, "Auto KAC Alarms", HighLogic.Skin.button);
             overrideLaunchBtn = GUILayout.Toggle(overrideLaunchBtn, "Override Launch Button", HighLogic.Skin.button);
-            useBlizzyToolbar = GUILayout.Toggle(useBlizzyToolbar, "Use Toolbar Mod", HighLogic.Skin.button);
+            //useBlizzyToolbar = GUILayout.Toggle(useBlizzyToolbar, "Use Toolbar Mod", HighLogic.Skin.button);
             disableAllMsgs = !GUILayout.Toggle(!disableAllMsgs, "Use Message System", HighLogic.Skin.button);
             debug = GUILayout.Toggle(debug, "Debug Logging", HighLogic.Skin.button);
+
 #if DEBUG
             debugUpdateChecking = GUILayout.Toggle(debugUpdateChecking, "Check for Dev Updates", HighLogic.Skin.button);
 #endif
+
             GUILayout.EndVertical();
             GUILayout.EndVertical();
             
