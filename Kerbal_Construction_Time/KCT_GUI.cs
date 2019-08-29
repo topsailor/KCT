@@ -210,6 +210,7 @@ namespace KerbalConstructionTime
 
         public static void ClickToggle()
         {
+            KCTDebug.Log("ClickToggle");
             clicked = !clicked;
             onClick();
         }
@@ -228,7 +229,7 @@ namespace KerbalConstructionTime
                 if (KCT_Events.instance.KCTButtonStockImportant)
                     KCT_Events.instance.KCTButtonStockImportant = false;
             }
-
+#if false
             if (PrimarilyDisabled && (HighLogic.LoadedScene == GameScenes.SPACECENTER))
             {
                 if (clicked)
@@ -236,7 +237,9 @@ namespace KerbalConstructionTime
                 else
                     showSettings = false;
             }
-            else if (HighLogic.LoadedScene == GameScenes.FLIGHT && !PrimarilyDisabled)
+            else
+#endif
+            if (HighLogic.LoadedScene == GameScenes.FLIGHT && !PrimarilyDisabled)
             {
                 //showMainGUI = !showMainGUI;
                 buildListWindowPosition.height = 1;
@@ -279,7 +282,7 @@ namespace KerbalConstructionTime
                 }
             }
 #endif
-            if (showBuildList || showSettings || showEditorGUI)
+            if (showBuildList || /* showSettings || */ showEditorGUI)
             {
                 KCT_GameStates.toolbarControl.SetTrue(false);
             }
@@ -288,7 +291,7 @@ namespace KerbalConstructionTime
                 KCT_GameStates.toolbarControl.SetFalse(false);
             }
         }
-
+#if false
         public static void onHoverOn()
         {
             KCTDebug.Log("onHoverOn: Clicked = " + clicked);
@@ -302,6 +305,7 @@ namespace KerbalConstructionTime
                 }
             }
         }
+
         public static void onHoverOff()
         {
             KCTDebug.Log("onHoverOff: Clicked = " + clicked);
@@ -313,7 +317,26 @@ namespace KerbalConstructionTime
                 }
             }
         }
+#endif
 
+        public static void onRightClick()
+        {
+            if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
+            {
+                Debug.Log("onRightClick, PrimarilyDisabled: " + PrimarilyDisabled + ", showFirstRun: " + showFirstRun);
+                if (KCT_PresetManager.PresetLoaded() && !showFirstRun)
+                {
+                    if (!showSettings)
+                    {
+                        ShowSettings();
+                    }
+                    else
+                    {
+                        showSettings = false;
+                    }
+                }
+            }
+        }
 
         public static void hideAll()
         {
@@ -1508,6 +1531,7 @@ namespace KerbalConstructionTime
         public static double reconSplit;
         public static string newRecoveryModDefault;
         public static bool disableBuildTimesDefault, instantTechUnlockDefault, enableAllBodiesDefault, reconDefault, instantKSCUpgradeDefault;
+
         private static void ShowSettings()
         {
             newTimewarp = KCT_GameStates.settings.MaxTimeWarp;
@@ -1524,12 +1548,15 @@ namespace KerbalConstructionTime
 
         public static void CheckToolbar()
         {
+#if false
             if (KCT_GameStates.toolbarControl == null)
             {
+
+                Debug.Log("CheckToolbar, creating toolbar");
                 var go = new GameObject();
                 KCT_GameStates.toolbarControl = go.AddComponent<ToolbarControl>();
-                KCT_GameStates.toolbarControl.AddToAllToolbars(KCT_GUI.ClickOn, KCT_GUI.ClickOff,
-                    KCT_GUI.onHoverOn, KCT_GUI.onHoverOff, null, null,
+                KCT_GameStates.toolbarControl.AddToAllToolbars(null, null, // KCT_GUI.ClickOn, KCT_GUI.ClickOff,
+                    null, null, /* KCT_GUI.onHoverOn, KCT_GUI.onHoverOff, */ null, null,
                     ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW | ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.TRACKSTATION | ApplicationLauncher.AppScenes.VAB,
                     KCT_GameStates.MODID,
                     "MainButton",
@@ -1539,7 +1566,9 @@ namespace KerbalConstructionTime
                     "KerbalConstructionTime/Icons/KCT_off-24",
                     KCT_GameStates.MODNAME
                     );
+                KCT_GameStates.toolbarControl.AddLeftRightClickCallbacks(ClickToggle, onRightClick);
             }
+#endif
 #if false
             if (ToolbarManager.ToolbarAvailable && ToolbarManager.Instance != null && KCT_GameStates.settings.PreferBlizzyToolbar && KCT_GameStates.kctToolbarButton == null)
             {

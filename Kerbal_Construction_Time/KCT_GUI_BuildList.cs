@@ -267,12 +267,14 @@ namespace KerbalConstructionTime
                     showBuildList = false;
                     showBLPlus = false;
                 }
+#if false
                 if (GUILayout.Button("Settings"))
                 {
                     showBuildList = false;
                     showBLPlus = false;
                     ShowSettings();
                 }
+#endif
             }
             GUILayout.EndHorizontal();
             //Content of lists
@@ -1115,7 +1117,7 @@ namespace KerbalConstructionTime
                 InputLockManager.SetControlLock(ControlTypes.EDITOR_LOAD, "KCTEditLoad");
                 InputLockManager.SetControlLock(ControlTypes.EDITOR_NEW, "KCTEditNew");
                 InputLockManager.SetControlLock(ControlTypes.EDITOR_LAUNCH, "KCTEditLaunch");
-                Debug.Log("b.type: " + b.type);
+
                 EditorDriver.StartAndLoadVessel(tempFile, b.type == KCT_BuildListVessel.ListType.VAB ? EditorFacility.VAB : EditorFacility.SPH);
             }
             if (GUILayout.Button("Rename"))
@@ -1184,12 +1186,20 @@ namespace KerbalConstructionTime
                     {
                         b.RemoveFromBuildList();
                         b.type = KCT_BuildListVessel.ListType.SPH;
+                        //b.ship.shipFacility = EditorFacility.SPH;
+                        b.launchSite = "Runway";
                         KCT_GameStates.ActiveKSC.SPHList.Insert(0, b);
                     }
                     else if (b.type == KCT_BuildListVessel.ListType.SPH)
                     {
                         b.RemoveFromBuildList();
                         b.type = KCT_BuildListVessel.ListType.VAB;
+                        //b.ship.shipFacility = EditorFacility.VAB;
+                        b.launchSite = "LaunchPad";
+                        if (b.launchSiteID >= 0)
+                            launchSite = b.KSC.LaunchPads[b.launchSiteID].name;
+                        else
+                            launchSite = b.KSC.ActiveLPInstance.name;
                         KCT_GameStates.ActiveKSC.VABList.Insert(0, b);
                     }
                 }

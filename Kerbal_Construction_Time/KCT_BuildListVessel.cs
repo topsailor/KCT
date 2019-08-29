@@ -10,12 +10,13 @@ namespace KerbalConstructionTime
 {
     public class KCT_BuildListVessel : IKCTBuildItem
     {
-        private ShipConstruct ship;
+        public enum ListType { None, VAB, SPH, TechNode, Reconditioning, KSC };
+
+        internal ShipConstruct ship;
         public double progress, buildPoints;
         public String launchSite, flag, shipName;
         public int launchSiteID = -1;
         public ListType type;
-        public enum ListType { None, VAB, SPH, TechNode, Reconditioning, KSC };
         public ConfigNode shipNode;
         public Guid id;
         public bool cannotEarnScience;

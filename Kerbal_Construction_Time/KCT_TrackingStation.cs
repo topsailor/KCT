@@ -43,7 +43,7 @@ namespace KerbalConstructionTime
         }
         public void RecoverToVAB()
         {
-            if (!KCT_Utilities.RecoverVesselToStorage(KCT_BuildListVessel.ListType.VAB, selectedVessel))
+            //if (!KCT_Utilities.RecoverVesselToStorage(KCT_BuildListVessel.ListType.VAB, selectedVessel))
             {
                 //PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), "vesselRecoverErrorPopup", "Error!", "There was an error while recovering the ship. Sometimes reloading the scene and trying again works. Sometimes a vessel just can't be recovered this way and you must use the stock recover system.", "OK", false, HighLogic.UISkin);
 
@@ -53,7 +53,7 @@ namespace KerbalConstructionTime
 
         public void RecoverToSPH()
         {
-            if (!KCT_Utilities.RecoverVesselToStorage(KCT_BuildListVessel.ListType.SPH, selectedVessel))
+            //if (!KCT_Utilities.RecoverVesselToStorage(KCT_BuildListVessel.ListType.SPH, selectedVessel))
             {
                 //PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), "recoverShipErrorPopup", "Error!", "There was an error while recovering the ship. Sometimes reloading the scene and trying again works. Sometimes a vessel just can't be recovered this way and you must use the stock recover system.", "OK", false, HighLogic.UISkin);
 

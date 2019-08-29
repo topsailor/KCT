@@ -102,6 +102,7 @@ namespace KerbalConstructionTime
             }
             node.AddNode(tech);
         }
+
         public override void OnLoad(ConfigNode node)
         {
 
@@ -248,11 +249,11 @@ namespace KerbalConstructionTime
             {
                 KCT_Events.instance.CreateEvents();
             }
-
+            
             var go = new GameObject();
             KCT_GameStates.toolbarControl = go.AddComponent<ToolbarControl>();
-            KCT_GameStates.toolbarControl.AddToAllToolbars(KCT_GUI.ClickOn, KCT_GUI.ClickOff,
-                KCT_GUI.onHoverOn, KCT_GUI.onHoverOff, null, null,
+            KCT_GameStates.toolbarControl.AddToAllToolbars(null, null,//KCT_GUI.ClickOn, KCT_GUI.ClickOff,
+                null, null, /* KCT_GUI.onHoverOn, KCT_GUI.onHoverOff, */ null, null,
                 ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW | ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.TRACKSTATION | ApplicationLauncher.AppScenes.VAB,
                 KCT_GameStates.MODID,
                 "MainButton",
@@ -262,6 +263,9 @@ namespace KerbalConstructionTime
                 "KerbalConstructionTime/Icons/KCT_off-24",
                 KCT_GameStates.MODNAME
                 );
+
+            KCT_GameStates.toolbarControl.AddLeftRightClickCallbacks(KCT_GUI.ClickToggle, KCT_GUI.onRightClick);
+
 #if false
             //Add the toolbar button
             if (ToolbarManager.ToolbarAvailable && ToolbarManager.Instance != null && KCT_GameStates.settings.PreferBlizzyToolbar)

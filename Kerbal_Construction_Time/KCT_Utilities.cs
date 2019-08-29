@@ -1553,7 +1553,7 @@ namespace KerbalConstructionTime
 
             return total;
         }
-
+#if false
         public static bool RecoverVesselToStorage(KCT_BuildListVessel.ListType listType, Vessel v)
         {
             Debug.Log("RecoverVesselToStorage 1");
@@ -1562,6 +1562,7 @@ namespace KerbalConstructionTime
             //save vessel
             ConfigNode vesselNode = new ConfigNode("VESSEL");
             ProtoVessel pVessel = v.BackupVessel();
+            pVessel.vesselRef = v;
             pVessel.Save(vesselNode);
             nodeToSave.AddNode("VESSEL", vesselNode);
             nodeToSave.Save("vesselToSave");
@@ -1571,7 +1572,29 @@ namespace KerbalConstructionTime
             {
                 KCTDebug.Log("Attempting to recover active vessel to storage.  listType: " + listType);
                 GamePersistence.SaveGame("KCT_Backup", HighLogic.SaveFolder, SaveMode.OVERWRITE);
+#if false
+                ProtoVessel VesselToSave = HighLogic.CurrentGame.AddVessel(nodeToSave);
+                if (VesselToSave.vesselRef == null)
+                {
+                    Debug.Log("Vessel reference is null!");
+                    return false;
+                }
+                try
+                {
+                    string ShipName = VesselToSave.vesselName;
 
+                    //Vessel FromFlight = FlightGlobals.Vessels.Find(v => v.id == VesselToSave.vesselID);
+                    try
+                    {
+                        VesselToSave.vesselRef.Load();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogException(ex);
+                        Debug.Log("Attempting to continue.");
+                    }
+                }
+#endif
                 KCT_GameStates.recoveredVessel = new KCT_BuildListVessel(pVessel, vesselNode, listType);
 
 
@@ -1583,15 +1606,26 @@ namespace KerbalConstructionTime
 
                 //check for symmetry parts and remove those references if they can't be found
                 RemoveMissingSymmetry(KCT_GameStates.recoveredVessel.shipNode);
+                Debug.Log("RecoverVesselToStorage 1");
 
                 // debug, save to a file
-                KCT_GameStates.recoveredVessel.shipNode.Save("KCTVesselSave");
+                KCT_GameStates.recoveredVessel.shipNode.Save("KCTVesselSave_trackingstation");
 
+                Debug.Log("RecoverVesselToStorage 2");
+                if (test == null)
+                    Debug.Log("test is null");
+                if (KCT_GameStates.recoveredVessel == null)
+                    Debug.Log("KCT_GameStates.recoveredVessel is null");
+                if (KCT_GameStates.recoveredVessel.shipNode == null)
+                    Debug.Log("KCT_GameStates.recoveredVessel.shipNode is null");
 
-
+                Debug.Log("RecoverVesselToStorage 2.1");
                 //test if we can actually convert it
+
                 bool success = test.LoadShip(KCT_GameStates.recoveredVessel.shipNode);
- return false;
+                Debug.Log("RecoverVesselToStorage 3, success: " + success);
+                //return false;
+         
                 if (success)
                     ShipConstruction.CreateBackup(test);
                 KCTDebug.Log("Load test reported success = " + success);
@@ -1621,6 +1655,7 @@ namespace KerbalConstructionTime
             }
             return false;
         }
+#endif
 
         public static bool RecoverActiveVesselToStorage(KCT_BuildListVessel.ListType listType)
         {

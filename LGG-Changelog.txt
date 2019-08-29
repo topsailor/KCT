@@ -1,4 +1,4 @@
-1.4.6.7 (unreleased)
+1.4.6.7 (beta)
 	Added InstallChecker
 	Replaced all button logic with the ToolbarController
 	Removed Blizzy toggle
@@ -8,6 +8,10 @@
 	Added check for full tanks at launch, if so, then it won't show the "Fill tanks & launch" button
 	Renamed the Building Plans window to Building Plans & Construction
 	Added a Build button to the Building Plans window
+	Removed the window showing up when hovering over button
+	Removed Settings button
+	Added right-click on toolbar button to bring up settings window
+	Removed unnecessary 2nd set of code to create the toolbar button
 
 	Known issue with the Inventory button (blue button on top in the editor):  Moving the game from 
 	an HD monitor to a standard monitor (in windowed mode), may cause the button to be at 

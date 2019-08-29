@@ -253,8 +253,6 @@ namespace KerbalConstructionTime
                 KCT_PresetManager.Instance.ActivePreset = WorkingPreset;
                 KCT_PresetManager.Instance.SaveActiveToSaveData();
                 WorkingPreset = null;
-                showSettings = false;
-
 
                 if (!KCT_PresetManager.Instance.ActivePreset.generalSettings.Enabled)
                     KCT_Utilities.DisableModFunctionality();

@@ -20,7 +20,6 @@ namespace KerbalConstructionTime
             {
                 for (var i = 0; i < loaders.Count; i++)
                 {
-                    Debug.Log("loader: " + i);
                     var loadingSystem = loaders[i];
                     if (loadingSystem is KCT_FuelWhitelistLoader)
                     {
