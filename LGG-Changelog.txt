@@ -1,3 +1,8 @@
+1.4.6.8 (unreleased)
+	Added check for Magicore
+	Added check for disabled in Flight and Tracking scenes for recovery purposes
+	Moved icons into PluginData folder
+
 1.4.6.7 (beta)
 	Added InstallChecker
 	Replaced all button logic with the ToolbarController

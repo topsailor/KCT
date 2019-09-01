@@ -15,6 +15,9 @@ namespace KerbalConstructionTime
         public new void Start()
         {
             base.Start();
+            if (KCT_GUI.PrimarilyDisabled)
+                return;
+
             Debug.Log("KCT_Flight, Start");
             SpaceTracking trackingStation = UnityEngine.Object.FindObjectOfType<SpaceTracking>();
             if (trackingStation != null)
@@ -31,6 +34,7 @@ namespace KerbalConstructionTime
         {
             flyCallback.Invoke();
         }
+
         void KCT_Recovery()
         {
             DialogGUIBase[] options = new DialogGUIBase[2];

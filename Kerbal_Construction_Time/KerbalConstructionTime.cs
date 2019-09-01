@@ -257,10 +257,10 @@ namespace KerbalConstructionTime
                 ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW | ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.TRACKSTATION | ApplicationLauncher.AppScenes.VAB,
                 KCT_GameStates.MODID,
                 "MainButton",
-                "KerbalConstructionTime/Icons/KCT_on-38",
-                "KerbalConstructionTime/Icons/KCT_off-38",
-                "KerbalConstructionTime/Icons/KCT_on-24",
-                "KerbalConstructionTime/Icons/KCT_off-24",
+                "KerbalConstructionTime/PluginData/Icons/KCT_on-38",
+                "KerbalConstructionTime/PluginData/Icons/KCT_off-38",
+                "KerbalConstructionTime/PluginData/Icons/KCT_on-24",
+                "KerbalConstructionTime/PluginData/Icons/KCT_off-24",
                 KCT_GameStates.MODNAME
                 );
 
