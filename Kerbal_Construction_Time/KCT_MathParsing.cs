@@ -30,6 +30,7 @@ namespace KerbalConstructionTime
                 case "IntegrationCost": return MathParsing.ParseMath("KCT_INTEGRATION_COST", KCT_PresetManager.Instance.ActivePreset.formulaSettings.IntegrationCostFormula, variables);
                 case "RolloutCost": return MathParsing.ParseMath("KCT_ROLLOUT_COST", KCT_PresetManager.Instance.ActivePreset.formulaSettings.RolloutCostFormula, variables);
                 case "NewLaunchPadCost": return MathParsing.ParseMath("KCT_NEW_LAUNCHPAD_COST", KCT_PresetManager.Instance.ActivePreset.formulaSettings.NewLaunchPadCostFormula, variables);
+                case "RushCost": return MathParsing.ParseMath("KCT_RUSH_COST", KCT_PresetManager.Instance.ActivePreset.formulaSettings.RushCostFormula, variables);
                 default: return 0;
             }
         }
@@ -123,6 +124,20 @@ namespace KerbalConstructionTime
 
             Dictionary<string, string> variables = GetIntegrationRolloutVariables(vessel);
             return GetStandardFormulaValue("IntegrationTime", variables);
+        }
+
+        public static double ParseRushCostFormula(KCT_BuildListVessel vessel)
+        {
+            if (!KCT_PresetManager.Instance.ActivePreset.generalSettings.Enabled ||
+                string.IsNullOrEmpty(KCT_PresetManager.Instance.ActivePreset.formulaSettings.RushCostFormula))
+            {
+                return 0;
+            }
+
+            Dictionary<string, string> variables = GetIntegrationRolloutVariables(vessel);
+            variables.Add("TC", vessel.GetTotalCost().ToString());
+            variables.Add("RC", vessel.rushBuildClicks.ToString());
+            return GetStandardFormulaValue("RushCost", variables);
         }
 
         private static Dictionary<string, string> GetIntegrationRolloutVariables(KCT_BuildListVessel vessel)

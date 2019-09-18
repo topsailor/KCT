@@ -1094,7 +1094,6 @@ namespace KerbalConstructionTime
             KCT_BuildListVessel b = KCT_Utilities.FindBLVesselByID(IDSelected);
             GUILayout.BeginVertical();
             string launchSite = b.launchSite;
-            float rbMultiplier = KCT_PresetManager.Instance.ActivePreset.generalSettings.RushMultiplier;
 
             if (launchSite == "LaunchPad")
             {
@@ -1202,18 +1201,9 @@ namespace KerbalConstructionTime
             }
             if (!b.isFinished 
                 && (KCT_PresetManager.Instance.ActivePreset.generalSettings.MaxRushClicks == 0 || b.rushBuildClicks < KCT_PresetManager.Instance.ActivePreset.generalSettings.MaxRushClicks) 
-                && GUILayout.Button("Rush Build 10%\n√" + Math.Round(rbMultiplier * b.GetTotalCost())))
+                && GUILayout.Button("Rush Build 10%\n√" + Math.Round(b.GetRushCost())))
             {
-                double cost = b.GetTotalCost();
-                double rush = cost * rbMultiplier;
-                double remainingBP = b.buildPoints + b.integrationPoints - b.progress;
-                if (Funding.Instance.Funds >= rush)
-                {
-                    b.AddProgress(remainingBP * 0.1);
-                    KCT_Utilities.SpendFunds(rush, TransactionReasons.None);
-                    ++b.rushBuildClicks;
-                }
-
+                b.DoRushBuild();
             }
             if (GUILayout.Button("Close"))
             {

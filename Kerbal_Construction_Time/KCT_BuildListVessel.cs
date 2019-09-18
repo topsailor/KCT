@@ -11,6 +11,7 @@ namespace KerbalConstructionTime
     public class KCT_BuildListVessel : IKCTBuildItem
     {
         private ShipConstruct ship;
+        private double rushCost = -1;
         public double progress, effectiveCost, buildPoints, integrationPoints;
         public String launchSite, flag, shipName;
         public int launchSiteID = -1;
@@ -650,6 +651,28 @@ namespace KerbalConstructionTime
             }
 
             return cost + integrationCost;
+        }
+
+        public double GetRushCost()
+        {
+            if (rushCost > -1) return rushCost;
+
+            rushCost = KCT_MathParsing.ParseRushCostFormula(this);
+            return rushCost;
+        }
+
+        public bool DoRushBuild()
+        {
+            double rushCost = GetRushCost();
+            if (Funding.Instance.Funds < rushCost) return false;
+
+            double remainingBP = buildPoints + integrationPoints - progress;
+            AddProgress(remainingBP * 0.1);
+            KCT_Utilities.SpendFunds(rushCost, TransactionReasons.None);
+            ++rushBuildClicks;
+            this.rushCost = -1;    // force recalculation of rush cost
+
+            return true;
         }
 
         public bool RemoveFromBuildList()

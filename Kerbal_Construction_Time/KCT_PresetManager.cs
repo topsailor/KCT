@@ -323,8 +323,6 @@ namespace KerbalConstructionTime
             VABRecoveryTech = null;
         [Persistent]
         public int MaxRushClicks = 0;
-        [Persistent]
-        public float RushMultiplier = 0.2f;
     }
 
     public class KCT_Preset_Time : ConfigNodeStorage
@@ -352,7 +350,8 @@ namespace KerbalConstructionTime
             IntegrationTimeFormula = "0", //[M]=Vessel loaded mass, [m]=vessel empty mass, [C]=vessel loaded cost, [c]=vessel empty cost, [BP]=vessel BPs, [E]=editor level, [L]=launch site level (pad), [VAB]=1 if VAB craft, 0 if SPH
             RolloutCostFormula = "0", //[M]=Vessel loaded mass, [m]=vessel empty mass, [C]=vessel loaded cost, [c]=vessel empty cost, [BP]=vessel BPs, [E]=editor level, [L]=launch site level (pad), [VAB]=1 if VAB craft, 0 if SPH
             IntegrationCostFormula = "0", //[M]=Vessel loaded mass, [m]=vessel empty mass, [C]=vessel loaded cost, [c]=vessel empty cost, [BP]=vessel BPs, [E]=editor level, [L]=launch site level (pad), [VAB]=1 if VAB craft, 0 if SPH
-            NewLaunchPadCostFormula = "100000*([N]^3)"; //[N]=total number of unlocked launchpads (negative disables)
+            NewLaunchPadCostFormula = "100000*([N]^3)", //[N]=total number of unlocked launchpads (negative disables)
+            RushCostFormula = "[TC]*0.2";
     }
 
     public class KCT_Preset_Part_Variables
