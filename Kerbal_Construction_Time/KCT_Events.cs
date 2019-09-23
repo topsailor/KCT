@@ -555,7 +555,7 @@ namespace KerbalConstructionTime
                     //rebuy the ship if ScrapYard isn't overriding funds
                     if (!ScrapYardWrapper.OverrideFunds)
                     {
-                        KCT_Utilities.SpendFunds(KCT_GameStates.recoveredVessel.GetTotalCost(), TransactionReasons.VesselRollout); //pay for the ship again
+                        KCT_Utilities.SpendFunds(KCT_GameStates.recoveredVessel.cost, TransactionReasons.VesselRollout); //pay for the ship again
                     }
 
                     //pull all of the parts out of the inventory
