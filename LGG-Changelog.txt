@@ -1,18 +1,36 @@
-Issues
-I was fixing up my damaged plane using the edit craft after I recovered it. When I hit the "Save edits" button and got back to the KSC scene I could't find the plane anywhere in KCT's SPH storage. It just disappeared entirely.
+1.4.6.8 (unreleased)
+	Added check for Magicore
+	Added check for disabled in Flight and Tracking scenes for recovery purposes
+	Moved icons into PluginData folder
+
+1.4.6.7 (beta)
+	Added InstallChecker
+	Replaced all button logic with the ToolbarController
+	Removed Blizzy toggle
+	Thanks to github user @henrybauer:
+		Added check for a loaded tech tree (The only way you'd get into this situation is by taking a fresh copy of KSP, installing mods (including KCT) and then copying over a saved game from another copy of KSP.)
+	Added interception of the altimiter Recover button, presents a dialog
+	Added check for full tanks at launch, if so, then it won't show the "Fill tanks & launch" button
+	Renamed the Building Plans window to Building Plans & Construction
+	Added a Build button to the Building Plans window
+	Removed the window showing up when hovering over button
+	Removed Settings button
+	Added right-click on toolbar button to bring up settings window
+	Removed unnecessary 2nd set of code to create the toolbar button
+
+	Known issue with the Inventory button (blue button on top in the editor):  Moving the game from 
+	an HD monitor to a standard monitor (in windowed mode), may cause the button to be at 
+	the extreme right when on the standard monitor.  This is not going to be fixed!
 
 
-Enhancement
-Add info about science to message window #6
-would it be possible to add information about science gain after building a rocket in the message window? I know it shows up on the screen, but I always forget to take a look.
-
-1.4.6.6 (unreleased)
+1.4.6.6
 	Merged PR from RCrockford:
 		Fixes #17 filling tanks doesn't fill EC.
 		Added missing fuels: EC, various RF monoprops, RF solids, TAC-LS resources.
 	Fixed issue of recovered crafts not resetting (#9)
 	Fixed issue of edited craft not being saved (#10)
 	Added line showing science earned to the vessel Complete message (#6)
+
 
 1.4.6.5
 	Fixed initialization of the CTIWrapper

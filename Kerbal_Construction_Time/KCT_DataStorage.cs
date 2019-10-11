@@ -70,8 +70,9 @@ namespace KerbalConstructionTime
     }
     public class KCT_DataStorage : ConfigNodeStorage
     {
-        [Persistent] bool enabledForSave = (HighLogic.CurrentGame.Mode == Game.Modes.CAREER || HighLogic.CurrentGame.Mode == Game.Modes.SCIENCE_SANDBOX
-            || (HighLogic.CurrentGame.Mode == Game.Modes.SANDBOX));
+        [Persistent] bool enabledForSave = (HighLogic.CurrentGame.Mode == Game.Modes.CAREER || 
+                                            HighLogic.CurrentGame.Mode == Game.Modes.SCIENCE_SANDBOX ||
+                                            HighLogic.CurrentGame.Mode == Game.Modes.SANDBOX);
 
 
 
