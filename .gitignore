@@ -165,6 +165,8 @@ $RECYCLE.BIN/
 /.vs/KerbalConstructionTime/v15/Server/sqlite3/storage.ide-wal
 /.vs/KerbalConstructionTime/v15/Server/sqlite3/storage.ide-shm
 /.vs/KerbalConstructionTime/v15/Server/sqlite3/storage.ide
+db.lock
+storage.ide*
 
 # ============
 # Added by LGG
