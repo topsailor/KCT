@@ -7,6 +7,7 @@ using System.Reflection;
 using KSP.UI.Screens;
 using ToolbarControl_NS;
 using ClickThroughFix;
+using MagiCore;
 
 namespace KerbalConstructionTime
 {
@@ -1560,10 +1561,10 @@ namespace KerbalConstructionTime
                     ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW | ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.TRACKSTATION | ApplicationLauncher.AppScenes.VAB,
                     KCT_GameStates.MODID,
                     "MainButton",
-                    "KerbalConstructionTime/Icons/KCT_on-38",
-                    "KerbalConstructionTime/Icons/KCT_off-38",
-                    "KerbalConstructionTime/Icons/KCT_on-24",
-                    "KerbalConstructionTime/Icons/KCT_off-24",
+                    "KerbalConstructionTime/PluginData/Icons/KCT_on-38",
+                    "KerbalConstructionTime/PluginData/Icons/KCT_off-38",
+                    "KerbalConstructionTime/PluginData/Icons/KCT_on-24",
+                    "KerbalConstructionTime/PluginData/Icons/KCT_off-24",
                     KCT_GameStates.MODNAME
                     );
                 KCT_GameStates.toolbarControl.AddLeftRightClickCallbacks(ClickToggle, onRightClick);
@@ -1600,7 +1601,7 @@ namespace KerbalConstructionTime
                     KCT_Events.instance.DummyVoid, //TODO: List next ship here?
                     KCT_Events.instance.DummyVoid,
                     ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW | ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.TRACKSTATION | ApplicationLauncher.AppScenes.VAB,
-                    GameDatabase.Instance.GetTexture("KerbalConstructionTime/Icons/KCT_on-38", false));
+                    GameDatabase.Instance.GetTexture("KerbalConstructionTime/PluginData/Icons/KCT_on-38", false));
 
                 ApplicationLauncher.Instance.EnableMutuallyExclusive(KCT_Events.instance.KCTButtonStock);
             }

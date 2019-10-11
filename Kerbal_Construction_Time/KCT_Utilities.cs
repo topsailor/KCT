@@ -7,6 +7,7 @@ using System.Text;
 using KSP.UI;
 using KSP.UI.Screens;
 using UnityEngine;
+using ToolbarControl_NS;
 
 namespace KerbalConstructionTime
 {
@@ -622,8 +623,8 @@ namespace KerbalConstructionTime
         {
             if (!textureInited)
             {
-                KCT_OFF_38_str = "KerbalConstructionTime/Icons/KCT_off-38";
-                KCT_On_38_str = "KerbalConstructionTime/Icons/KCT_on-38";
+                KCT_OFF_38_str = "KerbalConstructionTime/PluginData/Icons/KCT_off-38";
+                KCT_On_38_str = "KerbalConstructionTime/PluginData/Icons/KCT_on-38";
             }
             if (KCT_Events.instance.KCTButtonStockImportant && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(0))) > 0 && DateTime.Now.Millisecond < 500)
                 return KCT_OFF_38_str;
@@ -642,8 +643,12 @@ namespace KerbalConstructionTime
         {
             if (!textureInited)
             {
-                KCT_Off_38 = GameDatabase.Instance.GetTexture("KerbalConstructionTime/Icons/KCT_off-38", false);
-                KCT_On_38 = GameDatabase.Instance.GetTexture("KerbalConstructionTime/Icons/KCT_on-38", false);
+                KCT_Off_38 = new Texture2D(2, 2);
+                KCT_On_38 = new Texture2D(2, 2);
+                ToolbarControl.LoadImageFromFile(ref KCT_Off_38, "KerbalConstructionTime/PluginData/Icons/KCT_off-38");
+                ToolbarControl.LoadImageFromFile(ref KCT_On_38, "KerbalConstructionTime/PluginData/Icons/KCT_on-38");
+                //KCT_Off_38 = GameDatabase.Instance.GetTexture("KerbalConstructionTime/PluginData/Icons/KCT_off-38", false);
+                //KCT_On_38 = GameDatabase.Instance.GetTexture("KerbalConstructionTime/PluginData/Icons/KCT_on-38", false);
             }
             if (KCT_Events.instance.KCTButtonStockImportant && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(0))) > 0 && DateTime.Now.Millisecond < 500)
                 return KCT_Off_38;
@@ -662,22 +667,22 @@ namespace KerbalConstructionTime
             String textureReturn;
            
             if (!KCT_PresetManager.Instance.ActivePreset.generalSettings.Enabled)
-                return "KerbalConstructionTime/Icons/KCT_off-24";
+                return "KerbalConstructionTime/PluginData/Icons/KCT_off-24";
 
             // replace KCT_GameStates.kctToolbarButton.Important with KCT_Events.instance.KCTButtonStockImportant
             
             //Flash for up to 3 seconds, at half second intervals per icon
             if (KCT_Events.instance.KCTButtonStockImportant && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(3))) < 0 && DateTime.Now.Millisecond < 500)
-                textureReturn = "KerbalConstructionTime/Icons/KCT_off";
+                textureReturn = "KerbalConstructionTime/PluginData/Icons/KCT_off";
             //If it's been longer than 3 seconds, set Important to false and stop flashing
             else if (KCT_Events.instance.KCTButtonStockImportant && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(3))) > 0)
             {
                 KCT_Events.instance.KCTButtonStockImportant = false;
-                textureReturn = "KerbalConstructionTime/Icons/KCT_on";
+                textureReturn = "KerbalConstructionTime/PluginData/Icons/KCT_on";
             }
             //The normal icon
             else
-                textureReturn = "KerbalConstructionTime/Icons/KCT_on";
+                textureReturn = "KerbalConstructionTime/PluginData/Icons/KCT_on";
             
             return textureReturn + "-24";
         }

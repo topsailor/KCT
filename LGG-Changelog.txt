@@ -1,3 +1,7 @@
+1.4.6.10
+	Fixed new icon positions in directory structure
+	Replaced loading icons from game database with ToolbarController.LoadImageFromFile
+
 1.4.6.9
 	Thanks to github user @ssweim for this:
 		Added Kerbalism as an alternative to TacLifeSupport

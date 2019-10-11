@@ -266,7 +266,7 @@ namespace KerbalConstructionTime
 
             if (ApplicationLauncher.Ready && (KCTButtonStock == null || !ApplicationLauncher.Instance.Contains(KCTButtonStock, out vis))) //Add Stock button
             {
-                string texturePath = "KerbalConstructionTime/Icons/KCT_on-38";
+                string texturePath = "KerbalConstructionTime/PluginData/Icons/KCT_on-38";
                 KCT_Events.instance.KCTButtonStock = ApplicationLauncher.Instance.AddModApplication(
                     KCT_GUI.ClickOn,
                     KCT_GUI.ClickOff,

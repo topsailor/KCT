@@ -81,12 +81,15 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="CrewRandRAPI.cs" />
+    <Compile Include="CTIWrapper.cs" />
     <Compile Include="IKCTBuildItem.cs" />
     <Compile Include="KACWrapper.cs" />
     <Compile Include="KCTDebug.cs" />
     <Compile Include="KCT_BuildListStorage.cs" />
     <Compile Include="KCT_BuildListVessel.cs" />
+    <Compile Include="KCT_BuildPlans.cs" />
     <Compile Include="KCT_Events.cs" />
+    <Compile Include="KCT_FuelWhitelistLoader.cs" />
     <Compile Include="KCT_GameStates.cs" />
     <Compile Include="KCT_GUI.cs" />
     <Compile Include="KCT_DataStorage.cs" />
@@ -103,6 +106,7 @@
     <Compile Include="KCT_UpdateChecker.cs" />
     <Compile Include="KCT_UpgradingBuilding.cs" />
     <Compile Include="KCT_Utilities.cs" />
+    <Compile Include="KCT_WindowHelper.cs" />
     <Compile Include="KerbalConstructionTime.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScrapYardWrapper.cs" />
@@ -122,7 +126,36 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>del "System.Core.dll"</PostBuildEvent>
+    <PostBuildEvent>rem d:\Users\jbb\github\pdb2mdb.exe $(TargetPath)
+
+
+
+
+
+
+
+
+
+
+
+start /D D:\Users\jbb\github\KCT /WAIT deploy.bat  $(TargetDir) $(TargetFileName)
+
+
+
+
+if $(ConfigurationName) == Release (
+
+
+
+
+
+	start /D D:\Users\jbb\github\KCT /WAIT buildRelease.bat $(TargetDir) $(TargetFileName)
+
+
+
+
+
+)</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using KSP.UI.Screens;
+using ToolbarControl_NS;
 
 namespace KerbalConstructionTime
 {
@@ -52,12 +53,16 @@ namespace KerbalConstructionTime
 
             //ALPresent = AssemblyLoader.loadedAssemblies.Any(a => a.assembly.GetName().Name == "AviationLights");
 
+            up = new Texture2D(2, 2);
+            hover = new Texture2D(2, 2);
+            ToolbarControl.LoadImageFromFile(ref up, "KerbalConstructionTime/PluginData/Icons/KCT_add_normal");
+            ToolbarControl.LoadImageFromFile(ref hover, "KerbalConstructionTime/PluginData/Icons/KCT_add_hover");
+            //up = GameDatabase.Instance.GetTexture("KerbalConstructionTime/PluginData/Icons/KCT_add_normal", false);
+            //hover = GameDatabase.Instance.GetTexture("KerbalConstructionTime/PluginData/Icons/KCT_add_hover", false);
 
-
-            up = GameDatabase.Instance.GetTexture("KerbalConstructionTime/Icons/KCT_add_normal", false);
-            hover = GameDatabase.Instance.GetTexture("KerbalConstructionTime/Icons/KCT_add_hover", false);
             PositionAndSizeIcon();
         }
+
         static void PositionAndSizeIcon()
         {
             Texture2D upTex = Texture2D.Instantiate(up);
@@ -71,6 +76,7 @@ namespace KerbalConstructionTime
             if (mechjebPresent)
                 offset = 140;
             scale = GameSettings.UI_SCALE;
+
             rect = new Rect(Screen.width - (260 + offset) * scale, 0, 42 * scale, 38 * scale);
             {
                 TextureScale.Bilinear(upTex, (int)(up.width * scale), (int)(up.height * scale));
