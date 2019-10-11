@@ -30,6 +30,9 @@
 # 1:GAMEDIR, VERSIONFILE [, GITHUBREPO ]
 1:KerbalConstructionTime, KerbalConstructionTime-Stock.version, KCT
 
+# compiler Compiler options and flags
+2c:-d:KSP1_4
+
 # 2:PROJNAME, PROJFILE, VERSIONFILE, PLUGINSFOLDER
 2:Kerbal_Construction_Time,Kerbal_Construction_Time/KerbalConstructionTime-KSP1-4.csproj,KerbalConstructionTime-Stock.version,GameData/KerbalConstructionTime/Plugins
 
@@ -56,8 +59,7 @@
 #8:ConnectedLivingSpace
 
 
-NOT:1.4.5
-#NOT:1.5.1
+DO:1.6.1
 
 #
 # End of file

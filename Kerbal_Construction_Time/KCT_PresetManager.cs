@@ -426,8 +426,12 @@ namespace KerbalConstructionTime
         public double GetModuleVariable(List<string> moduleNames)
         {
             double value = 1.0;
-            foreach (string name in moduleNames)
+            for (int i = moduleNames.Count - 1; i >= 0; i--)
             {
+                string name = moduleNames[i];
+            
+            //foreach (string name in moduleNames)
+            //{
                 if (Module_Variables.ContainsKey(name))
                     value *= Module_Variables[name];
             }
@@ -437,8 +441,12 @@ namespace KerbalConstructionTime
         public double GetResourceVariable(List<string> resourceNames)
         {
             double value = 1.0;
-            foreach (string name in resourceNames)
+            for (int i = resourceNames.Count - 1; i >= 0; i--)
             {
+                string name = resourceNames[i];
+            
+            //foreach (string name in resourceNames)
+            //{
                 if (Resource_Variables.ContainsKey(name))
                     value *= Resource_Variables[name];
             }
@@ -448,8 +456,11 @@ namespace KerbalConstructionTime
         public double GetGlobalVariable(List<string> moduleNames)
         {
             double value = 1.0;
-            foreach (string name in moduleNames)
+            for (int i = moduleNames.Count - 1; i >= 0; i--)
             {
+                string name = moduleNames[i];
+            //foreach (string name in moduleNames)
+            //{
                 if (Global_Variables.ContainsKey(name))
                     value *= Global_Variables[name];
             }
@@ -494,8 +505,11 @@ namespace KerbalConstructionTime
 
         public void SetGlobalVariables(List<string> variables, List<string> moduleNames)
         {
-            foreach (string name in moduleNames)
+            for (int i = moduleNames.Count - 1; i >= 0; i--)
             {
+                string name = moduleNames[i];
+            //foreach (string name in moduleNames)
+            //{
                 if (Global_Variables.ContainsKey(name))
                     variables.AddUnique(name);
             }

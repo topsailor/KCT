@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ToolbarControl_NS;
 
 namespace KerbalConstructionTime
 {
@@ -54,7 +55,12 @@ namespace KerbalConstructionTime
         public static int UpgradesResetCounter = 0;
         public static KCT_BuildListVessel launchedVessel, editedVessel, recoveredVessel;
         public static List<CrewedPart> launchedCrew = new List<CrewedPart>();
-        public static IButton kctToolbarButton;
+        //public static IButton kctToolbarButton;
+
+        public static ToolbarControl toolbarControl;
+        internal const string MODID = "KCT_NS";
+        internal const string MODNAME = "Kerbal Construction Time";
+
         public static bool EditorShipEditingMode = false;
         public static bool firstStart = false;
         public static IKCTBuildItem targetedItem = null;
