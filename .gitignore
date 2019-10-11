@@ -173,3 +173,4 @@ storage.ide*
 # ============
 .bak
 .gitignore
+db.logk

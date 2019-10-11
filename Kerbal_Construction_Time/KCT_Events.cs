@@ -5,6 +5,7 @@ using System.Text;
 using UnityEngine;
 using System.Collections;
 using KSP.UI.Screens;
+using ToolbarControl_NS;
 
 namespace KerbalConstructionTime
 {
@@ -33,7 +34,7 @@ namespace KerbalConstructionTime
             GameEvents.onGameSceneLoadRequested.Add(gameSceneEvent);
             GameEvents.OnTechnologyResearched.Add(TechUnlockEvent);
             //if (!ToolbarManager.ToolbarAvailable || !KCT_GameStates.settings.PreferBlizzyToolbar)
-            GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
+            //GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
             GameEvents.onEditorShipModified.Add(ShipModifiedEvent);
             GameEvents.OnPartPurchased.Add(PartPurchasedEvent);
             //GameEvents.OnVesselRecoveryRequested.Add(RecoveryRequested);
@@ -254,8 +255,9 @@ namespace KerbalConstructionTime
             KerbalConstructionTime.instance.editorRecalcuationRequired = true;
         }
 
-        public ApplicationLauncherButton KCTButtonStock = null;
+        //public ApplicationLauncherButton KCTButtonStock = null;
         public bool KCTButtonStockImportant = false;
+#if false
         public void OnGUIAppLauncherReady()
         {
             bool vis;
@@ -278,6 +280,8 @@ namespace KerbalConstructionTime
                 ApplicationLauncher.Instance.EnableMutuallyExclusive(KCT_Events.instance.KCTButtonStock);
             }
         }
+#endif
+
         public void DummyVoid() { }
 
         public void PartPurchasedEvent(AvailablePart part)

@@ -10,12 +10,13 @@ namespace KerbalConstructionTime
 {
     public class KCT_BuildListVessel : IKCTBuildItem
     {
-        private ShipConstruct ship;
+        public enum ListType { None, VAB, SPH, TechNode, Reconditioning, KSC };
+
+        internal ShipConstruct ship;
         public double progress, buildPoints;
         public String launchSite, flag, shipName;
         public int launchSiteID = -1;
         public ListType type;
-        public enum ListType { None, VAB, SPH, TechNode, Reconditioning, KSC };
         public ConfigNode shipNode;
         public Guid id;
         public bool cannotEarnScience;
@@ -178,6 +179,57 @@ namespace KerbalConstructionTime
         }
 
         //private ProtoVessel recovered;
+        public KCT_BuildListVessel(ProtoVessel pvessel, ConfigNode vesselNode, KCT_BuildListVessel.ListType listType = ListType.None) //For recovered vessels
+        {
+            id = Guid.NewGuid();
+            shipName = pvessel.vesselName;
+            shipNode = vesselNode;
+
+            if (listType != ListType.None)
+                this.type = listType;
+
+            cost = KCT_Utilities.GetTotalVesselCost(shipNode);
+            emptyCost = KCT_Utilities.GetTotalVesselCost(shipNode, false);
+            TotalMass = 0;
+            emptyMass = 0;
+
+            HashSet<int> stages = new HashSet<int>();
+            //for (int i = vessel.protoVessel.protoPartSnapshots.Count - 1; i >= 0; i--)
+            //{
+            //    ProtoPartSnapshot p = vessel.protoVessel.protoPartSnapshots[i];
+
+            foreach (ProtoPartSnapshot p in pvessel.protoPartSnapshots)
+            {
+                stages.Add(p.inverseStageIndex);
+
+                if (p.partPrefab != null && p.partPrefab.Modules.Contains<LaunchClamp>())
+                    continue;
+
+                TotalMass += p.mass;
+                emptyMass += p.mass;
+                //for (int i1 = p.resources.Count - 1; i1 >= 0; i1--)
+                //{
+                //    ProtoPartResourceSnapshot rsc = p.resources[i1];
+
+                foreach (ProtoPartResourceSnapshot rsc in p.resources)
+                {
+                    PartResourceDefinition def = PartResourceLibrary.Instance.GetDefinition(rsc.resourceName);
+                    if (def != null)
+                        TotalMass += def.density * (float)rsc.amount;
+                }
+            }
+            cannotEarnScience = true;
+            numStages = stages.Count;
+            // FIXME ignore stageable part count and cost - it'll be fixed when we put this back in the editor.
+
+            buildPoints = KCT_Utilities.GetBuildTime(shipNode.GetNodes("PART").ToList());
+            flag = HighLogic.CurrentGame.flagURL;
+            progress = buildPoints;
+
+            DistanceFromKSC = 0; // (float)SpaceCenter.Instance.GreatCircleDistance(SpaceCenter.Instance.cb.GetRelSurfaceNVector(vessel.latitude, vessel.longitude));
+
+            rushBuildClicks = 0;
+        }
 
         public KCT_BuildListVessel(Vessel vessel, KCT_BuildListVessel.ListType listType = ListType.None) //For recovered vessels
         {
@@ -610,6 +662,55 @@ namespace KerbalConstructionTime
             }
         }
 
+        internal bool TanksFull()
+        {
+            foreach (ConfigNode p in shipNode.GetNodes("PART"))
+            {
+                if (KCT_Utilities.PartIsProcedural(p))
+                {
+                    var resList = p.GetNodes("RESOURCE");
+                    foreach (var res in resList)
+                    {
+                        if (KCT_GuiDataAndWhitelistItemsDatabase.validFuelRes.Contains(res.GetValue("name")))
+                        {
+                            bool flowState = bool.Parse(res.GetValue("flowState"));
+                            if (flowState)
+                            {
+                                var maxAmt = float.Parse( res.GetValue("maxAmount"));
+                                var amt = float.Parse(res.GetValue("amount"));
+                                if (Math.Abs(amt-maxAmt) >= 1)
+                                {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    var resList = p.GetNodes("RESOURCE");
+                    foreach (var res in resList)
+                    {
+                        var name = res.GetValue("partName");
+                        if (KCT_GuiDataAndWhitelistItemsDatabase.validFuelRes.Contains(name))
+                        {
+                            bool flowState = bool.Parse(res.GetValue("flowState"));
+                            if (flowState)
+                            {
+                                var maxAmt = float.Parse(res.GetValue("maxAmount"));
+                                var amt = float.Parse(res.GetValue("amount"));
+                                if (Math.Abs(amt - maxAmt) >= 1)
+                                {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+    
         private void FillUnlockedFuelTanks()
         {
             foreach (ConfigNode p in shipNode.GetNodes("PART"))
@@ -650,6 +751,7 @@ namespace KerbalConstructionTime
                 }
             }
         }
+
         public double GetTotalMass()
         {
             if (TotalMass != 0 && emptyMass != 0) return TotalMass;

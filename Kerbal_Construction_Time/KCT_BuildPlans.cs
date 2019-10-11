@@ -128,9 +128,22 @@ namespace KerbalConstructionTime
                     }
                     else
                     {
+                        GUILayout.BeginHorizontal();
                         if (GUILayout.Button("Add To Building Plans", GUILayout.Height(2 * 22)))
                         {
                             AddVesselToPlansList();
+                        }
+                        GUILayout.EndHorizontal();
+                        //if (!KCT_GameStates.settings.OverrideLaunchButton)
+                        {
+                            GUILayout.BeginHorizontal();
+                            if (GUILayout.Button("Build", GUILayout.Height(2 * 22)))
+                            {
+                                KCT_Utilities.AddVesselToBuildList();
+                                //SwitchCurrentPartCategory();
+                                KCT_Utilities.RecalculateEditorBuildTime(EditorLogic.fetch.ship);
+                            }
+                            GUILayout.EndHorizontal();
                         }
                     }
                 }
@@ -139,6 +152,12 @@ namespace KerbalConstructionTime
                     GUILayout.Button("No vessel available", GUILayout.Height(2 * 22));
                 }
             }
+            GUILayout.Space(10);
+            GUILayout.BeginHorizontal();            
+            GUILayout.FlexibleSpace();
+            GUILayout.Label("Available Building Plans");
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             bool VABSelectedNew = GUILayout.Toggle(VABSelected, "VAB", GUI.skin.button);
             bool SPHSelectedNew = GUILayout.Toggle(SPHSelected, "SPH", GUI.skin.button);
@@ -200,11 +219,13 @@ namespace KerbalConstructionTime
                     }
                     GUILayout.EndScrollView();
                 }
+                GUILayout.FlexibleSpace();
                 if (GUILayout.Button("Close"))
                 {
                     showBuildPlansWindow = false;
                 }
             }
+
             GUILayout.EndVertical();
             GUI.DragWindow();
         }
