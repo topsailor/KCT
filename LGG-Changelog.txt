@@ -1,7 +1,9 @@
-1.4.6.8 (unreleased)
+1.4.6.8 
 	Added check for Magicore
 	Added check for disabled in Flight and Tracking scenes for recovery purposes
 	Moved icons into PluginData folder
+	Thanks to github user @ssweim for this:
+		Added Kerbalism as an alternative to TacLifeSupport
 
 1.4.6.7 (beta)
 	Added InstallChecker
