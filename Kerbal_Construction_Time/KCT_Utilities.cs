@@ -1846,6 +1846,20 @@ namespace KerbalConstructionTime
 
             if (KCT_GameStates.settings.OverrideLaunchButton)
             {
+                if (KCT_GameStates.EditorShipEditingMode)
+                {
+                    // Prevent switching between VAB and SPH in edit mode.
+                    // Bad things will happen if the edits are saved in another mode than the initial one.
+                    EditorLogic.fetch.switchEditorBtn.onClick.RemoveAllListeners();
+                    EditorLogic.fetch.switchEditorBtn.onClick.AddListener(() => 
+                    {
+                        PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), "cannotSwitchEditor",
+                            "Cannot switch editor!",
+                            "Switching between VAB and SPH is not allowed while editing a vessel.",
+                            "Acknowledged", false, HighLogic.UISkin);
+                    });
+                }
+
                 KCTDebug.Log("Attempting to take control of launch button");
 
                 // EditorLogic.fetch.launchBtn.onClick = new UnityEngine.UI.Button.ButtonClickedEvent(); //delete all other listeners (sorry :( )
