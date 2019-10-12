@@ -1168,30 +1168,29 @@ namespace KerbalConstructionTime
             {
                 b.DoRushBuild();
             }
-            if (b.type == KCT_BuildListVessel.ListType.SPH || b.type == KCT_BuildListVessel.ListType.VAB)
+            if ((b.type == KCT_BuildListVessel.ListType.SPH || b.type == KCT_BuildListVessel.ListType.VAB) &&
+                string.IsNullOrEmpty(KCT_PresetManager.Instance.ActivePreset.generalSettings.VABRecoveryTech) &&    // Disabled in RP-1
+                GUILayout.Button("Move to " + (b.type == KCT_BuildListVessel.ListType.SPH ? "VAB" : "SPH")))
             {
-                if (GUILayout.Button("Move to " + (b.type == KCT_BuildListVessel.ListType.SPH ? "VAB" : "SPH")))
+                if (b.type == KCT_BuildListVessel.ListType.VAB)
                 {
-                    if (b.type == KCT_BuildListVessel.ListType.VAB)
-                    {
-                        b.RemoveFromBuildList();
-                        b.type = KCT_BuildListVessel.ListType.SPH;
-                        //b.ship.shipFacility = EditorFacility.SPH;
-                        b.launchSite = "Runway";
-                        KCT_GameStates.ActiveKSC.SPHList.Insert(0, b);
-                    }
-                    else if (b.type == KCT_BuildListVessel.ListType.SPH)
-                    {
-                        b.RemoveFromBuildList();
-                        b.type = KCT_BuildListVessel.ListType.VAB;
-                        //b.ship.shipFacility = EditorFacility.VAB;
-                        b.launchSite = "LaunchPad";
-                        if (b.launchSiteID >= 0)
-                            launchSite = b.KSC.LaunchPads[b.launchSiteID].name;
-                        else
-                            launchSite = b.KSC.ActiveLPInstance.name;
-                        KCT_GameStates.ActiveKSC.VABList.Insert(0, b);
-                    }
+                    b.RemoveFromBuildList();
+                    b.type = KCT_BuildListVessel.ListType.SPH;
+                    //b.ship.shipFacility = EditorFacility.SPH;
+                    b.launchSite = "Runway";
+                    KCT_GameStates.ActiveKSC.SPHList.Insert(0, b);
+                }
+                else if (b.type == KCT_BuildListVessel.ListType.SPH)
+                {
+                    b.RemoveFromBuildList();
+                    b.type = KCT_BuildListVessel.ListType.VAB;
+                    //b.ship.shipFacility = EditorFacility.VAB;
+                    b.launchSite = "LaunchPad";
+                    if (b.launchSiteID >= 0)
+                        launchSite = b.KSC.LaunchPads[b.launchSiteID].name;
+                    else
+                        launchSite = b.KSC.ActiveLPInstance.name;
+                    KCT_GameStates.ActiveKSC.VABList.Insert(0, b);
                 }
             }
             if (GUILayout.Button("Close"))
