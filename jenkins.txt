@@ -34,7 +34,7 @@
 #2c:-d:KSP1_4
 
 # 2:PROJNAME, PROJFILE, VERSIONFILE, PLUGINSFOLDER
-2:Kerbal_Construction_Time,Kerbal_Construction_Time/KerbalConstructionTime-KSP1-4.csproj,KerbalConstructionTime-Stock.version,GameData/KerbalConstructionTime/Plugins
+2:Kerbal_Construction_Time,Kerbal_Construction_Time/KerbalConstructionTime-Stock.csproj,KerbalConstructionTime-Stock.version,GameData/KerbalConstructionTime/Plugins
 
 # 3:SOURCEFILE, DESTDIR
 3:KerbalConstructionTime-Stock.version,GameData/KerbalConstructionTime
