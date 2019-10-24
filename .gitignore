@@ -156,11 +156,9 @@ $RECYCLE.BIN/
 .DS_Store
 
 # ===============
-# Added by me
+# Added by me (who is "me")
 # ===============
 
-# DLL files
-# *.dll
 .vs/
 
 # ============
@@ -168,3 +166,5 @@ $RECYCLE.BIN/
 # ============
 .bak
 .gitignore
+# DLL files
+*.dll
