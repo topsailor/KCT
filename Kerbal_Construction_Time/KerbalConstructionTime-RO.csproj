@@ -135,13 +135,9 @@
     <PostBuildEvent>del "System.Core.dll"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>
-
-set textTemplatingPath="$(DevEnvDir)texttransform.exe"
-
-
-
-%25textTemplatingPath%25 "$(ProjectDir)AssemblyVersion-RO.tt</PreBuildEvent>
+    <PreBuildEvent>set textTemplatingPath="$(DevEnvDir)texttransform.exe"
+%25textTemplatingPath%25 "$(ProjectDir)AssemblyVersion-RO.tt"
+</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets. -->
