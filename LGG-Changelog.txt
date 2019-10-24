@@ -1,3 +1,7 @@
+1.4.6.12
+	Added back in missing files
+	Deleted unneeded ToolbarWrapper.cs
+
 1.4.6.11
 	Removed the ability to move a ship from VAB to SPH and back
 	Removed all KSP1_4 #if/#endif statements
