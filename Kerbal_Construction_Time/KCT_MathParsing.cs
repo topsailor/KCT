@@ -26,8 +26,11 @@ namespace KerbalConstructionTime
                 case "BuildRate": return MathParsing.ParseMath("KCT_BUILD_RATE", KCT_PresetManager.Instance.ActivePreset.formulaSettings.BuildRateFormula, variables);
                 case "UpgradeReset": return MathParsing.ParseMath("KCT_UPGRADE_RESET", KCT_PresetManager.Instance.ActivePreset.formulaSettings.UpgradeResetFormula, variables);
                 case "InventorySales": return MathParsing.ParseMath("KCT_INVENTORY_SALES", KCT_PresetManager.Instance.ActivePreset.formulaSettings.InventorySaleFormula, variables);
+                case "IntegrationTime": return MathParsing.ParseMath("KCT_INTEGRATION_TIME", KCT_PresetManager.Instance.ActivePreset.formulaSettings.IntegrationTimeFormula, variables);
+                case "IntegrationCost": return MathParsing.ParseMath("KCT_INTEGRATION_COST", KCT_PresetManager.Instance.ActivePreset.formulaSettings.IntegrationCostFormula, variables);
                 case "RolloutCost": return MathParsing.ParseMath("KCT_ROLLOUT_COST", KCT_PresetManager.Instance.ActivePreset.formulaSettings.RolloutCostFormula, variables);
                 case "NewLaunchPadCost": return MathParsing.ParseMath("KCT_NEW_LAUNCHPAD_COST", KCT_PresetManager.Instance.ActivePreset.formulaSettings.NewLaunchPadCostFormula, variables);
+                case "RushCost": return MathParsing.ParseMath("KCT_RUSH_COST", KCT_PresetManager.Instance.ActivePreset.formulaSettings.RushCostFormula, variables);
                 default: return 0;
             }
         }
@@ -93,8 +96,54 @@ namespace KerbalConstructionTime
             if (!KCT_PresetManager.Instance.ActivePreset.generalSettings.Enabled || !KCT_PresetManager.Instance.ActivePreset.generalSettings.ReconditioningTimes)
                 return 0;
 
+            Dictionary<string, string> variables = GetIntegrationRolloutVariables(vessel);
+            return GetStandardFormulaValue("RolloutCost", variables);
+        }
+
+        public static double ParseIntegrationCostFormula(KCT_BuildListVessel vessel)
+        {
+            if (!KCT_PresetManager.Instance.ActivePreset.generalSettings.Enabled ||
+                string.IsNullOrEmpty(KCT_PresetManager.Instance.ActivePreset.formulaSettings.IntegrationCostFormula) ||
+                KCT_PresetManager.Instance.ActivePreset.formulaSettings.IntegrationCostFormula == "0")
+            {
+                return 0;
+            }
+
+            Dictionary<string, string> variables = GetIntegrationRolloutVariables(vessel);
+            return GetStandardFormulaValue("IntegrationCost", variables);
+        }
+
+        public static double ParseIntegrationTimeFormula(KCT_BuildListVessel vessel)
+        {
+            if (!KCT_PresetManager.Instance.ActivePreset.generalSettings.Enabled ||
+                string.IsNullOrEmpty(KCT_PresetManager.Instance.ActivePreset.formulaSettings.IntegrationTimeFormula) ||
+                KCT_PresetManager.Instance.ActivePreset.formulaSettings.IntegrationTimeFormula == "0")
+            {
+                return 0;
+            }
+
+            Dictionary<string, string> variables = GetIntegrationRolloutVariables(vessel);
+            return GetStandardFormulaValue("IntegrationTime", variables);
+        }
+
+        public static double ParseRushCostFormula(KCT_BuildListVessel vessel)
+        {
+            if (!KCT_PresetManager.Instance.ActivePreset.generalSettings.Enabled ||
+                string.IsNullOrEmpty(KCT_PresetManager.Instance.ActivePreset.formulaSettings.RushCostFormula))
+            {
+                return 0;
+            }
+
+            Dictionary<string, string> variables = GetIntegrationRolloutVariables(vessel);
+            variables.Add("TC", vessel.GetTotalCost().ToString());
+            variables.Add("RC", vessel.rushBuildClicks.ToString());
+            return GetStandardFormulaValue("RushCost", variables);
+        }
+
+        private static Dictionary<string, string> GetIntegrationRolloutVariables(KCT_BuildListVessel vessel)
+        {
             double loadedMass, emptyMass, loadedCost, emptyCost;
-            loadedCost = vessel.GetTotalCost();
+            loadedCost = vessel.cost;
             emptyCost = vessel.emptyCost;
             loadedMass = vessel.GetTotalMass();
             emptyMass = vessel.emptyMass;
@@ -126,6 +175,7 @@ namespace KerbalConstructionTime
             variables.Add("C", loadedCost.ToString());
             variables.Add("c", emptyCost.ToString());
             variables.Add("VAB", isVABVessel.ToString());
+            variables.Add("E", vessel.effectiveCost.ToString());
             variables.Add("BP", BP.ToString());
             variables.Add("L", LaunchSiteLvl.ToString());
             variables.Add("LM", LaunchSiteMax.ToString());
@@ -137,7 +187,7 @@ namespace KerbalConstructionTime
 
             AddCrewVariables(variables);
 
-            return GetStandardFormulaValue("RolloutCost", variables);
+            return variables;
         }
 
         public static double ParseReconditioningFormula(KCT_BuildListVessel vessel, bool isReconditioning)
@@ -147,7 +197,7 @@ namespace KerbalConstructionTime
             Dictionary<string, string> variables = new Dictionary<string, string>();
 
             double loadedMass, emptyMass, loadedCost, emptyCost;
-            loadedCost = vessel.GetTotalCost();
+            loadedCost = vessel.cost;
             emptyCost = vessel.emptyCost;
             loadedMass = vessel.GetTotalMass();
             emptyMass = vessel.emptyMass;

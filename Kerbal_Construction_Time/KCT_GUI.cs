@@ -42,8 +42,8 @@ namespace KerbalConstructionTime
         private static Rect bLPlusPosition = new Rect(Screen.width - 500, 40, 100, 1);
 
         static Rect buildPlansWindowPosition = new Rect(Screen.width - 300, 40, 300, 1);
-        public static GUISkin windowSkin;// = HighLogic.UISkin;// = new GUIStyle(HighLogic.Skin.window);
-        //public static UISkinDef windowSkin;
+        public static GUISkin windowSkin;
+        public static GUIStyle orangeText;
 
         private static bool isKSCLocked = false, isEditorLocked = false;
 
@@ -415,7 +415,7 @@ namespace KerbalConstructionTime
             //GUILayout.Label("Current KSC: " + KCT_GameStates.ActiveKSC.KSCName);
             if (!KCT_GameStates.EditorShipEditingMode) //Build mode
             {
-                double buildTime = KCT_GameStates.EditorBuildTime;
+                double buildTime = KCT_GameStates.EditorBuildTime + KCT_GameStates.EditorIntegrationTime;
                 KCT_BuildListVessel.ListType type = EditorLogic.fetch.launchSiteName == "LaunchPad" ? KCT_BuildListVessel.ListType.VAB : KCT_BuildListVessel.ListType.SPH;
                 //GUILayout.Label("Total Build Points (BP):", GUILayout.ExpandHeight(true));
                 //GUILayout.Label(Math.Round(buildTime, 2).ToString(), GUILayout.ExpandHeight(true));
@@ -452,8 +452,17 @@ namespace KerbalConstructionTime
                     GUILayout.Label("Invalid Build Rate");
                 }
 
+                if (KCT_GameStates.EditorRolloutTime > 0)
+                {
+                    bR = KCT_Utilities.GetVABBuildRateSum(KCT_GameStates.ActiveKSC);
+                    GUILayout.Label("Rollout Time: " + MagiCore.Utilities.GetFormattedTime(KCT_GameStates.EditorRolloutTime / bR));
+                }
+
+                if (KCT_GameStates.EditorIntegrationCosts > 0)
+                    GUILayout.Label("Integration Cost: " + Math.Round(KCT_GameStates.EditorIntegrationCosts, 1));
+
                 if (KCT_GameStates.EditorRolloutCosts > 0)
-                    GUILayout.Label("Launch Cost: " + Math.Round(KCT_GameStates.EditorRolloutCosts, 1));
+                    GUILayout.Label("Rollout Cost: " + Math.Round(KCT_GameStates.EditorRolloutCosts, 1));
 
                 //bool useHolder = useInventory;
                 //useInventory = GUILayout.Toggle(useInventory, " Use parts from inventory?");
@@ -493,18 +502,23 @@ namespace KerbalConstructionTime
 
                 KCT_BuildListVessel ship = KCT_GameStates.editedVessel;
                 if (finishedShipBP < 0 && ship.isFinished)
+                {
+                    // If ship is finished, then both build and integration times can be refreshed with newly calculated values
                     finishedShipBP = KCT_Utilities.GetBuildTime(ship.ExtractedPartNodes);
-                double origBP = ship.isFinished ? finishedShipBP : ship.buildPoints; //If the ship is finished, recalculate times. Else, use predefined times.
-                double buildTime = KCT_GameStates.EditorBuildTime;
+                    ship.buildPoints = finishedShipBP;
+                    ship.integrationPoints = KCT_MathParsing.ParseIntegrationTimeFormula(ship);
+                }
+
+                double origBP = ship.isFinished ? finishedShipBP : ship.buildPoints;
+                origBP += ship.integrationPoints;
+                double buildTime = KCT_GameStates.EditorBuildTime + KCT_GameStates.EditorIntegrationTime;
                 double difference = Math.Abs(buildTime - origBP);
                 double progress;
                 if (ship.isFinished) progress = origBP;
                 else progress = ship.progress;
                 double newProgress = Math.Max(0, progress - (1.1 * difference));
-                //GUILayout.Label("Original: " + Math.Max(0, Math.Round(progress, 2)) + "/" + Math.Round(origBP, 2) + " BP (" + Math.Max(0, Math.Round(100 * (progress / origBP), 2)) + "%)");
-                GUILayout.Label("Original: " + Math.Max(0, Math.Round(100 * (progress / origBP), 2)) + "%");
-                //GUILayout.Label("Edited: " + Math.Round(newProgress, 2) + "/" + Math.Round(buildTime, 2) + " BP (" + Math.Round(100 * newProgress / buildTime, 2) + "%)");
-                GUILayout.Label("Edited: " + Math.Round(100 * newProgress / buildTime, 2) + "%");
+                GUILayout.Label($"Original: {Math.Max(0, Math.Round(100 * (progress / origBP), 2))}%");
+                GUILayout.Label($"Edited: {Math.Round(100 * newProgress / buildTime, 2)}%");
 
                 KCT_BuildListVessel.ListType type = EditorLogic.fetch.launchSiteName == "LaunchPad" ? KCT_BuildListVessel.ListType.VAB : KCT_BuildListVessel.ListType.SPH;
                 GUILayout.BeginHorizontal();
@@ -538,11 +552,11 @@ namespace KerbalConstructionTime
                 {
 
                     finishedShipBP = -1;
-                    KCT_Utilities.AddFunds(ship.cost, TransactionReasons.VesselRollout);
+                    KCT_Utilities.AddFunds(ship.GetTotalCost(), TransactionReasons.VesselRollout);
                     KCT_BuildListVessel newShip = KCT_Utilities.AddVesselToBuildList();
                     if (newShip == null)
                     {
-                        KCT_Utilities.SpendFunds(ship.cost, TransactionReasons.VesselRollout);
+                        KCT_Utilities.SpendFunds(ship.GetTotalCost(), TransactionReasons.VesselRollout);
                         return;
                     }
 
@@ -718,7 +732,7 @@ namespace KerbalConstructionTime
                 ScrapYardWrapper.AddPartsToInventory(b.ExtractedPartNodes, false); //don't count as a recovery
             }
             ScrapYardWrapper.SetProcessedStatus(ScrapYardWrapper.GetPartID(b.ExtractedPartNodes[0]), false);
-            KCT_Utilities.AddFunds(b.cost, TransactionReasons.VesselRollout);
+            KCT_Utilities.AddFunds(b.GetTotalCost(), TransactionReasons.VesselRollout);
         }
 
         public static void DummyVoid() { InputLockManager.RemoveControlLock("KCTPopupLock"); }
@@ -847,7 +861,11 @@ namespace KerbalConstructionTime
             GUILayout.BeginVertical(GUILayout.ExpandHeight(true), GUILayout.MaxHeight(Screen.height / 2));
             GUILayout.BeginHorizontal();
             randomCrew = GUILayout.Toggle(randomCrew, " Randomize Filling");
-            autoHire = GUILayout.Toggle(autoHire, " Auto-Hire Applicants");
+            if (!UseAvailabilityChecker)
+            {
+                // Don't allow auto-hiring because the Availability Checker wouldn't allow assigining the new crewmember anyway
+                autoHire = GUILayout.Toggle(autoHire, " Auto-Hire Applicants");
+            }
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             if (AvailableCrew == null)
@@ -962,6 +980,7 @@ namespace KerbalConstructionTime
                     }
                 }
             }
+
             if (GUILayout.Button("Clear All"))
             {
                 foreach (CrewedPart cP in KCT_GameStates.launchedCrew)
@@ -985,6 +1004,8 @@ namespace KerbalConstructionTime
                     numberItems += 1 + p.CrewCapacity;
                 }
             }
+
+            bool foundAssignableCrew = false;
             scrollPos = GUILayout.BeginScrollView(scrollPos, GUILayout.Height(numberItems * 25 + 10), GUILayout.MaxHeight(Screen.height / 2));
             for (int j = 0; j < parts.Count; j++)
             {
@@ -1001,6 +1022,8 @@ namespace KerbalConstructionTime
                     }
                     else
                         PossibleCrewForPart = AvailableCrew;
+
+                    foundAssignableCrew |= PossibleCrewForPart.Count > 0;
 
                     GUILayout.BeginHorizontal();
                     GUILayout.Label(p.partInfo.title.Length <= 25 ? p.partInfo.title : p.partInfo.title.Substring(0, 25));
@@ -1088,6 +1111,7 @@ namespace KerbalConstructionTime
                             }
                         }
                     }
+
                     if (GUILayout.Button("Clear", GUILayout.Width(75)))
                     {
                         KCT_GameStates.launchedCrew[j].crewList.Clear();
@@ -1095,11 +1119,13 @@ namespace KerbalConstructionTime
                         AvailableCrew = GetAvailableCrew(string.Empty);
                     }
                     GUILayout.EndHorizontal();
+
                     for (int i = 0; i < p.CrewCapacity; i++)
                     {
                         GUILayout.BeginHorizontal();
                         if (i < KCT_GameStates.launchedCrew[j].crewList.Count && KCT_GameStates.launchedCrew[j].crewList[i] != null)
                         {
+                            foundAssignableCrew = true;
                             ProtoCrewMember kerbal = KCT_GameStates.launchedCrew[j].crewList[i];
                             GUILayout.Label(kerbal.name + ", " + kerbal.experienceTrait.Title + " " + kerbal.experienceLevel); //Display the kerbal currently in the seat, followed by occupation and level
                             if (GUILayout.Button("Remove", GUILayout.Width(120)))
@@ -1155,6 +1181,17 @@ namespace KerbalConstructionTime
                 }
             }
             GUILayout.EndScrollView();
+
+            if (UseAvailabilityChecker && !foundAssignableCrew)
+            {
+                if (orangeText == null)
+                {
+                    orangeText = new GUIStyle(GUI.skin.label);
+                    orangeText.normal.textColor = XKCDColors.Orange;
+                }
+                GUILayout.Label("No trained crew found for this cockpit or capsule. Check proficiency and mission training status of your astronauts.", orangeText);
+            }
+
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Launch"))
             {
@@ -1167,6 +1204,7 @@ namespace KerbalConstructionTime
                     CheckTanksAndLaunch(true);
                 }
             }
+
             if (GUILayout.Button("Cancel"))
             {
                 showShipRoster = false;

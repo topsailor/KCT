@@ -385,8 +385,8 @@ namespace KerbalConstructionTime
                         if (b.buildRate > 0)
                             GUILayout.Label(MagiCore.Utilities.GetColonFormattedTime(b.timeLeft), GUILayout.Width(width2));
                         else
-                            GUILayout.Label("Est: " + MagiCore.Utilities.GetColonFormattedTime((b.buildPoints - b.progress) / KCT_Utilities.GetBuildRate(0, KCT_BuildListVessel.ListType.VAB, null)), GUILayout.Width(width2));
-                        // GUILayout.Label(Math.Round(b.buildPoints, 2).ToString(), GUILayout.Width(width1 / 2 + 10));
+                            GUILayout.Label("Est: " + MagiCore.Utilities.GetColonFormattedTime((b.buildPoints + b.integrationPoints - b.progress) / KCT_Utilities.GetBuildRate(0, KCT_BuildListVessel.ListType.VAB, null)), GUILayout.Width(width2));
+                       // GUILayout.Label(Math.Round(b.buildPoints, 2).ToString(), GUILayout.Width(width1 / 2 + 10));
                         GUILayout.EndHorizontal();
                     }
 
@@ -531,7 +531,7 @@ namespace KerbalConstructionTime
                                     }
                                     else
                                     {
-                                        PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), "cannotLaunchEditorChecksPopup", "Cannot Launch!", "Warning! This vessel did not pass the editor checks! Until you upgrade the VAB and/or Launchpad it cannot be launched. Listed below are the failed checks:\n" + String.Join("\n", facilityChecks.ToArray()), "Acknowledged", false, HighLogic.UISkin);
+                                        PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), "cannotLaunchEditorChecksPopup", "Cannot Launch!", "Warning! This vessel did not pass the editor checks! Until you upgrade the VAB and/or Launchpad it cannot be launched. Listed below are the failed checks:\n" + String.Join("\n", facilityChecks.Select(s => $"• {s}").ToArray()), "Acknowledged", false, HighLogic.UISkin);
                                     }
                                 }
                             }
@@ -641,7 +641,7 @@ namespace KerbalConstructionTime
                                 }
                                 else
                                 {
-                                    PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), "cannotLaunchEditorChecksPopup", "Cannot Launch!", "Warning! This vessel did not pass the editor checks! Until you upgrade the VAB and/or Launchpad it cannot be launched. Listed below are the failed checks:\n" + String.Join("\n", facilityChecks.ToArray()), "Acknowledged", false, HighLogic.UISkin);
+                                    PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), "cannotLaunchEditorChecksPopup", "Cannot Launch!", "Warning! This vessel did not pass the editor checks! Until you upgrade the VAB and/or Launchpad it cannot be launched. Listed below are the failed checks:\n" + String.Join("\n", facilityChecks.Select(s => $"• {s}").ToArray()), "Acknowledged", false, HighLogic.UISkin);
                                 }
                             }
                         }
@@ -781,7 +781,7 @@ namespace KerbalConstructionTime
                         if (b.buildRate > 0)
                             GUILayout.Label(MagiCore.Utilities.GetColonFormattedTime(b.timeLeft), GUILayout.Width(width2));
                         else
-                            GUILayout.Label("Est: " + MagiCore.Utilities.GetColonFormattedTime((b.buildPoints - b.progress) / KCT_Utilities.GetBuildRate(0, KCT_BuildListVessel.ListType.SPH, null)), GUILayout.Width(width2));
+                            GUILayout.Label("Est: " + MagiCore.Utilities.GetColonFormattedTime((b.buildPoints + b.integrationPoints - b.progress) / KCT_Utilities.GetBuildRate(0, KCT_BuildListVessel.ListType.SPH, null)), GUILayout.Width(width2));
                         //GUILayout.Label(Math.Round(b.buildPoints, 2).ToString(), GUILayout.Width(width1 / 2 + 10));
                         GUILayout.EndHorizontal();
                     }
@@ -871,7 +871,7 @@ namespace KerbalConstructionTime
                             }
                             else
                             {
-                                PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), "cannotLaunchEditorChecksPopup", "Cannot Launch!", "Warning! This vessel did not pass the editor checks! Until you upgrade the SPH and/or Runway it cannot be launched. Listed below are the failed checks:\n" + String.Join("\n", facilityChecks.ToArray()), "Acknowledged", false, HighLogic.UISkin);
+                                PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), "cannotLaunchEditorChecksPopup", "Cannot Launch!", "Warning! This vessel did not pass the editor checks! Until you upgrade the SPH and/or Runway it cannot be launched. Listed below are the failed checks:\n" + String.Join("\n", facilityChecks.Select(s => $"• {s}").ToArray()), "Acknowledged", false, HighLogic.UISkin);
                             }
                         }
                         else if (recovery != null)
@@ -1061,7 +1061,6 @@ namespace KerbalConstructionTime
             KCT_BuildListVessel b = KCT_Utilities.FindBLVesselByID(IDSelected);
             GUILayout.BeginVertical();
             string launchSite = b.launchSite;
-            float rbMultiplier = KCT_PresetManager.Instance.ActivePreset.generalSettings.RushMultiplier;
 
             if (launchSite == "LaunchPad")
             {
@@ -1163,45 +1162,35 @@ namespace KerbalConstructionTime
                     KCT_GameStates.ActiveKSC.SPHList.Insert(0, b);
                 }
             }
-            if (!b.isFinished
-                && (KCT_PresetManager.Instance.ActivePreset.generalSettings.MaxRushClicks == 0 || b.rushBuildClicks < KCT_PresetManager.Instance.ActivePreset.generalSettings.MaxRushClicks)
-                && GUILayout.Button("Rush Build 10%\n√" + Math.Round(rbMultiplier * b.GetTotalCost())))
+            if (!b.isFinished 
+                && (KCT_PresetManager.Instance.ActivePreset.generalSettings.MaxRushClicks == 0 || b.rushBuildClicks < KCT_PresetManager.Instance.ActivePreset.generalSettings.MaxRushClicks) 
+                && GUILayout.Button("Rush Build 10%\n√" + Math.Round(b.GetRushCost())))
             {
-                double cost = b.GetTotalCost();
-                double rush = cost * rbMultiplier;
-                double remainingBP = b.buildPoints - b.progress;
-                if (Funding.Instance.Funds >= rush)
-                {
-                    b.AddProgress(remainingBP * 0.1);
-                    KCT_Utilities.SpendFunds(rush, TransactionReasons.None);
-                    ++b.rushBuildClicks;
-                }
-
+                b.DoRushBuild();
             }
-            if (b.type == KCT_BuildListVessel.ListType.SPH || b.type == KCT_BuildListVessel.ListType.VAB)
+            if ((b.type == KCT_BuildListVessel.ListType.SPH || b.type == KCT_BuildListVessel.ListType.VAB) &&
+                string.IsNullOrEmpty(KCT_PresetManager.Instance.ActivePreset.generalSettings.VABRecoveryTech) &&    // Disabled in RP-1
+                GUILayout.Button("Move to " + (b.type == KCT_BuildListVessel.ListType.SPH ? "VAB" : "SPH")))
             {
-                if (GUILayout.Button("Move to " + (b.type == KCT_BuildListVessel.ListType.SPH ? "VAB" : "SPH")))
+                if (b.type == KCT_BuildListVessel.ListType.VAB)
                 {
-                    if (b.type == KCT_BuildListVessel.ListType.VAB)
-                    {
-                        b.RemoveFromBuildList();
-                        b.type = KCT_BuildListVessel.ListType.SPH;
-                        //b.ship.shipFacility = EditorFacility.SPH;
-                        b.launchSite = "Runway";
-                        KCT_GameStates.ActiveKSC.SPHList.Insert(0, b);
-                    }
-                    else if (b.type == KCT_BuildListVessel.ListType.SPH)
-                    {
-                        b.RemoveFromBuildList();
-                        b.type = KCT_BuildListVessel.ListType.VAB;
-                        //b.ship.shipFacility = EditorFacility.VAB;
-                        b.launchSite = "LaunchPad";
-                        if (b.launchSiteID >= 0)
-                            launchSite = b.KSC.LaunchPads[b.launchSiteID].name;
-                        else
-                            launchSite = b.KSC.ActiveLPInstance.name;
-                        KCT_GameStates.ActiveKSC.VABList.Insert(0, b);
-                    }
+                    b.RemoveFromBuildList();
+                    b.type = KCT_BuildListVessel.ListType.SPH;
+                    //b.ship.shipFacility = EditorFacility.SPH;
+                    b.launchSite = "Runway";
+                    KCT_GameStates.ActiveKSC.SPHList.Insert(0, b);
+                }
+                else if (b.type == KCT_BuildListVessel.ListType.SPH)
+                {
+                    b.RemoveFromBuildList();
+                    b.type = KCT_BuildListVessel.ListType.VAB;
+                    //b.ship.shipFacility = EditorFacility.VAB;
+                    b.launchSite = "LaunchPad";
+                    if (b.launchSiteID >= 0)
+                        launchSite = b.KSC.LaunchPads[b.launchSiteID].name;
+                    else
+                        launchSite = b.KSC.ActiveLPInstance.name;
+                    KCT_GameStates.ActiveKSC.VABList.Insert(0, b);
                 }
             }
             if (GUILayout.Button("Close"))

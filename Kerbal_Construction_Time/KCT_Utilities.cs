@@ -54,7 +54,35 @@ namespace KerbalConstructionTime
             return PartLoader.getPartInfoByName(partName);
         }
 
+        /// <summary>
+        /// This is actually the cost in BPs which can in turn be used to calculate the ingame time it takes to build the vessel.
+        /// </summary>
+        /// <param name="parts"></param>
+        /// <returns></returns>
         public static double GetBuildTime(List<Part> parts)
+        {
+            double totalEffectiveCost = GetEffectiveCost(parts);
+            return GetBuildTime(totalEffectiveCost);
+        }
+
+        public static double GetBuildTime(List<ConfigNode> parts)
+        {
+            double totalEffectiveCost = GetEffectiveCost(parts);
+            return GetBuildTime(totalEffectiveCost);
+        }
+
+        public static double GetBuildTime(double totalEffectiveCost)
+        {
+            var formulaParams = new Dictionary<string, string>()
+            {
+                { "E", totalEffectiveCost.ToString() },
+                { "O", KCT_PresetManager.Instance.ActivePreset.timeSettings.OverallMultiplier.ToString() }
+            };
+            double finalBP = KCT_MathParsing.GetStandardFormulaValue("BP", formulaParams);
+            return finalBP;
+        }
+
+        public static double GetEffectiveCost(List<Part> parts)
         {
             //get list of parts that are in the inventory
             IList<Part> inventorySample = ScrapYardWrapper.GetPartsInInventory(parts, ScrapYardWrapper.ComparisonStrength.STRICT) ?? new List<Part>();
@@ -69,7 +97,7 @@ namespace KerbalConstructionTime
                 double effectiveCost = 0;
                 double cost = GetPartCosts(p);
                 double dryCost = GetPartCosts(p, false);
-                
+
                 double drymass = p.mass;
                 double wetmass = p.GetResourceMass() + drymass;
 
@@ -86,10 +114,22 @@ namespace KerbalConstructionTime
                 int used = ScrapYardWrapper.GetUseCount(p);
                 //C=cost, c=dry cost, M=wet mass, m=dry mass, U=part tracker, O=overall multiplier, I=inventory effect (0 if not in inv), B=build effect
 
-                effectiveCost = KCT_MathParsing.GetStandardFormulaValue("EffectivePart", new Dictionary<string, string>() { {"C", cost.ToString()}, {"c", dryCost.ToString()}, {"M",wetmass.ToString()},
-                    { "m", drymass.ToString()}, {"U", builds.ToString()}, {"u", used.ToString() }, {"O", KCT_PresetManager.Instance.ActivePreset.timeSettings.OverallMultiplier.ToString()}, {"I", InvEff.ToString()},
-                    { "B", KCT_PresetManager.Instance.ActivePreset.timeSettings.BuildEffect.ToString()}, 
-                    {"PV", PartMultiplier.ToString()}, {"RV", ResourceMultiplier.ToString()}, {"MV", ModuleMultiplier.ToString()}});
+                effectiveCost = KCT_MathParsing.GetStandardFormulaValue("EffectivePart",
+                    new Dictionary<string, string>()
+                    {
+                        {"C", cost.ToString()},
+                        {"c", dryCost.ToString()},
+                        {"M", wetmass.ToString()},
+                        {"m", drymass.ToString()},
+                        {"U", builds.ToString()},
+                        {"u", used.ToString() },
+                        {"O", KCT_PresetManager.Instance.ActivePreset.timeSettings.OverallMultiplier.ToString()},
+                        {"I", InvEff.ToString()},
+                        {"B", KCT_PresetManager.Instance.ActivePreset.timeSettings.BuildEffect.ToString()},
+                        {"PV", PartMultiplier.ToString()},
+                        {"RV", ResourceMultiplier.ToString()},
+                        {"MV", ModuleMultiplier.ToString()}
+                    });
 
                 if (InvEff != 0)
                 {
@@ -99,13 +139,14 @@ namespace KerbalConstructionTime
                 if (effectiveCost < 0) effectiveCost = 0;
                 totalEffectiveCost += effectiveCost;
             }
-            double finalBP = KCT_PresetManager.Instance.ActivePreset.partVariables.GetGlobalVariable(globalVariables) * KCT_MathParsing.GetStandardFormulaValue("BP", new Dictionary<string, string>() { { "E", totalEffectiveCost.ToString() }, { "O", KCT_PresetManager.Instance.ActivePreset.timeSettings.OverallMultiplier.ToString() } });
-            return finalBP;
+
+            double globalMultiplier = KCT_PresetManager.Instance.ActivePreset.partVariables.GetGlobalVariable(globalVariables);
+
+            return totalEffectiveCost * globalMultiplier;
         }
 
-        public static double GetBuildTime(List<ConfigNode> parts)
+        public static double GetEffectiveCost(List<ConfigNode> parts)
         {
-
             //get list of parts that are in the inventory
             IList<ConfigNode> inventorySample = ScrapYardWrapper.GetPartsInInventory(parts, ScrapYardWrapper.ComparisonStrength.STRICT) ?? new List<ConfigNode>();
 
@@ -124,7 +165,6 @@ namespace KerbalConstructionTime
                 ShipConstruction.GetPartCostsAndMass(p, GetAvailablePartByName(name), out dryCost, out fuelCost, out dryMass, out fuelMass);
                 cost = dryCost + fuelCost;
                 wetMass = dryMass + fuelMass;
-                    
 
                 double PartMultiplier = KCT_PresetManager.Instance.ActivePreset.partVariables.GetPartVariable(raw_name);
                 List<string> moduleNames = new List<string>();
@@ -154,21 +194,22 @@ namespace KerbalConstructionTime
                 int used = ScrapYardWrapper.GetUseCount(p);
                 //C=cost, c=dry cost, M=wet mass, m=dry mass, U=part tracker, O=overall multiplier, I=inventory effect (0 if not in inv), B=build effect
 
-
-                effectiveCost = KCT_MathParsing.GetStandardFormulaValue("EffectivePart", 
-                    new Dictionary<string, string>() { 
-                        {"C", cost.ToString()}, 
-                        {"c", dryCost.ToString()}, 
-                        {"M",wetMass.ToString()},
-                        {"m", dryMass.ToString()}, 
-                        {"U", builds.ToString()}, 
-                        {"u", used.ToString()}, 
-                        {"O", KCT_PresetManager.Instance.ActivePreset.timeSettings.OverallMultiplier.ToString()}, 
-                        {"I", InvEff.ToString()}, {"B", KCT_PresetManager.Instance.ActivePreset.timeSettings.BuildEffect.ToString()}, 
-                        {"PV", PartMultiplier.ToString()}, 
-                        {"RV", PartMultiplier.ToString()}, 
-                        {"MV", ModuleMultiplier.ToString()}});
-
+                effectiveCost = KCT_MathParsing.GetStandardFormulaValue("EffectivePart",
+                    new Dictionary<string, string>()
+                    {
+                        {"C", cost.ToString()},
+                        {"c", dryCost.ToString()},
+                        {"M", wetMass.ToString()},
+                        {"m", dryMass.ToString()},
+                        {"U", builds.ToString()},
+                        {"u", used.ToString()},
+                        {"O", KCT_PresetManager.Instance.ActivePreset.timeSettings.OverallMultiplier.ToString()},
+                        {"I", InvEff.ToString()},
+                        {"B", KCT_PresetManager.Instance.ActivePreset.timeSettings.BuildEffect.ToString()},
+                        {"PV", PartMultiplier.ToString()},
+                        {"RV", ResourceMultiplier.ToString()},
+                        {"MV", ModuleMultiplier.ToString()}
+                    });
 
                 if (InvEff != 0)
                 {
@@ -178,9 +219,10 @@ namespace KerbalConstructionTime
                 if (effectiveCost < 0) effectiveCost = 0;
                 totalEffectiveCost += effectiveCost;
             }
-            double finalBP = KCT_PresetManager.Instance.ActivePreset.partVariables.GetGlobalVariable(globalVariables) * KCT_MathParsing.GetStandardFormulaValue("BP", new Dictionary<string, string>() { { "E", totalEffectiveCost.ToString() }, { "O", KCT_PresetManager.Instance.ActivePreset.timeSettings.OverallMultiplier.ToString() } });
-            return finalBP;
-            //return Math.Sqrt(totalEffectiveCost) * 2000 * KCT_PresetManager.Instance.ActivePreset.timeSettings.OverallMultiplier;
+
+            double globalMultiplier = KCT_PresetManager.Instance.ActivePreset.partVariables.GetGlobalVariable(globalVariables);
+
+            return totalEffectiveCost * globalMultiplier;
         }
 
         public static string PartNameFromNode(ConfigNode part)
@@ -914,7 +956,9 @@ namespace KerbalConstructionTime
             {
                 launchSite = EditorLogic.fetch.launchSiteName;
             }
-            KCT_BuildListVessel blv = new KCT_BuildListVessel(EditorLogic.fetch.ship, launchSite, GetBuildTime(EditorLogic.fetch.ship.Parts), EditorLogic.FlagURL);
+            double effCost = GetEffectiveCost(EditorLogic.fetch.ship.Parts);
+            double bp = GetBuildTime(effCost);
+            KCT_BuildListVessel blv = new KCT_BuildListVessel(EditorLogic.fetch.ship, launchSite, effCost, bp, EditorLogic.FlagURL);
             blv.shipName = EditorLogic.fetch.shipNameField.text;
             return AddVesselToBuildList(blv);
         }
@@ -930,7 +974,7 @@ namespace KerbalConstructionTime
                 {
                     PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), "editorChecksFailedPopup", "Failed editor checks!",
                         "Warning! This vessel did not pass the editor checks! It will still be built, but you will not be able to launch it without upgrading. Listed below are the failed checks:\n" 
-                        + string.Join("\n", facilityChecks.ToArray()), "Acknowledged", false, HighLogic.UISkin);
+                        + string.Join("\n", facilityChecks.Select(s => $"• {s}").ToArray()), "Acknowledged", false, HighLogic.UISkin);
                 }
 
 
@@ -963,10 +1007,10 @@ namespace KerbalConstructionTime
 
             ScrapYardWrapper.ProcessVessel(blv.ExtractedPartNodes);
 
-            KCTDebug.Log("Added " + blv.shipName + " to " + type + " build list at KSC "+KCT_GameStates.ActiveKSC.KSCName+". Cost: "+blv.cost);
+            KCTDebug.Log($"Added {blv.shipName} to {type} build list at KSC {KCT_GameStates.ActiveKSC.KSCName}. Cost: {blv.cost}. IntegrationCost: {blv.integrationCost}");
             KCTDebug.Log("Launch site is " + blv.launchSite);
             //KCTDebug.Log("Cost Breakdown (total, parts, fuel): " + blv.totalCost + ", " + blv.dryCost + ", " + blv.fuelCost);
-            var message = new ScreenMessage("[KCT] Added " + blv.shipName + " to " + type + " build list.", 4.0f, ScreenMessageStyle.UPPER_CENTER);
+            var message = new ScreenMessage($"[KCT] Added {blv.shipName} to {type} build list.", 4.0f, ScreenMessageStyle.UPPER_CENTER);
             ScreenMessages.PostScreenMessage(message);
             return blv;
         }
@@ -1272,8 +1316,14 @@ namespace KerbalConstructionTime
                 return;
             }
 
-            KCT_GameStates.EditorBuildTime = GetBuildTime(ship.Parts);
-            KCT_GameStates.EditorRolloutCosts = KCT_MathParsing.ParseRolloutCostFormula(new KCT_BuildListVessel(ship, EditorLogic.fetch.launchSiteName, KCT_GameStates.EditorBuildTime, EditorLogic.FlagURL));
+            double effCost = GetEffectiveCost(ship.Parts);
+            KCT_GameStates.EditorBuildTime = GetBuildTime(effCost);
+            var kctVessel = new KCT_BuildListVessel(ship, EditorLogic.fetch.launchSiteName, effCost, KCT_GameStates.EditorBuildTime, EditorLogic.FlagURL);
+
+            KCT_GameStates.EditorIntegrationTime = KCT_MathParsing.ParseIntegrationTimeFormula(kctVessel);
+            KCT_GameStates.EditorRolloutCosts = KCT_MathParsing.ParseRolloutCostFormula(kctVessel);
+            KCT_GameStates.EditorIntegrationCosts = KCT_MathParsing.ParseIntegrationCostFormula(kctVessel);
+            KCT_GameStates.EditorRolloutTime = KCT_MathParsing.ParseReconditioningFormula(kctVessel, false);
         }
 
         public static bool ApproximatelyEqual(double d1, double d2, double error = 0.01 )
@@ -1436,7 +1486,27 @@ namespace KerbalConstructionTime
                 dict[key] -= value;
                 return true;
             }
-                
+
+        }
+
+        public static bool PartIsUnlocked(ConfigNode partNode)
+        {
+            string partName = PartNameFromNode(partNode);
+            return PartIsUnlocked(partName);
+        }
+
+        public static bool PartIsUnlocked(string partName)
+        {
+            if (partName == null) return false;
+
+            AvailablePart partInfoByName = PartLoader.getPartInfoByName(partName);
+            if (partInfoByName == null) return false;
+
+            ProtoTechNode techState = ResearchAndDevelopment.Instance.GetTechState(partInfoByName.TechRequired);
+            bool partIsUnlocked = techState != null && techState.state == RDTech.State.Available &&
+                                  RUIutils.Any(techState.partsPurchased, (a => a.name == partName));
+
+            return partIsUnlocked;
         }
 
         public static bool PartIsProcedural(ConfigNode part)
@@ -1470,6 +1540,22 @@ namespace KerbalConstructionTime
                 }
             }
             return false;
+        }
+
+        public static string ConstructLockedPartsWarning(Dictionary<AvailablePart, int> lockedPartsOnShip)
+        {
+            if (lockedPartsOnShip == null || lockedPartsOnShip.Count == 0)
+                return null;
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("This vessel contains parts which are not available at the moment:\n");
+
+            foreach (KeyValuePair<AvailablePart, int> kvp in lockedPartsOnShip)
+            {
+                sb.Append($" <color=orange><b>{kvp.Value}x {kvp.Key.title}</b></color>\n");
+            }
+
+            return sb.ToString();
         }
 
         public static int BuildingUpgradeLevel(SpaceCenterFacility facility)
@@ -1760,6 +1846,20 @@ namespace KerbalConstructionTime
 
             if (KCT_GameStates.settings.OverrideLaunchButton)
             {
+                if (KCT_GameStates.EditorShipEditingMode)
+                {
+                    // Prevent switching between VAB and SPH in edit mode.
+                    // Bad things will happen if the edits are saved in another mode than the initial one.
+                    EditorLogic.fetch.switchEditorBtn.onClick.RemoveAllListeners();
+                    EditorLogic.fetch.switchEditorBtn.onClick.AddListener(() => 
+                    {
+                        PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), "cannotSwitchEditor",
+                            "Cannot switch editor!",
+                            "Switching between VAB and SPH is not allowed while editing a vessel.",
+                            "Acknowledged", false, HighLogic.UISkin);
+                    });
+                }
+
                 KCTDebug.Log("Attempting to take control of launch button");
 
                 // EditorLogic.fetch.launchBtn.onClick = new UnityEngine.UI.Button.ButtonClickedEvent(); //delete all other listeners (sorry :( )

@@ -236,8 +236,23 @@ namespace KerbalConstructionTime
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
+                GUILayout.Label("IntegrationCosts: ");
+                WorkingPreset.formulaSettings.IntegrationCostFormula = GUILayout.TextField(WorkingPreset.formulaSettings.IntegrationCostFormula, GUILayout.Width(textWidth));
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("IntegrationTime: ");
+                WorkingPreset.formulaSettings.IntegrationTimeFormula = GUILayout.TextField(WorkingPreset.formulaSettings.IntegrationTimeFormula, GUILayout.Width(textWidth));
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
                 GUILayout.Label("NewLaunchPadCost: ");
                 WorkingPreset.formulaSettings.NewLaunchPadCostFormula = GUILayout.TextField(WorkingPreset.formulaSettings.NewLaunchPadCostFormula, GUILayout.Width(textWidth));
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("RushCost: ");
+                WorkingPreset.formulaSettings.RushCostFormula = GUILayout.TextField(WorkingPreset.formulaSettings.RushCostFormula, GUILayout.Width(textWidth));
                 GUILayout.EndHorizontal();
             }
 
