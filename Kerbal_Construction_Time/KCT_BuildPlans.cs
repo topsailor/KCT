@@ -18,7 +18,7 @@ namespace KerbalConstructionTime
         static Rect rect;
         static float scale;
         static GUIContent content;
-        static bool buildPlansInitted = false;
+        //static bool buildPlansInitted = false;
 
         static SortedList<string, KCT_BuildListVessel> plansList = null;
         static int planToDelete;
@@ -27,7 +27,7 @@ namespace KerbalConstructionTime
 
         internal static void InitBuildPlans()
         {
-            buildPlansInitted = true;
+            //buildPlansInitted = true;
             buildPlansbutton = new GUIStyle(HighLogic.Skin.button);
             buildPlansbutton.margin = new RectOffset(0, 0, 0, 0);
             buildPlansbutton.padding = new RectOffset(0, 0, 0, 0);
@@ -55,8 +55,8 @@ namespace KerbalConstructionTime
 
             up = new Texture2D(2, 2);
             hover = new Texture2D(2, 2);
-            ToolbarControl.LoadImageFromFile(ref up, "KerbalConstructionTime/PluginData/Icons/KCT_add_normal");
-            ToolbarControl.LoadImageFromFile(ref hover, "KerbalConstructionTime/PluginData/Icons/KCT_add_hover");
+            ToolbarControl.LoadImageFromFile(ref up, KSPUtil.ApplicationRootPath + "GameData/" + "KerbalConstructionTime/PluginData/Icons/KCT_add_normal");
+            ToolbarControl.LoadImageFromFile(ref hover, KSPUtil.ApplicationRootPath + "GameData/" + "KerbalConstructionTime/PluginData/Icons/KCT_add_hover");
             //up = GameDatabase.Instance.GetTexture("KerbalConstructionTime/PluginData/Icons/KCT_add_normal", false);
             //hover = GameDatabase.Instance.GetTexture("KerbalConstructionTime/PluginData/Icons/KCT_add_hover", false);
 

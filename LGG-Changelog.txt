@@ -1,3 +1,31 @@
+1.4.6.11
+	Removed the ability to move a ship from VAB to SPH and back
+	Removed all KSP1_4 #if/#endif statements
+	Following are from the RO branch
+		Fixed assembly loading for other mods that reference KCT
+		Can no longer launch vessels with locked parts
+		Those files shouldn't be in the repo
+		Reworked the code that checks for locked parts. Previous version was causing issues with a couple of other mods.
+		Can no longer do 5 more rush builds after editing a vessel
+		Added training warning and disabled Auto-hire button for RP-1
+		Update message text
+		Separated Build+Rollout into Build+Integration+Rollout
+		Fix a nasty infinite loop and add correct estimate to build list
+		Added rollout time to GUI; 
+		Fix vessel editing progress calculations
+		Fix build progress for recovered vessels
+		Refactor BP calculations and apply global multipliers to Effective cost
+		Added effectiveCost field to KCT_BuildListVessel
+		Improve .gitignore
+		Add Effective Cost [E] variable to integration and rollout cost formulas
+		Clean up the editor UI
+		Added formula for calculating rush cost
+		Fix funds being changed by integration cost on launch and recovery
+		Merge LGG->SepIntegration
+		Add missing files to RO csproj
+		Disable transferring vessels between VAB and SPH in RP-1
+		Disable the Switch Editor button while editing an existing vessel. Bad things will happen if the edits are saved in another mode than the initial one
+
 1.4.6.10
 	Fixed new icon positions in directory structure
 	Replaced loading icons from game database with ToolbarController.LoadImageFromFile
