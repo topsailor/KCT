@@ -9,6 +9,12 @@ Kerbal Construction Time is an addon for Kerbal Space Program, a game developed 
 
 Check out the development forum for additional details and pre-built binaries: http://forum.kerbalspaceprogram.com/threads/92377-0-24-2-Kerbal-Construction-Time-Release-v1-0-2-%289-3-14%29
 
+Please note:  Thre are 3 different projects here, only one should be enabled at any time:
+
+KerbalConstructionTime-1.7.3		Builds for KSP 1.7.3
+KerbalConstructinTime-1.8			Builds for KSP 1.8 and newer
+KerbalConstructionTime-RO			Used by the RO people
+
 ####DEPENDENCIES FOR BUILDING
 * Assembly-CSharp.dll (from KSP)
 * UnityEngine.dll (from KSP)

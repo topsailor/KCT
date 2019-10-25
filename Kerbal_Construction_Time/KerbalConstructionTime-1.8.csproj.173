@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{18990461-34A4-4632-8644-EE550B0DF90E}</ProjectGuid>
+    <ProjectGuid>{4465AA31-424A-4839-8598-5CD6569439D0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>KerbalConstructionTime</RootNamespace>
@@ -43,6 +43,7 @@
     </Reference>
     <Reference Include="ClickThroughBlocker">
       <HintPath>R:\KSP_1.7.3_dev\GameData\000_ClickThroughBlocker\Plugins\ClickThroughBlocker.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MagiCore">
       <HintPath>R:\KSP_1.7.3_dev\GameData\MagiCore\Plugins\MagiCore.dll</HintPath>
@@ -62,6 +63,7 @@
     </Reference>
     <Reference Include="ToolbarControl">
       <HintPath>R:\KSP_1.7.3_dev\GameData\001_ToolbarControl\Plugins\ToolbarControl.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -83,12 +85,14 @@
     <Compile Include="CrewRandRAPI.cs" />
     <Compile Include="CTIWrapper.cs" />
     <Compile Include="IKCTBuildItem.cs" />
+    <Compile Include="InstallChecker.cs" />
     <Compile Include="KACWrapper.cs" />
     <Compile Include="KCTDebug.cs" />
     <Compile Include="KCT_BuildListStorage.cs" />
     <Compile Include="KCT_BuildListVessel.cs" />
     <Compile Include="KCT_BuildPlans.cs" />
     <Compile Include="KCT_Events.cs" />
+    <Compile Include="KCT_Flight.cs" />
     <Compile Include="KCT_FuelWhitelistLoader.cs" />
     <Compile Include="KCT_GameStates.cs" />
     <Compile Include="KCT_GUI.cs" />
@@ -103,6 +107,7 @@
     <Compile Include="KCT_Recon_Rollout.cs" />
     <Compile Include="KCT_Settings.cs" />
     <Compile Include="KCT_TechControl.cs" />
+    <Compile Include="KCT_TrackingStation.cs" />
     <Compile Include="KCT_UpdateChecker.cs" />
     <Compile Include="KCT_UpgradingBuilding.cs" />
     <Compile Include="KCT_Utilities.cs" />
@@ -111,7 +116,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScrapYardWrapper.cs" />
     <Compile Include="StageRecoveryWrapper.cs" />
-    <Compile Include="ToolbarWrapper.cs" />
+    <Compile Include="TextureScale.cs" />
+    <Compile Include="ToolbarRegistration.cs" />
     <Compile Include="TypeExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
