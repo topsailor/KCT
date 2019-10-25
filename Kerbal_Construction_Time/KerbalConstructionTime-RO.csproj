@@ -118,7 +118,6 @@
     <Compile Include="StageRecoveryWrapper.cs" />
     <Compile Include="TextureScale.cs" />
     <Compile Include="ToolbarRegistration.cs" />
-    <Compile Include="ToolbarWrapper.cs" />
     <Compile Include="TypeExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -135,7 +134,7 @@
     <PostBuildEvent>del "System.Core.dll"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-	<PreBuildEvent>set textTemplatingPath="$(DevEnvDir)texttransform.exe"
+    <PreBuildEvent>set textTemplatingPath="$(DevEnvDir)texttransform.exe"
 %25textTemplatingPath%25 "$(ProjectDir)AssemblyVersion-RO.tt"
 </PreBuildEvent>
   </PropertyGroup>
