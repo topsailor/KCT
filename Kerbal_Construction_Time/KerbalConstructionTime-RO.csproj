@@ -118,7 +118,6 @@
     <Compile Include="StageRecoveryWrapper.cs" />
     <Compile Include="TextureScale.cs" />
     <Compile Include="ToolbarRegistration.cs" />
-    <Compile Include="ToolbarWrapper.cs" />
     <Compile Include="TypeExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
