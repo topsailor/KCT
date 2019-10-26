@@ -34,7 +34,7 @@
 #2c:-d:KSP1_4
 
 # 2:PROJNAME, PROJFILE, VERSIONFILE, PLUGINSFOLDER
-2:Kerbal_Construction_Time,Kerbal_Construction_Time/KerbalConstructionTime-173.csproj,KerbalConstructionTime-173.version,GameData/KerbalConstructionTime/Plugins
+2:Kerbal_Construction_Time,Kerbal_Construction_Time/KerbalConstructionTime-1.7.3.csproj,KerbalConstructionTime-173.version,GameData/KerbalConstructionTime/Plugins
 
 # 3:SOURCEFILE, DESTDIR
 3:KerbalConstructionTime-173.version,GameData/KerbalConstructionTime
