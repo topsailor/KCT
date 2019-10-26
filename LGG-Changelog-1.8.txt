@@ -1,3 +1,6 @@
+1.4.7.1
+	Version bump to fix CKAN issue
+
 1.4.7
 	Disabled KCT_UpdateChecker using #if false
 	Rebuilt for 1.8
