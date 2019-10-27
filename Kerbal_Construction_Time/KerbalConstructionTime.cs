@@ -164,6 +164,8 @@ namespace KerbalConstructionTime
     {
         internal void FacilityContextMenuSpawn(KSCFacilityContextMenu menu)
         {
+            if (KCT_GUI.PrimarilyDisabled) return;
+
             KCT_KSCContextMenuOverrider overrider = new KCT_KSCContextMenuOverrider(menu);
             StartCoroutine(overrider.OnContextMenuSpawn());
         }

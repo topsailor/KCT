@@ -1501,7 +1501,9 @@ namespace KerbalConstructionTime
             bool partIsUnlocked = techState != null && techState.state == RDTech.State.Available &&
                                   RUIutils.Any(techState.partsPurchased, (a => a.name == partName));
 
-            return partIsUnlocked;
+            bool isExperimental = ResearchAndDevelopment.IsExperimentalPart(partInfoByName);
+
+            return partIsUnlocked || isExperimental;
         }
 
         public static bool PartIsProcedural(ConfigNode part)
