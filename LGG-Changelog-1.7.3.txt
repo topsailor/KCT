@@ -1,5 +1,6 @@
+ChangeLog
 
-1.4.6.13 (unreleased)
+1.4.6.13
 	Disabled KCT_UpdateChecker using #if false
 
 1.4.6.12
