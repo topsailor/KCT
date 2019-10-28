@@ -1,5 +1,11 @@
 ChangeLog
 
+1.4.6.14 (unreleased)
+	@siimav
+		Fix facility upgrades still not happening instantly when KCT itself is disabled
+		Check for experimental parts in locked parts test
+	Fixed issue where RO fuels weren't being filled when the "Fill Tank" was selected
+
 1.4.6.13
 	Disabled KCT_UpdateChecker using #if false
 

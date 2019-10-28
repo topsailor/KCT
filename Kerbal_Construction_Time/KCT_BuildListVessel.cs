@@ -731,7 +731,7 @@ namespace KerbalConstructionTime
                     var resList = p.GetNodes("RESOURCE");
                     foreach (var res in resList)
                     {
-                        var name = res.GetValue("partName");
+                        var name = res.GetValue("name");
                         if (KCT_GuiDataAndWhitelistItemsDatabase.validFuelRes.Contains(name))
                         {
                             bool flowState = bool.Parse(res.GetValue("flowState"));
