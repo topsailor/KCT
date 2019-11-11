@@ -153,7 +153,7 @@ namespace KerbalConstructionTime
                 }
             }
 
-            KCT_GUI.CheckToolbar();
+            //KCT_GUI.CheckToolbar();
             KCT_GameStates.erroredDuringOnLoad.OnLoadFinish();
             //KerbalConstructionTime.DelayedStart();
         }
@@ -177,16 +177,6 @@ namespace KerbalConstructionTime
 
         public void OnDestroy()//more toolbar stuff
         {
-#if false
-            if (KCT_GameStates.kctToolbarButton != null)
-            {
-                KCT_GameStates.kctToolbarButton.Destroy();
-            }
-            if (KCT_Events.instance.KCTButtonStock != null)
-            {
-                KSP.UI.Screens.ApplicationLauncher.Instance.RemoveModApplication(KCT_Events.instance.KCTButtonStock);
-            }
-#endif
             if (KCT_GameStates.toolbarControl != null)
             {
                 KCT_GameStates.toolbarControl.OnDestroy();
@@ -261,25 +251,6 @@ namespace KerbalConstructionTime
 
             KCT_GameStates.toolbarControl.AddLeftRightClickCallbacks(KCT_GUI.ClickToggle, KCT_GUI.onRightClick);
 
-#if false
-            //Add the toolbar button
-            if (ToolbarManager.ToolbarAvailable && ToolbarManager.Instance != null && KCT_GameStates.settings.PreferBlizzyToolbar)
-            {
-                KCTDebug.Log("Adding Toolbar Button");
-                KCT_GameStates.kctToolbarButton = ToolbarManager.Instance.add("Kerbal_Construction_Time", "MainButton");
-                if (KCT_GameStates.kctToolbarButton != null)
-                {
-                    if (KCT_PresetManager.PresetLoaded() && !KCT_PresetManager.Instance.ActivePreset.generalSettings.Enabled) KCT_GameStates.kctToolbarButton.Visibility = new GameScenesVisibility(GameScenes.SPACECENTER);
-                    else KCT_GameStates.kctToolbarButton.Visibility = new GameScenesVisibility(new GameScenes[] { GameScenes.SPACECENTER, GameScenes.FLIGHT, GameScenes.TRACKSTATION, GameScenes.EDITOR });
-                    KCT_GameStates.kctToolbarButton.TexturePath = KCT_Utilities.GetButtonTexture();
-                    KCT_GameStates.kctToolbarButton.ToolTip = "Kerbal Construction Time";
-                    KCT_GameStates.kctToolbarButton.OnClick += ((e) =>
-                    {
-                        KCT_GUI.ClickToggle();
-                    });
-                }
-            }
-#endif
             KCTDebug.Log("Awake finished");
         }
 
@@ -491,13 +462,7 @@ namespace KerbalConstructionTime
             try
             {
                 //
-#if false
-                if (KCT_Events.instance != null && KCT_Events.instance.KCTButtonStock != null)
-                    if (KCT_GUI.clicked)
-                        KCT_Events.instance.KCTButtonStock.SetTrue(false);
-                    else
-                        KCT_Events.instance.KCTButtonStock.SetFalse(false);
-#endif
+
                 if (KCT_GUI.clicked && KCT_GameStates.toolbarControl != null)
                     KCT_GameStates.toolbarControl.SetTrue(false);
                 else

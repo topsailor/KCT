@@ -62,19 +62,6 @@ namespace KerbalConstructionTime
 
             if (validScenes.Contains(HighLogic.LoadedScene)) //&& KCT_GameStates.settings.enabledForSave)//!(HighLogic.CurrentGame.Mode == Game.Modes.SANDBOX && !KCT_GameStates.settings.SandboxEnabled))
             {
-#if false
-                if (ToolbarManager.ToolbarAvailable && KCT_GameStates.kctToolbarButton != null)
-                {
-                    KCT_GameStates.kctToolbarButton.TexturePath = KCT_Utilities.GetButtonTexture(); //Set texture, allowing for flashing of icon.
-                }
-                else
-                {
-                    Texture2D tex = KCT_Utilities.GetStockButtonTexture();
-
-                    if (tex != null && KCT_Events.instance != null && KCT_Events.instance.KCTButtonStock != null)
-                        KCT_Events.instance.KCTButtonStock.SetTexture(tex);
-                }
-#endif
                 KCT_GameStates.toolbarControl.SetTexture(KCT_Utilities.GetStockButtonTexturePath(), KCT_Utilities.GetButtonTexture());
 
                 if (showSettings)
@@ -219,27 +206,10 @@ namespace KerbalConstructionTime
         public static void onClick()
         {
             // clicked = !clicked;
-#if false
-            if (ToolbarManager.ToolbarAvailable && KCT_GameStates.kctToolbarButton != null)
-            {
-                if (KCT_GameStates.kctToolbarButton.Important) KCT_GameStates.kctToolbarButton.Important = false;
-            }
-            else
-#endif
-            {
-                if (KCT_Events.instance.KCTButtonStockImportant)
-                    KCT_Events.instance.KCTButtonStockImportant = false;
-            }
-#if false
-            if (PrimarilyDisabled && (HighLogic.LoadedScene == GameScenes.SPACECENTER))
-            {
-                if (clicked)
-                    ShowSettings();
-                else
-                    showSettings = false;
-            }
-            else
-#endif
+
+            if (KCT_Events.instance.KCTButtonStockImportant)
+                KCT_Events.instance.KCTButtonStockImportant = false;
+
             if (HighLogic.LoadedScene == GameScenes.FLIGHT && !PrimarilyDisabled)
             {
                 //showMainGUI = !showMainGUI;
@@ -267,22 +237,6 @@ namespace KerbalConstructionTime
                 KCT_GameStates.showWindows[0] = showBuildList;
             }
 
-#if false
-            if (!KCT_GameStates.settings.PreferBlizzyToolbar)
-            {
-                if (KCT_Events.instance != null && KCT_Events.instance.KCTButtonStock != null)
-                {
-                    if (showBuildList || showSettings || showEditorGUI)
-                    {
-                        KCT_Events.instance.KCTButtonStock.SetTrue(false);
-                    }
-                    else
-                    {
-                        KCT_Events.instance.KCTButtonStock.SetFalse(false);
-                    }
-                }
-            }
-#endif
             if (showBuildList || /* showSettings || */ showEditorGUI)
             {
                 KCT_GameStates.toolbarControl.SetTrue(false);
@@ -292,33 +246,6 @@ namespace KerbalConstructionTime
                 KCT_GameStates.toolbarControl.SetFalse(false);
             }
         }
-#if false
-        public static void onHoverOn()
-        {
-            KCTDebug.Log("onHoverOn: Clicked = " + clicked);
-            if (!PrimarilyDisabled)
-            {
-                if (HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedSceneIsFlight)
-                {
-                    if (!showBuildList)
-                        ResetBLWindow();
-                    showBuildList = true;
-                }
-            }
-        }
-
-        public static void onHoverOff()
-        {
-            KCTDebug.Log("onHoverOff: Clicked = " + clicked);
-            if (!PrimarilyDisabled && !clicked)
-            {
-                if (HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedSceneIsFlight)
-                {
-                    showBuildList = false;
-                }
-            }
-        }
-#endif
 
         public static void onRightClick()
         {
@@ -597,31 +524,33 @@ namespace KerbalConstructionTime
                     HighLogic.LoadScene(GameScenes.SPACECENTER);
                 }
                 GUILayout.EndHorizontal();
-
-                if (GUILayout.Button("Fill Tanks"))
+                if (!KCT_GameStates.launchedVessel.TanksFull())
                 {
-                    foreach (Part p in EditorLogic.fetch.ship.parts)
+                    if (GUILayout.Button("Fill Tanks"))
                     {
-                        //fill as part prefab would be filled?
-                        if (KCT_Utilities.PartIsProcedural(p))
+                        foreach (Part p in EditorLogic.fetch.ship.parts)
                         {
-                            foreach (PartResource rsc in p.Resources)
+                            //fill as part prefab would be filled?
+                            if (KCT_Utilities.PartIsProcedural(p))
                             {
-                                if (KCT_GuiDataAndWhitelistItemsDatabase.validFuelRes.Contains(rsc.resourceName) && rsc.flowState)
+                                foreach (PartResource rsc in p.Resources)
                                 {
-                                    rsc.amount = rsc.maxAmount;
+                                    if (KCT_GuiDataAndWhitelistItemsDatabase.validFuelRes.Contains(rsc.resourceName) && rsc.flowState)
+                                    {
+                                        rsc.amount = rsc.maxAmount;
+                                    }
                                 }
                             }
-                        }
-                        else
-                        {
-                            foreach (PartResource rsc in p.Resources)
+                            else
                             {
-                                if (KCT_GuiDataAndWhitelistItemsDatabase.validFuelRes.Contains(rsc.resourceName) && rsc.flowState)
+                                foreach (PartResource rsc in p.Resources)
                                 {
-                                    PartResource templateRsc = p.partInfo.partPrefab.Resources.FirstOrDefault(r => r.resourceName == rsc.resourceName);
-                                    if (templateRsc != null)
-                                        rsc.amount = templateRsc.amount;
+                                    if (KCT_GuiDataAndWhitelistItemsDatabase.validFuelRes.Contains(rsc.resourceName) && rsc.flowState)
+                                    {
+                                        PartResource templateRsc = p.partInfo.partPrefab.Resources.FirstOrDefault(r => r.resourceName == rsc.resourceName);
+                                        if (templateRsc != null)
+                                            rsc.amount = templateRsc.amount;
+                                    }
                                 }
                             }
                         }
@@ -1585,67 +1514,12 @@ namespace KerbalConstructionTime
             showSettings = !showSettings;
         }
 
+#if false
         public static void CheckToolbar()
         {
-#if false
-            if (KCT_GameStates.toolbarControl == null)
-            {
-
-                Debug.Log("CheckToolbar, creating toolbar");
-                var go = new GameObject();
-                KCT_GameStates.toolbarControl = go.AddComponent<ToolbarControl>();
-                KCT_GameStates.toolbarControl.AddToAllToolbars(null, null, // KCT_GUI.ClickOn, KCT_GUI.ClickOff,
-                    null, null, /* KCT_GUI.onHoverOn, KCT_GUI.onHoverOff, */ null, null,
-                    ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW | ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.TRACKSTATION | ApplicationLauncher.AppScenes.VAB,
-                    KCT_GameStates.MODID,
-                    "MainButton",
-                    "KerbalConstructionTime/PluginData/Icons/KCT_on-38",
-                    "KerbalConstructionTime/PluginData/Icons/KCT_off-38",
-                    "KerbalConstructionTime/PluginData/Icons/KCT_on-24",
-                    "KerbalConstructionTime/PluginData/Icons/KCT_off-24",
-                    KCT_GameStates.MODNAME
-                    );
-                KCT_GameStates.toolbarControl.AddLeftRightClickCallbacks(ClickToggle, onRightClick);
-            }
-#endif
-#if false
-            if (ToolbarManager.ToolbarAvailable && ToolbarManager.Instance != null && KCT_GameStates.settings.PreferBlizzyToolbar && KCT_GameStates.kctToolbarButton == null)
-            {
-                KCTDebug.Log("Adding Toolbar Button");
-                KCT_GameStates.kctToolbarButton = ToolbarManager.Instance.add("Kerbal_Construction_Time", "MainButton");
-                if (KCT_GameStates.kctToolbarButton != null)
-                {
-                    if (!KCT_PresetManager.Instance.ActivePreset.generalSettings.Enabled) KCT_GameStates.kctToolbarButton.Visibility = new GameScenesVisibility(GameScenes.SPACECENTER);
-                    else KCT_GameStates.kctToolbarButton.Visibility = new GameScenesVisibility(new GameScenes[] { GameScenes.SPACECENTER, GameScenes.FLIGHT, GameScenes.TRACKSTATION, GameScenes.EDITOR });
-                    KCT_GameStates.kctToolbarButton.TexturePath = KCT_Utilities.GetButtonTexture();
-                    KCT_GameStates.kctToolbarButton.ToolTip = "Kerbal Construction Time";
-                    KCT_GameStates.kctToolbarButton.OnClick += ((e) =>
-                    {
-                        //KCT_GUI.clicked = !KCT_GUI.clicked;
-                        KCT_GUI.ClickToggle();
-                    });
-                }
-            }
-#endif
            // bool vis;
-#if false
-            if (ApplicationLauncher.Ready && (!KCT_GameStates.settings.PreferBlizzyToolbar || !ToolbarManager.ToolbarAvailable) && (KCT_Events.instance.KCTButtonStock == null || !ApplicationLauncher.Instance.Contains(KCT_Events.instance.KCTButtonStock, out vis))) //Add Stock button
-            {
-                KCT_Events.instance.KCTButtonStock = ApplicationLauncher.Instance.AddModApplication(
-                    KCT_GUI.ClickOn,
-                    KCT_GUI.ClickOff,
-                    KCT_GUI.onHoverOn,
-                    KCT_GUI.onHoverOff,
-                    KCT_Events.instance.DummyVoid, //TODO: List next ship here?
-                    KCT_Events.instance.DummyVoid,
-                    ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW | ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.TRACKSTATION | ApplicationLauncher.AppScenes.VAB,
-                    GameDatabase.Instance.GetTexture("KerbalConstructionTime/PluginData/Icons/KCT_on-38", false));
-
-                ApplicationLauncher.Instance.EnableMutuallyExclusive(KCT_Events.instance.KCTButtonStock);
-            }
-#endif
         }
-
+#endif
         private static int upgradeWindowHolder = 0;
         public static double sciCost = -13, fundsCost = -13;
         public static double nodeRate = -13, upNodeRate = -13;

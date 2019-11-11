@@ -1,6 +1,10 @@
 ChangeLog
 
-1.4.7.3 (unreleased)
+1.4.7.4 (unreleased)
+	Added check for full tanks to the "Fill Tanks" button, which was already there for the "Fill Tanks & Launch" button
+	Deleted old commented out toolbar code
+
+1.4.7.3
 	@siimav
 		Fix facility upgrades still not happening instantly when KCT itself is disabled
 		Check for experimental parts in locked parts test

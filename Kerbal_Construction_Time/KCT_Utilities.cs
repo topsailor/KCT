@@ -763,20 +763,9 @@ namespace KerbalConstructionTime
         public static void MoveVesselToWarehouse(int ListIdentifier, int index, KCT_KSC KSC)
         {
             if (KSC == null) KSC = KCT_GameStates.ActiveKSC;
-#if false
-            if (KCT_GameStates.kctToolbarButton != null)
-            {
-                KCT_GameStates.kctToolbarButton.Important = true; //Show the button if it is hidden away
-                startedFlashing = DateTime.Now; //Set the time to start flashing
-            }
-            else
-#endif
-            {
-                KCT_Events.instance.KCTButtonStockImportant = true;
-                startedFlashing = DateTime.Now; //Set the time to start flashing
-            }
 
-            
+            KCT_Events.instance.KCTButtonStockImportant = true;
+            startedFlashing = DateTime.Now; //Set the time to start flashing
 
             StringBuilder Message = new StringBuilder();
             Message.AppendLine("The following vessel is complete:");

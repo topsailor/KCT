@@ -257,30 +257,6 @@ namespace KerbalConstructionTime
 
         //public ApplicationLauncherButton KCTButtonStock = null;
         public bool KCTButtonStockImportant = false;
-#if false
-        public void OnGUIAppLauncherReady()
-        {
-            bool vis;
-            if (ToolbarManager.ToolbarAvailable && KCT_GameStates.settings.PreferBlizzyToolbar)
-                return;
-
-            if (ApplicationLauncher.Ready && (KCTButtonStock == null || !ApplicationLauncher.Instance.Contains(KCTButtonStock, out vis))) //Add Stock button
-            {
-                string texturePath = "KerbalConstructionTime/PluginData/Icons/KCT_on-38";
-                KCT_Events.instance.KCTButtonStock = ApplicationLauncher.Instance.AddModApplication(
-                    KCT_GUI.ClickOn,
-                    KCT_GUI.ClickOff,
-                    KCT_GUI.onHoverOn,
-                    KCT_GUI.onHoverOff,
-                    KCT_Events.instance.DummyVoid,
-                    KCT_Events.instance.DummyVoid,
-                    ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW | ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.TRACKSTATION | ApplicationLauncher.AppScenes.VAB,
-                    GameDatabase.Instance.GetTexture(texturePath, false));
-
-                ApplicationLauncher.Instance.EnableMutuallyExclusive(KCT_Events.instance.KCTButtonStock);
-            }
-        }
-#endif
 
         public void DummyVoid() { }
 

@@ -137,7 +137,11 @@
 
 
 
+
+
 start /D D:\Users\jbb\github\KCT /WAIT deploy.bat  $(TargetDir) $(TargetFileName)
+
+
 
 
 
@@ -148,7 +152,11 @@ if $(ConfigurationName) == Release (
 
 
 
+
+
 	start /D D:\Users\jbb\github\KCT /WAIT buildRelease.bat $(TargetDir) $(TargetFileName)
+
+
 
 
 

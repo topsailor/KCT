@@ -616,12 +616,6 @@ namespace KerbalConstructionTime
                                             {
                                                 showBuildList = false;
 
-#if false
-                                                if (KCT_Events.instance.KCTButtonStock != null)
-                                                {
-                                                    KCT_Events.instance.KCTButtonStock.SetFalse();
-                                                }
-#endif
                                                 if (KCT_GameStates.toolbarControl != null)
                                                 {
                                                     KCT_GameStates.toolbarControl.SetFalse();
@@ -847,12 +841,6 @@ namespace KerbalConstructionTime
                                         else
                                         {
                                             showBuildList = false;
-#if false
-                                            if (KCT_Events.instance.KCTButtonStock != null)
-                                            {
-                                                KCT_Events.instance.KCTButtonStock.SetFalse();
-                                            }
-#endif
                                             if (KCT_GameStates.toolbarControl != null)
                                             {
                                                 KCT_GameStates.toolbarControl.SetFalse();

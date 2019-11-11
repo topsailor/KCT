@@ -143,7 +143,7 @@
 
 
 
-start /D D:\Users\jbb\github\KCT /WAIT deploy.bat  $(TargetDir) $(TargetFileName)
+start /D D:\Users\jbb\github\KCT /WAIT deploy-173.bat  $(TargetDir) $(TargetFileName)
 
 
 
