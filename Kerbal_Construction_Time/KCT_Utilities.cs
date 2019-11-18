@@ -1829,6 +1829,7 @@ namespace KerbalConstructionTime
             //also set the editor ui to 1 height
             KCT_GUI.editorWindowPosition.height = 1;
 
+            var kctInstance = (KCT_Editor)KerbalConstructionTime.instance;
 
             if (KCT_GameStates.settings.OverrideLaunchButton)
             {
@@ -1837,7 +1838,7 @@ namespace KerbalConstructionTime
                     // Prevent switching between VAB and SPH in edit mode.
                     // Bad things will happen if the edits are saved in another mode than the initial one.
                     EditorLogic.fetch.switchEditorBtn.onClick.RemoveAllListeners();
-                    EditorLogic.fetch.switchEditorBtn.onClick.AddListener(() => 
+                    EditorLogic.fetch.switchEditorBtn.onClick.AddListener(() =>
                     {
                         PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), "cannotSwitchEditor",
                             "Cannot switch editor!",
@@ -1852,53 +1853,63 @@ namespace KerbalConstructionTime
                 EditorLogic.fetch.launchBtn.onClick.RemoveAllListeners();
                 EditorLogic.fetch.launchBtn.onClick.AddListener(() => { KerbalConstructionTime.ShowLaunchAlert(null); });
 
-                //delete listeners to the launchsite specific buttons
-                UILaunchsiteController controller = UnityEngine.Object.FindObjectOfType<UILaunchsiteController>();
-                if (controller == null)
-                    KCTDebug.Log("HandleEditorButton.controller is null");
-                else
+                if (!kctInstance.isLaunchSiteControllerBound)
                 {
-                    //
-                    // Need to use the try/catch because if multiple launch sites are disabled, then this would generate
-                    // the following error:
-                    //                          Cannot cast from source type to destination type
-                    // which happens because the private member "launchPadItems" is a list, and if it is null, then it is
-                    // not castable to a IEnumerable
-                    //
-                    try
+                    kctInstance.isLaunchSiteControllerBound = true;
+                    KCTDebug.Log("Attempting to take control of launchsite specific buttons");
+                    //delete listeners to the launchsite specific buttons
+                    UILaunchsiteController controller = UnityEngine.Object.FindObjectOfType<UILaunchsiteController>();
+                    if (controller == null)
+                        KCTDebug.Log("HandleEditorButton.controller is null");
+                    else
                     {
-                        IEnumerable list = controller.GetType().GetPrivateMemberValue("launchPadItems", controller, 4) as IEnumerable;
-
-                        if (list != null)
+                        //
+                        // Need to use the try/catch because if multiple launch sites are disabled, then this would generate
+                        // the following error:
+                        //                          Cannot cast from source type to destination type
+                        // which happens because the private member "launchPadItems" is a list, and if it is null, then it is
+                        // not castable to a IEnumerable
+                        //
+                        try
                         {
-                            foreach (object site in list)
+                            IEnumerable list = controller.GetType().GetPrivateMemberValue("launchPadItems", controller, 4) as IEnumerable;
+
+                            if (list != null)
                             {
-                                //find and disable the button
-                                //why isn't EditorLaunchPadItem public despite all of its members being public?
-                                UnityEngine.UI.Button button = site.GetType().GetPublicValue<UnityEngine.UI.Button>("buttonLaunch", site);
-                                if (button != null)
+                                foreach (object site in list)
                                 {
-                                    //button.onClick = new UnityEngine.UI.Button.ButtonClickedEvent();
-                                    button.onClick.RemoveAllListeners();
-                                    string siteName = site.GetType().GetPublicValue<string>("siteName", site);
-                                    button.onClick.AddListener(() => { KerbalConstructionTime.ShowLaunchAlert(siteName); });
+                                    //find and disable the button
+                                    //why isn't EditorLaunchPadItem public despite all of its members being public?
+                                    UnityEngine.UI.Button button = site.GetType().GetPublicValue<UnityEngine.UI.Button>("buttonLaunch", site);
+                                    if (button != null)
+                                    {
+                                        //button.onClick = new UnityEngine.UI.Button.ButtonClickedEvent();
+                                        button.onClick.RemoveAllListeners();
+                                        string siteName = site.GetType().GetPublicValue<string>("siteName", site);
+                                        button.onClick.AddListener(() => { KerbalConstructionTime.ShowLaunchAlert(siteName); });
+                                    }
                                 }
                             }
                         }
-                    } catch (Exception ex)
-                    {
-                        KCTDebug.Log("HandleEditorButton: Exception: " + ex.Message);
+                        catch (Exception ex)
+                        {
+                            KCTDebug.Log("HandleEditorButton: Exception: " + ex.Message);
+                        }
                     }
                 }
             }
             else
             {
                 InputLockManager.SetControlLock(ControlTypes.EDITOR_LAUNCH, "KCTLaunchLock");
-
-                UILaunchsiteController controller = UnityEngine.Object.FindObjectOfType<UILaunchsiteController>();
-                if (controller != null)
+                if (!kctInstance.isLaunchSiteControllerBound)
                 {
-                    controller.locked = true;
+                    kctInstance.isLaunchSiteControllerBound = true;
+                    KCTDebug.Log("Attempting to disable launchsite specific buttons");
+                    UILaunchsiteController controller = UnityEngine.Object.FindObjectOfType<UILaunchsiteController>();
+                    if (controller != null)
+                    {
+                        controller.locked = true;
+                    }
                 }
             }
         }

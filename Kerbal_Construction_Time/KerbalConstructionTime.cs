@@ -15,20 +15,6 @@ using KSP.Localization;
 
 namespace KerbalConstructionTime
 {
-#if false
-    [KSPAddon(KSPAddon.Startup.TrackingStation, false)]
-    public class KCT_Tracking_Station : KerbalConstructionTime
-    {
-
-    }
-
-    [KSPAddon(KSPAddon.Startup.Flight, false)]
-    public class KCT_Flight : KerbalConstructionTime
-    {
-
-    }
-#endif
-
     [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
     public class KCT_SpaceCenter : KerbalConstructionTime
     {
@@ -38,7 +24,7 @@ namespace KerbalConstructionTime
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     public class KCT_Editor : KerbalConstructionTime
     {
-
+        public bool isLaunchSiteControllerBound;
     }
 
     [KSPScenario(ScenarioCreationOptions.AddToAllGames, new GameScenes[] { GameScenes.EDITOR, GameScenes.FLIGHT, GameScenes.SPACECENTER, GameScenes.TRACKSTATION })]
