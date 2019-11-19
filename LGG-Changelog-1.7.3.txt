@@ -1,9 +1,12 @@
 ChangeLog
 
-1.4.6.15 (unreleased)
+
+1.4.6.15
 	Added check for full tanks to the "Fill Tanks" button, which was already there for the "Fill Tanks & Launch" button
 	Deleted old commented out toolbar code
 	Created dedicated deploy-173.bat for local testing
+	Thanks to @siimav for this fix:
+		Fixed lag in editor by moving FindObjectByType to where it was used and not called every frame
 
 1.4.6.14
 	@siimav
