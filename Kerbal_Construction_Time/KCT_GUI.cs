@@ -524,7 +524,7 @@ namespace KerbalConstructionTime
                     HighLogic.LoadScene(GameScenes.SPACECENTER);
                 }
                 GUILayout.EndHorizontal();
-                if (!KCT_GameStates.launchedVessel.TanksFull())
+                if (KCT_GameStates.launchedVessel != null && !KCT_GameStates.launchedVessel.TanksFull())
                 {
                     if (GUILayout.Button("Fill Tanks"))
                     {
@@ -1126,7 +1126,7 @@ namespace KerbalConstructionTime
             {
                 CheckTanksAndLaunch(false);
             }
-            if (!KCT_GameStates.launchedVessel.TanksFull())
+            if (KCT_GameStates.launchedVessel != null && !KCT_GameStates.launchedVessel.TanksFull())
             {
                 if (GUILayout.Button("Fill Tanks & Launch"))
                 {
