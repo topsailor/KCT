@@ -2138,9 +2138,22 @@ namespace KerbalConstructionTime
         private static string sAzimuth = "270";
         private static string sVelocity = "180";
         private static string errorMsg;
+        private static AirlaunchParams airlaunchParams;
 
         public static void DrawAirlaunchWindow(int windowID)
         {
+            if (airlaunchParams == null)
+            {
+                airlaunchParams = new AirlaunchParams();
+                var lvl = AirlaunchTechLevel.GetCurrentLevel();
+                if (lvl != null)
+                {
+                    sKscDistance = (lvl.MaxKscDistance / 1000).ToString();
+                    sAltitude = lvl.MaxAltitude.ToString();
+                    sVelocity = lvl.MaxVelocity.ToString();
+                }
+            }
+
             GUILayout.BeginVertical();
 
             GUILayout.BeginHorizontal();
@@ -2162,7 +2175,7 @@ namespace KerbalConstructionTime
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Altitude from SL: ", GUILayout.ExpandWidth(true)); ;
+            GUILayout.Label("Altitude from SL: ", GUILayout.ExpandWidth(true));
             sAltitude = GUILayout.TextField(sAltitude, GUILayout.MaxWidth(70f));
             GUILayout.Label("m", GUILayout.Width(25f));
             GUILayout.EndHorizontal();
@@ -2189,7 +2202,6 @@ namespace KerbalConstructionTime
             {
                 try
                 {
-                    var airlaunchParams = new AirlaunchParams();
                     airlaunchParams.VesselId = KCT_GameStates.launchedVessel.id;
                     airlaunchParams.Altitude = double.Parse(sAltitude);
                     airlaunchParams.Velocity = double.Parse(sVelocity);
