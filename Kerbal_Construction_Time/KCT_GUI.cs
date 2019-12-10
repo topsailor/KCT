@@ -1646,7 +1646,7 @@ namespace KerbalConstructionTime
             int oldByModifier = buyModifier;
             if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
             {
-                buyModifier = 10;
+                buyModifier = 5;
             }
             else if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
