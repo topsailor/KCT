@@ -933,11 +933,11 @@ namespace KerbalConstructionTime
 
                     // Can move up if item above is not a parent.
                     List<string> parentList = KerbalConstructionTimeData.techNameToParents[t.techID];
-                    bool canMoveUp = i > 0 && parentList != null && !parentList.Contains(techList[i - 1].techID);
+                    bool canMoveUp = i > 0 && (parentList == null || !parentList.Contains(techList[i - 1].techID));
                     
                     // Can move down if item below is not a child.
                     List<string> nextParentList = i < techList.Count - 1 ? KerbalConstructionTimeData.techNameToParents[techList[i + 1].techID] : null;
-                    bool canMoveDown = nextParentList != null && !nextParentList.Contains(t.techID);
+                    bool canMoveDown = nextParentList == null || !nextParentList.Contains(t.techID);
 
                     if (i > 0 && t.BuildRate != techList[0].BuildRate)
                     {
@@ -947,7 +947,17 @@ namespace KerbalConstructionTime
                             techList.RemoveAt(i);
                             if (GameSettings.MODIFIER_KEY.GetKey())
                             {
-                                techList.Insert(0, t);
+                                // Find furthest postion tech can be moved to.
+                                int newLocation = i - 1;
+                                while (newLocation >= 0)
+                                {
+                                    if (parentList != null && parentList.Contains(techList[newLocation].techID))
+                                        break;
+                                    --newLocation;
+                                }
+                                ++newLocation;
+
+                                techList.Insert(newLocation, t);
                             }
                             else
                             {
@@ -965,7 +975,17 @@ namespace KerbalConstructionTime
                             techList.RemoveAt(i);
                             if (GameSettings.MODIFIER_KEY.GetKey())
                             {
-                                techList.Add(t);
+                                // Find furthest postion tech can be moved to.
+                                int newLocation = i + 1;
+                                while (newLocation < techList.Count)
+                                {
+                                    nextParentList = KerbalConstructionTimeData.techNameToParents[techList[newLocation].techID];
+                                    if (nextParentList != null && nextParentList.Contains(t.techID))
+                                        break;
+                                    ++newLocation;
+                                }
+
+                                techList.Insert(newLocation, t);
                             }
                             else
                             {
