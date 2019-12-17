@@ -970,7 +970,10 @@ namespace KerbalConstructionTime
                             techList[j].UpdateBuildRate(j);
                     }
 
-                    GUILayout.Label(t.techName);
+                    if (t.Parents.Count > 0)
+                        GUILayout.Label(t.techName + " => " + string.Join(",", t.Parents.ToArray()));
+                    else
+                        GUILayout.Label(t.techName);
                     GUILayout.Label(Math.Round(100 * t.progress / t.scienceCost, 2) + " %", GUILayout.Width(width1 / 2));
                     if (t.BuildRate > 0)
                         GUILayout.Label(MagiCore.Utilities.GetColonFormattedTime(t.TimeLeft), GUILayout.Width(width1));
