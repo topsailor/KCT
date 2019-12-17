@@ -927,12 +927,21 @@ namespace KerbalConstructionTime
                         DialogGUIBase[] options = new DialogGUIBase[2];
                         options[0] = new DialogGUIButton("Yes", () => { CancelTechNode(cancelID); });
                         options[1] = new DialogGUIButton("No", DummyVoid);
-                        MultiOptionDialog diag = new MultiOptionDialog("cancelNodePopup", "Are you sure you want to stop researching " + t.techName + "?", "Cancel Node?", null, 300, options);
+                        MultiOptionDialog diag = new MultiOptionDialog("cancelNodePopup", "Are you sure you want to stop researching " + t.techName + "?\n\nThis will also cancel any dependent techs.", "Cancel Node?", null, 300, options);
                         PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), diag, false, HighLogic.UISkin);
                     }
 
+                    // Can move up if item above is not a parent.
+                    List<string> parentList = KerbalConstructionTimeData.techNameToParents[t.techID];
+                    bool canMoveUp = i > 0 && parentList != null && !parentList.Contains(techList[i - 1].techID);
+                    
+                    // Can move down if item below is not a child.
+                    List<string> nextParentList = i < techList.Count - 1 ? KerbalConstructionTimeData.techNameToParents[techList[i + 1].techID] : null;
+                    bool canMoveDown = nextParentList != null && !nextParentList.Contains(t.techID);
+
                     if (i > 0 && t.BuildRate != techList[0].BuildRate)
                     {
+                        GUI.enabled = canMoveUp;
                         if (i > 0 && GUILayout.Button("^", GUILayout.Width(butW)))
                         {
                             techList.RemoveAt(i);
@@ -946,9 +955,11 @@ namespace KerbalConstructionTime
                             }
                             forceRecheck = true;
                         }
+                        GUI.enabled = true;
                     }
                     if ((i == 0 && t.BuildRate != techList[techList.Count - 1].BuildRate) || t.BuildRate != techList[techList.Count - 1].BuildRate)
                     {
+                        GUI.enabled = canMoveDown;
                         if (i < techList.Count - 1 && GUILayout.Button("v", GUILayout.Width(butW)))
                         {
                             techList.RemoveAt(i);
@@ -962,6 +973,7 @@ namespace KerbalConstructionTime
                             }
                             forceRecheck = true;
                         }
+                        GUI.enabled = true;
                     }
                     if (forceRecheck)
                     {
@@ -970,10 +982,7 @@ namespace KerbalConstructionTime
                             techList[j].UpdateBuildRate(j);
                     }
 
-                    if (t.Parents.Count > 0)
-                        GUILayout.Label(t.techName + " => " + string.Join(",", t.Parents.ToArray()));
-                    else
-                        GUILayout.Label(t.techName);
+                    GUILayout.Label(t.techName);
                     GUILayout.Label(Math.Round(100 * t.progress / t.scienceCost, 2) + " %", GUILayout.Width(width1 / 2));
                     if (t.BuildRate > 0)
                         GUILayout.Label(MagiCore.Utilities.GetColonFormattedTime(t.TimeLeft), GUILayout.Width(width1));
@@ -1023,6 +1032,20 @@ namespace KerbalConstructionTime
             {
                 KCT_TechItem node = KCT_GameStates.TechList[index];
                 KCTDebug.Log("Cancelling tech: " + node.techName);
+
+                // cancel children
+                for (int i = 0; i < KCT_GameStates.TechList.Count; i++)
+                {
+                    List<string> parentList = KerbalConstructionTimeData.techNameToParents[KCT_GameStates.TechList[i].techID];
+                    if (parentList.Contains(node.techID))
+                    {
+                        CancelTechNode(i);
+                        // recheck list in case multiple levels of children were deleted.
+                        i = -1;
+                        index = KCT_GameStates.TechList.FindIndex(t => t.techID == node.techID);
+                    }
+                }
+
                 if (KCT_Utilities.CurrentGameHasScience())
                 {
                     bool valBef = KCT_GameStates.isRefunding;

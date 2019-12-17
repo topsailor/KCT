@@ -13,7 +13,6 @@ namespace KerbalConstructionTime
         public double progress;
         public ProtoTechNode protoNode;
         public List<string> UnlockedParts;
-        public List<string> Parents;    // Parent techs as TechIDs.
         // public double BuildRate { get { return (Math.Pow(2, KCT_GameStates.TechUpgradesTotal + 1) / (86400.0 * KCT_GameStates.timeSettings.NodeModifier)); } } //0pts=1day/2sci, 1pt=1/4, 2=1/8, 3=1/16, 4=1/32...n=1/2^(n+1)
         private double bRate_int = -1;
         public double BuildRate
@@ -46,30 +45,6 @@ namespace KerbalConstructionTime
             }
         }
 
-        private void FindParents()
-        {
-            KCTDebug.Log("Finding parents for tech: " + techID, true);
-
-            Parents.Clear();
-            try
-            {
-                KCTDebug.Log("RDController: " + KSP.UI.Screens.RDController.Instance == null ? "<null>" : KSP.UI.Screens.RDController.Instance.ToString(), true);
-                KCTDebug.Log("TreeNodes: " + KSP.UI.Screens.RDController.Instance == null || KSP.UI.Screens.RDController.Instance.techTree.GetTreeNodes() == null ? "<null>" : KSP.UI.Screens.RDController.Instance.techTree.GetTreeNodes().ToString(), true);
-
-                ProtoRDNode node = KSP.UI.Screens.RDController.Instance.techTree.GetTreeNodes().First(n => n.tech.techID == techID);
-
-                foreach (var p in node.parents)
-                {
-                    KCTDebug.Log("  " + p.tech.techID, true);
-                    Parents.Add(p.tech.techID);
-                }
-            }
-            catch (InvalidOperationException)
-            {
-                KCTDebug.Log("  Node not found", true);
-            }
-        }
-
         public KCT_TechItem(RDTech techNode)
         {
             scienceCost = techNode.scienceCost;
@@ -84,8 +59,6 @@ namespace KerbalConstructionTime
             KCTDebug.Log("techID = " + techID);
             //KCTDebug.Log("BuildRate = " + BuildRate);
             KCTDebug.Log("TimeLeft = " + TimeLeft);
-
-            FindParents();
         }
 
         public KCT_TechItem(string ID, string name, double prog, int sci, List<string> parts)
@@ -95,8 +68,6 @@ namespace KerbalConstructionTime
             progress = prog;
             scienceCost = sci;
             UnlockedParts = parts;
-
-            FindParents();
         }
 
         public KCT_TechItem() {}
