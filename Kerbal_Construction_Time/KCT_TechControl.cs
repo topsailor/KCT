@@ -127,6 +127,22 @@ namespace KerbalConstructionTime
             return (this.isComplete);
         }
 
+        public string GetBlockingTech(KCT_GameStates.KCT_TechItemIlist<KCT_TechItem> techList)
+        {
+            string blockingTech = null;
+            foreach (var t in techList)
+            {
+                List<string> parentList = KerbalConstructionTimeData.techNameToParents[t.techID];
+                if (parentList != null && parentList.Contains(techID))
+                {
+                    blockingTech = t.techName;
+                    break;
+                }
+            }
+
+            return blockingTech;
+        }
+
     }
 
     public class KCT_TechStorageItem

@@ -1002,13 +1002,22 @@ namespace KerbalConstructionTime
                             techList[j].UpdateBuildRate(j);
                     }
 
+                    string blockingPrereq = t.GetBlockingTech(techList);
+
                     GUILayout.Label(t.techName);
                     GUILayout.Label(Math.Round(100 * t.progress / t.scienceCost, 2) + " %", GUILayout.Width(width1 / 2));
                     if (t.BuildRate > 0)
-                        GUILayout.Label(MagiCore.Utilities.GetColonFormattedTime(t.TimeLeft), GUILayout.Width(width1));
+                    {
+                        if (blockingPrereq != null)
+                            GUILayout.Label(MagiCore.Utilities.GetColonFormattedTime(t.TimeLeft), GUILayout.Width(width1));
+                        else
+                            GUILayout.Label("Waiting for " + blockingPrereq, GUILayout.Width(width1));
+                    }
                     else
+                    {
                         GUILayout.Label("Est: " + MagiCore.Utilities.GetColonFormattedTime(t.EstimatedTimeLeft), GUILayout.Width(width1));
-                    if (t.BuildRate > 0)
+                    }
+                    if (t.BuildRate > 0 && blockingPrereq != null)
                     {
                         if (!HighLogic.LoadedSceneIsEditor && GUILayout.Button("Warp", GUILayout.Width(45)))
                         {

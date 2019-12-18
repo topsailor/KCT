@@ -462,6 +462,11 @@ namespace KerbalConstructionTime
                 for (int i = 0; i < KCT_GameStates.TechList.Count; i++)
                 {
                     KCT_TechItem tech = KCT_GameStates.TechList[i];
+
+                    // Don't progress blocked items
+                    if (tech.GetBlockingTech(KCT_GameStates.TechList) != null)
+                        continue;
+
                     double buildRate = tech.BuildRate;
                     tech.progress += (buildRate * (UTDiff));
                     if (tech.isComplete || !KCT_PresetManager.Instance.ActivePreset.generalSettings.TechUnlockTimes)
