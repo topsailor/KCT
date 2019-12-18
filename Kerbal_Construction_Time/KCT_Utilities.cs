@@ -1057,13 +1057,17 @@ namespace KerbalConstructionTime
                     }
                 }
             }
-            foreach (IKCTBuildItem blv in KCT_GameStates.TechList)
+            foreach (KCT_TechItem tech in KCT_GameStates.TechList)
             {
-                double time = blv.GetTimeLeft();
-                if (time < shortestTime)
+                // Ignore items that are blocked
+                if (tech.GetBlockingTech(KCT_GameStates.TechList) == null)
                 {
-                    thing = blv;
-                    shortestTime = time;
+                    double time = ((IKCTBuildItem)tech).GetTimeLeft();
+                    if (time < shortestTime)
+                    {
+                        thing = tech;
+                        shortestTime = time;
+                    }
                 }
             }
             return thing;
