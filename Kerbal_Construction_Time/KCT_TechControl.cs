@@ -130,10 +130,11 @@ namespace KerbalConstructionTime
         public string GetBlockingTech(KCT_GameStates.KCT_TechItemIlist<KCT_TechItem> techList)
         {
             string blockingTech = null;
+            List<string> parentList = KerbalConstructionTimeData.techNameToParents[techID];
+
             foreach (var t in techList)
             {
-                List<string> parentList = KerbalConstructionTimeData.techNameToParents[t.techID];
-                if (parentList != null && parentList.Contains(techID))
+                if (parentList != null && parentList.Contains(t.techID))
                 {
                     blockingTech = t.techName;
                     break;

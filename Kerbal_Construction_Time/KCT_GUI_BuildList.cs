@@ -1008,10 +1008,10 @@ namespace KerbalConstructionTime
                     GUILayout.Label(Math.Round(100 * t.progress / t.scienceCost, 2) + " %", GUILayout.Width(width1 / 2));
                     if (t.BuildRate > 0)
                     {
-                        if (blockingPrereq != null)
+                        if (blockingPrereq == null)
                             GUILayout.Label(MagiCore.Utilities.GetColonFormattedTime(t.TimeLeft), GUILayout.Width(width1));
                         else
-                            GUILayout.Label("Waiting for " + blockingPrereq, GUILayout.Width(width1));
+                            GUILayout.Label("Waiting for PreReq", GUILayout.Width(width1));
                     }
                     else
                     {
