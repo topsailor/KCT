@@ -421,6 +421,7 @@ namespace KerbalConstructionTime
                             else
                                 launchSite = KCT_GameStates.ActiveKSC.ActiveLPInstance.name;
                         }
+                        KCTDebug.Log("Rolling out, 2 to: " + launchSite);
                         KCT_Recon_Rollout rollout = KCT_GameStates.ActiveKSC.GetReconRollout(KCT_Recon_Rollout.RolloutReconType.Rollout, launchSite);
                         KCT_Recon_Rollout rollback = KCT_GameStates.ActiveKSC.Recon_Rollout.FirstOrDefault(r => r.associatedID == b.id.ToString() && r.RRType == KCT_Recon_Rollout.RolloutReconType.Rollback);
                         KCT_Recon_Rollout recovery = KCT_GameStates.ActiveKSC.Recon_Rollout.FirstOrDefault(r => r.associatedID == b.id.ToString() && r.RRType == KCT_Recon_Rollout.RolloutReconType.Recovery);

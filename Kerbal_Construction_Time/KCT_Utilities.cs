@@ -948,10 +948,12 @@ namespace KerbalConstructionTime
             {
                 launchSite = EditorLogic.fetch.launchSiteName;
             }
+
             double effCost = GetEffectiveCost(EditorLogic.fetch.ship.Parts);
             double bp = GetBuildTime(effCost);
             KCT_BuildListVessel blv = new KCT_BuildListVessel(EditorLogic.fetch.ship, launchSite, effCost, bp, EditorLogic.FlagURL);
             blv.shipName = EditorLogic.fetch.shipNameField.text;
+     
             return AddVesselToBuildList(blv);
         }
 
@@ -985,14 +987,17 @@ namespace KerbalConstructionTime
                     SpendFunds(totalCost, TransactionReasons.VesselRollout);
                 }
             }
+
             string type = "";
             if (blv.type == KCT_BuildListVessel.ListType.VAB)
             {
+                blv.launchSite = "LaunchPad";
                 KCT_GameStates.ActiveKSC.VABList.Add(blv);
                 type = "VAB";
             }
             else if (blv.type == KCT_BuildListVessel.ListType.SPH)
             {
+                blv.launchSite = "Runway";
                 KCT_GameStates.ActiveKSC.SPHList.Add(blv);
                 type = "SPH";
             }
