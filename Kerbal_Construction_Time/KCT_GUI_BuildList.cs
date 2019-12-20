@@ -1017,7 +1017,7 @@ namespace KerbalConstructionTime
                     {
                         GUILayout.Label("Est: " + MagiCore.Utilities.GetColonFormattedTime(t.EstimatedTimeLeft), GUILayout.Width(width1));
                     }
-                    if (t.BuildRate > 0 && blockingPrereq != null)
+                    if (t.BuildRate > 0 && blockingPrereq == null)
                     {
                         if (!HighLogic.LoadedSceneIsEditor && GUILayout.Button("Warp", GUILayout.Width(45)))
                         {
