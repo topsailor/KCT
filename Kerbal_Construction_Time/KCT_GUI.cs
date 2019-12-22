@@ -38,7 +38,7 @@ namespace KerbalConstructionTime
         public static Rect buildListWindowPosition = new Rect(Screen.width - 400, 40, 400, 1);
         private static Rect crewListWindowPosition = new Rect((Screen.width - 400) / 2, (Screen.height / 4), 400, 1);
         private static Rect settingsPosition = new Rect((3 * Screen.width / 8), (Screen.height / 4), 300, 1);
-        private static Rect upgradePosition = new Rect((Screen.width - 260) / 2, (Screen.height / 4), 260, 1);
+        private static Rect upgradePosition = new Rect((Screen.width - 450) / 2, (Screen.height / 4), 450, 1);
         private static Rect bLPlusPosition = new Rect(Screen.width - 500, 40, 100, 1);
 
         static Rect buildPlansWindowPosition = new Rect(Screen.width - 300, 40, 300, 1);
@@ -1629,12 +1629,16 @@ namespace KerbalConstructionTime
                 }
             }
 
+            int availablePoints = upgrades - spentPoints;
+
             //TODO: Calculate the cost of resetting
             int ResetCost = (int)KCT_MathParsing.GetStandardFormulaValue("UpgradeReset", new Dictionary<string, string> { { "N", KCT_GameStates.UpgradesResetCounter.ToString() } });
             if (ResetCost >= 0)
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Reset Upgrades: ");
+                if (availablePoints < ResetCost)
+                    GUI.enabled = false;
                 if (GUILayout.Button(ResetCost + " Points", GUILayout.ExpandWidth(false)))
                 {
                     if (spentPoints > 0 && (upgrades - spentPoints >= ResetCost)) //you have to spend some points before resetting does anything
@@ -1661,6 +1665,7 @@ namespace KerbalConstructionTime
                         KCT_GameStates.UpgradesResetCounter++;
                     }
                 }
+                GUI.enabled = true;
                 GUILayout.EndHorizontal();
             }
 
@@ -1683,19 +1688,54 @@ namespace KerbalConstructionTime
                     double rate = KCT_Utilities.GetBuildRate(i, KCT_BuildListVessel.ListType.VAB, KSC);
                     double upgraded = KCT_Utilities.GetBuildRate(i, KCT_BuildListVessel.ListType.VAB, KSC, true);
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label("Rate " + (i + 1));
+                    GUILayout.Label("Rate " + (i + 1)+":");
                     GUILayout.Label(rate + " BP/s");
+                    GUILayout.FlexibleSpace();
                     if (upgrades - spentPoints > 0 && (i == 0 || upgraded <= KCT_Utilities.GetBuildRate(i - 1, KCT_BuildListVessel.ListType.VAB, KSC)) && upgraded - rate > 0)
                     {
+                        bool recalc = false;
                         if (GUILayout.Button("+" + Math.Round(upgraded - rate, 3), GUILayout.Width(55)))
                         {
                             if (i < KSC.VABUpgrades.Count)
                                 ++KSC.VABUpgrades[i];
                             else
                                 KSC.VABUpgrades.Add(1);
+                            recalc = true;
+                         }
+                        if (availablePoints >= 5)
+                        {
+                            if (GUILayout.Button("+" + Math.Round(upgraded - rate, 3) * 5 + "(5x)", GUILayout.Width(65)))
+                            {
+                                if (i < KSC.VABUpgrades.Count)
+                                    KSC.VABUpgrades[i] += 5;
+                                recalc = true;
+                            }
+                        }
+                        else
+                            GUILayout.Space(69);
+                        if (availablePoints >= 100)
+                        {
+                            if (GUILayout.Button("+" + Math.Round(upgraded - rate, 3) * 100 + "(100x)", GUILayout.Width(70)))
+                            {
+                                if (i < KSC.VABUpgrades.Count)
+                                    KSC.VABUpgrades[i] +=  100;
+                                recalc = true;
+                            }
+                        }
+                        else
+                            GUILayout.Space(74);
+                        if (GUILayout.Button("+" + Math.Round(upgraded - rate, 3)* availablePoints + "("+ availablePoints + ")", GUILayout.Width(75)))
+                        {
+                            if (i < KSC.VABUpgrades.Count)
+                                KSC.VABUpgrades[i] += availablePoints;
+                            recalc = true;
+                        }
+                        if (recalc)
+                        {
                             KSC.RecalculateBuildRates();
                             KSC.RecalculateUpgradedBuildRates();
                         }
+
                     }
                     GUILayout.EndHorizontal();
                 }
@@ -1848,8 +1888,7 @@ namespace KerbalConstructionTime
                     //    KCT_Events.instance.KCTButtonStock.SetTrue();
                     if (KCT_GameStates.toolbarControl != null)
                         KCT_GameStates.toolbarControl.SetTrue();
-
-                    else
+                    //else
                         showBuildList = true;
                 }
             }
