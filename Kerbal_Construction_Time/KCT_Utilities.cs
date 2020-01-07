@@ -277,17 +277,26 @@ namespace KerbalConstructionTime
 
         public static double GetBuildRate(int index, KCT_BuildListVessel.ListType type, KCT_KSC KSC, bool UpgradedRate = false)
         {
+            return GetBuildRate(index, type, KSC, UpgradedRate ? 1 : 0);
+        }
+
+        public static double GetBuildRate(int index, KCT_BuildListVessel.ListType type, KCT_KSC KSC, int upgradeDelta)
+        {
             if (KSC == null) KSC = KCT_GameStates.ActiveKSC;
             double ret = 0;
             if (type == KCT_BuildListVessel.ListType.VAB)
             {
-                if (!UpgradedRate && KSC.VABRates.Count > index)
+                if (upgradeDelta == 0 && KSC.VABRates.Count > index)
                 {
                     return KSC.VABRates[index];
                 }
-                else if (UpgradedRate && KSC.UpVABRates.Count > index)
+                else if (upgradeDelta == 1 && KSC.UpVABRates.Count > index)
                 {
                     return KSC.UpVABRates[index];
+                }
+                else if (upgradeDelta > 1)
+                {
+                    return KCT_MathParsing.ParseBuildRateFormula(KCT_BuildListVessel.ListType.VAB, index, KSC, upgradeDelta);
                 }
                 else
                 {
@@ -296,13 +305,17 @@ namespace KerbalConstructionTime
             }
             else if (type == KCT_BuildListVessel.ListType.SPH)
             {
-                if (!UpgradedRate && KSC.SPHRates.Count > index)
+                if (upgradeDelta == 0 && KSC.SPHRates.Count > index)
                 {
                     return KSC.SPHRates[index];
                 }
-                else if (UpgradedRate && KSC.UpSPHRates.Count > index)
+                else if (upgradeDelta == 1 && KSC.UpSPHRates.Count > index)
                 {
                     return KSC.UpSPHRates[index];
+                }
+                else if (upgradeDelta > 1)
+                {
+                    return KCT_MathParsing.ParseBuildRateFormula(KCT_BuildListVessel.ListType.SPH, index, KSC, upgradeDelta);
                 }
                 else
                 {
@@ -367,7 +380,7 @@ namespace KerbalConstructionTime
 
         public static double GetBothBuildRateSum(KCT_KSC KSC)
         {
-            double rateTotal = rateTotal = GetSPHBuildRateSum(KSC);
+            double rateTotal = GetSPHBuildRateSum(KSC);
             rateTotal += GetVABBuildRateSum(KSC);
 
             return rateTotal;
@@ -387,74 +400,40 @@ namespace KerbalConstructionTime
             {
                 foreach (KCT_KSC ksc in KCT_GameStates.KSCs)
                 {
-                    double buildRate = 0;
-                    if (ksc.VABList.Count > 0)
+                    for (int i = 0; i < ksc.VABList.Count; i++)
                     {
-                        for (int i = 0; i < ksc.VABList.Count; i++)
-                        {
-                            buildRate = GetBuildRate(i, KCT_BuildListVessel.ListType.VAB, ksc);
-                            ksc.VABList[i].AddProgress(buildRate * (UTDiff));
-                            if (((IKCTBuildItem)ksc.VABList[i]).IsComplete())
-                                MoveVesselToWarehouse(0, i, ksc);
-                        }
+                        ksc.VABList[i].IncrementProgress(UTDiff);
                     }
-                    if (ksc.SPHList.Count > 0)
+                    for (int i = 0; i < ksc.SPHList.Count; i++)
                     {
-                        for (int i = 0; i < ksc.SPHList.Count; i++)
-                        {
-                            buildRate = GetBuildRate(i, KCT_BuildListVessel.ListType.SPH, ksc);
-                            ksc.SPHList[i].AddProgress(buildRate * (UTDiff));
-                            if (((IKCTBuildItem)ksc.SPHList[i]).IsComplete())
-                                MoveVesselToWarehouse(1, i, ksc);
-                        }
+                        ksc.SPHList[i].IncrementProgress(UTDiff);
                     }
 
                     foreach (KCT_Recon_Rollout rr in ksc.Recon_Rollout)
                     {
-                        double progBefore = rr.progress;
-                        rr.progress += rr.AsBuildItem().GetBuildRate() * (UTDiff);
-                        if (rr.progress > rr.BP) rr.progress = rr.BP;
-
-                        if (CurrentGameIsCareer() && rr.RRType == KCT_Recon_Rollout.RolloutReconType.Rollout && rr.cost > 0)
-                        {
-                            int steps = 0;
-                            if ((steps = (int)(Math.Floor((rr.progress/rr.BP)*10) - Math.Floor((progBefore/rr.BP)*10))) > 0) //passed 10% of the progress
-                            {
-                                if (Funding.Instance.Funds < rr.cost / 10) //If they can't afford to continue the rollout, progress stops
-                                {
-                                    rr.progress = progBefore;
-                                    if (TimeWarp.CurrentRate > 1f && KCT_GameStates.warpInitiated && rr == KCT_GameStates.targetedItem)
-                                    {
-                                        ScreenMessages.PostScreenMessage("Timewarp was stopped because there's insufficient funds to continue the rollout");
-                                        TimeWarp.SetRate(0, true);
-                                        KCT_GameStates.warpInitiated = false;
-                                    }
-                                }
-                                else
-                                    SpendFunds((rr.cost / 10) * steps, TransactionReasons.None);
-                            }
-                        }
+                        rr.IncrementProgress(UTDiff);
                     }
                     //Reset the associated launchpad id when rollback completes
                     ksc.Recon_Rollout.ForEach(delegate(KCT_Recon_Rollout rr)
                     {
-                        if (rr.RRType == KCT_Recon_Rollout.RolloutReconType.Rollback && rr.AsBuildItem().IsComplete())
+                        if (rr.RRType == KCT_Recon_Rollout.RolloutReconType.Rollback && rr.IsComplete())
                         {
                             KCT_BuildListVessel blv = KCT_Utilities.FindBLVesselByID(new Guid(rr.associatedID));
                             if (blv != null)
                                 blv.launchSiteID = -1;
                         }
                     });
-                    ksc.Recon_Rollout.RemoveAll(rr => !KCT_PresetManager.Instance.ActivePreset.generalSettings.ReconditioningTimes || (rr.RRType != KCT_Recon_Rollout.RolloutReconType.Rollout && rr.AsBuildItem().IsComplete()));
+                    ksc.Recon_Rollout.RemoveAll(rr => !KCT_PresetManager.Instance.ActivePreset.generalSettings.ReconditioningTimes || (rr.RRType != KCT_Recon_Rollout.RolloutReconType.Rollout && rr.IsComplete()));
+
+                    foreach (KCT_AirlaunchPrep ap in ksc.AirlaunchPrep)
+                    {
+                        ap.IncrementProgress(UTDiff);
+                    }
+                    ksc.AirlaunchPrep.RemoveAll(ap => ap.Direction != KCT_AirlaunchPrep.PrepDirection.Mount && ap.IsComplete());
 
                     foreach (KCT_UpgradingBuilding kscTech in ksc.KSCTech)
                     {
-                        if (!kscTech.AsIKCTBuildItem().IsComplete()) kscTech.AddProgress(kscTech.AsIKCTBuildItem().GetBuildRate() * (UTDiff));
-                        if (HighLogic.LoadedScene == GameScenes.SPACECENTER && (kscTech.AsIKCTBuildItem().IsComplete() || !KCT_PresetManager.Instance.ActivePreset.generalSettings.KSCUpgradeTimes))
-                        {
-                            if (ScenarioUpgradeableFacilities.Instance != null && KCT_GameStates.erroredDuringOnLoad.OnLoadFinished)
-                                kscTech.Upgrade();
-                        }
+                        kscTech.IncrementProgress(UTDiff);
                     }
                     if (HighLogic.LoadedScene == GameScenes.SPACECENTER) ksc.KSCTech.RemoveAll(ub => ub.UpgradeProcessed);
 
@@ -463,7 +442,7 @@ namespace KerbalConstructionTime
                 {
                     KCT_TechItem tech = KCT_GameStates.TechList[i];
 
-                    // Don't progress blocked items
+                  // Don't progress blocked items
                     if (tech.GetBlockingTech(KCT_GameStates.TechList) != null)
                         continue;
 
@@ -482,6 +461,7 @@ namespace KerbalConstructionTime
                         for (int j = 0; j < KCT_GameStates.TechList.Count; j++)
                             KCT_GameStates.TechList[j].UpdateBuildRate(j);
                     }
+
                 }
             }
             if (KCT_GameStates.targetedItem != null && KCT_GameStates.targetedItem.IsComplete())
@@ -765,7 +745,18 @@ namespace KerbalConstructionTime
             return "";
         }
 
-        public static void MoveVesselToWarehouse(int ListIdentifier, int index, KCT_KSC KSC)
+        public static void MoveVesselToWarehouse(KCT_BuildListVessel ship)
+        {
+            if (ship.type == KCT_BuildListVessel.ListType.None)
+                ship.FindTypeFromLists();
+
+            if (ship.type == KCT_BuildListVessel.ListType.VAB)
+                MoveVesselToWarehouse(ship.type, ship.KSC.VABList.IndexOf(ship), ship.KSC);
+            else if (ship.type == KCT_BuildListVessel.ListType.SPH)
+                MoveVesselToWarehouse(ship.type, ship.KSC.SPHList.IndexOf(ship), ship.KSC);
+        }
+
+        public static void MoveVesselToWarehouse(KCT_BuildListVessel.ListType ListIdentifier, int index, KCT_KSC KSC)
         {
             if (KSC == null) KSC = KCT_GameStates.ActiveKSC;
 
@@ -775,7 +766,7 @@ namespace KerbalConstructionTime
             StringBuilder Message = new StringBuilder();
             Message.AppendLine("The following vessel is complete:");
             KCT_BuildListVessel vessel = null;
-            if (ListIdentifier == 0) //VAB list
+            if (ListIdentifier == KCT_BuildListVessel.ListType.VAB)
             {
                 vessel = KSC.VABList[index];
                 KSC.VABList.RemoveAt(index);
@@ -785,7 +776,7 @@ namespace KerbalConstructionTime
                 Message.AppendLine("Please check the VAB Storage at "+KSC.KSCName+" to launch it.");
             
             }
-            else if (ListIdentifier == 1)//SPH list
+            else if (ListIdentifier == KCT_BuildListVessel.ListType.SPH)
             {
                 vessel = KSC.SPHList[index];
                 KSC.SPHList.RemoveAt(index);
@@ -1050,6 +1041,19 @@ namespace KerbalConstructionTime
                         shortestTime = time;
                     }
                 }
+
+                foreach (IKCTBuildItem ap in KSC.AirlaunchPrep)
+                {
+                    if (ap.IsComplete())
+                        continue;
+                    double time = ap.GetTimeLeft();
+                    if (time < shortestTime)
+                    {
+                        thing = ap;
+                        shortestTime = time;
+                    }
+                }
+
                 foreach (IKCTBuildItem ub in KSC.KSCTech)
                 {
                     if (ub.IsComplete())
@@ -1284,6 +1288,33 @@ namespace KerbalConstructionTime
             KCT_GameStates.activeKSCName = site;
         }
 
+        public static PQSCity FindKSC(CelestialBody home)
+        {
+            if (home != null)
+            {
+                if (home.pqsController != null && home.pqsController.transform != null)
+                {
+                    Transform t = home.pqsController.transform.Find("KSC");
+                    if (t != null)
+                    {
+                        PQSCity KSC = (PQSCity)t.GetComponent(typeof(PQSCity));
+                        if (KSC != null) { return KSC; }
+                    }
+                }
+            }
+
+            PQSCity[] cities = Resources.FindObjectsOfTypeAll<PQSCity>();
+            foreach (PQSCity c in cities)
+            {
+                if (c.name == "KSC")
+                {
+                    return c;
+                }
+            }
+
+            return null;
+        }
+
         public static void DisplayMessage(String title, StringBuilder text, MessageSystemButton.MessageButtonColor color, MessageSystemButton.ButtonIcons icon)
         {
             
@@ -1378,35 +1409,37 @@ namespace KerbalConstructionTime
 
         public static KCT_BuildListVessel FindBLVesselByID(Guid id)
         {
-            KCT_BuildListVessel ret = null;
             foreach (KCT_KSC ksc in KCT_GameStates.KSCs)
             {
-                KCT_BuildListVessel tmp = ksc.VABList.Find(v => v.id == id);
-                if (tmp != null)
-                {
-                    ret = tmp;
-                    break;
-                }
-                tmp = ksc.SPHList.Find(v => v.id == id);
-                if (tmp != null)
-                {
-                    ret = tmp;
-                    break;
-                }
-                tmp = ksc.VABWarehouse.Find(v => v.id == id);
-                if (tmp != null)
-                {
-                    ret = tmp;
-                    break;
-                }
-                tmp = ksc.SPHWarehouse.Find(v => v.id == id);
-                if (tmp != null)
-                {
-                    ret = tmp;
-                    break;
-                }
+                var v = FindBLVesselByID(id, ksc);
+                if (v != null) return v;
             }
-            return ret;
+
+            return null;
+        }
+
+        public static KCT_BuildListVessel FindBLVesselByID(Guid id, KCT_KSC ksc)
+        {
+            if (ksc != null)
+            {
+                KCT_BuildListVessel ves = ksc.VABWarehouse.Find(blv => blv.id == id);
+                if (ves != null)
+                    return ves;
+
+                ves = ksc.VABList.Find(blv => blv.id == id);
+                if (ves != null)
+                    return ves;
+
+                ves = ksc.SPHWarehouse.Find(blv => blv.id == id);
+                if (ves != null)
+                    return ves;
+
+                ves = ksc.SPHList.Find(blv => blv.id == id);
+                if (ves != null)
+                    return ves;
+            }
+
+            return null;
         }
 
         /**

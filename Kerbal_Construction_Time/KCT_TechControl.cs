@@ -143,7 +143,6 @@ namespace KerbalConstructionTime
 
             return blockingTech;
         }
-
     }
 
     public class KCT_TechStorageItem
