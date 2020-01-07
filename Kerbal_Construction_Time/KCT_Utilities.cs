@@ -441,27 +441,7 @@ namespace KerbalConstructionTime
                 for (int i = 0; i < KCT_GameStates.TechList.Count; i++)
                 {
                     KCT_TechItem tech = KCT_GameStates.TechList[i];
-
-                  // Don't progress blocked items
-                    if (tech.GetBlockingTech(KCT_GameStates.TechList) != null)
-                        continue;
-
-                    double buildRate = tech.BuildRate;
-                    tech.progress += (buildRate * (UTDiff));
-                    if (tech.isComplete || !KCT_PresetManager.Instance.ActivePreset.generalSettings.TechUnlockTimes)
-                    {
-                        if (KCT_GameStates.settings.ForceStopWarp && TimeWarp.CurrentRate > 1f)
-                            TimeWarp.SetRate(0, true);
-                        if (tech.protoNode == null) continue;
-                        tech.EnableTech();
-                        KCT_GameStates.TechList.Remove(tech);
-                        if (KCT_PresetManager.PresetLoaded() && KCT_PresetManager.Instance.ActivePreset.generalSettings.TechUpgrades)
-                            KCT_GameStates.MiscellaneousTempUpgrades++;
-
-                        for (int j = 0; j < KCT_GameStates.TechList.Count; j++)
-                            KCT_GameStates.TechList[j].UpdateBuildRate(j);
-                    }
-
+                    tech.IncrementProgress(UTDiff);
                 }
             }
             if (KCT_GameStates.targetedItem != null && KCT_GameStates.targetedItem.IsComplete())
