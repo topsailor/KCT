@@ -15,7 +15,8 @@ namespace KerbalConstructionTime
     {
         public static bool showMainGUI, showEditorGUI, showSOIAlert, showLaunchAlert, showTimeRemaining,
             showBuildList, showClearLaunch, showShipRoster, showCrewSelect, showSettings, showUpgradeWindow,
-            showBLPlus, showNewPad, showRename, showFirstRun, showLaunchSiteSelector, showBuildPlansWindow;
+            showBLPlus, showNewPad, showRename, showFirstRun, showLaunchSiteSelector, showBuildPlansWindow,
+            showAirlaunch;
 
         public static bool clicked = false;
 
@@ -38,7 +39,7 @@ namespace KerbalConstructionTime
         public static Rect buildListWindowPosition = new Rect(Screen.width - 400, 40, 400, 1);
         private static Rect crewListWindowPosition = new Rect((Screen.width - 400) / 2, (Screen.height / 4), 400, 1);
         private static Rect settingsPosition = new Rect((3 * Screen.width / 8), (Screen.height / 4), 300, 1);
-        private static Rect upgradePosition = new Rect((Screen.width - 260) / 2, (Screen.height / 4), 260, 1);
+        private static Rect upgradePosition = new Rect((Screen.width - 450) / 2, (Screen.height / 4), 450, 1);
         private static Rect bLPlusPosition = new Rect(Screen.width - 500, 40, 100, 1);
 
         static Rect buildPlansWindowPosition = new Rect(Screen.width - 300, 40, 300, 1);
@@ -104,6 +105,10 @@ namespace KerbalConstructionTime
                 if (showBuildPlansWindow)
                     buildPlansWindowPosition = ClickThruBlocker.GUILayoutWindow(KCT_WindowHelper.NextWindowId("DrawBuildPlansWindow"), buildPlansWindowPosition, DrawBuildPlansWindow, "Building Plans & Construction", HighLogic.Skin.window);
 
+                // both flags can be true when it's necessary to first show ClearLaunch and then Airlaunch right after that
+                if (showAirlaunch && !showClearLaunch)
+                    buildPlansWindowPosition = ClickThruBlocker.GUILayoutWindow(KCT_WindowHelper.NextWindowId("DrawAirlaunchWindow"), buildPlansWindowPosition, DrawAirlaunchWindow, "Airlaunch", HighLogic.Skin.window);
+
                 if (unlockEditor)
                 {
                     EditorLogic.fetch.Unlock("KCTGUILock");
@@ -116,7 +121,7 @@ namespace KerbalConstructionTime
                 }
 
                 //Disable KSC things when certain windows are shown.
-                if (showFirstRun || showRename || showNewPad || showUpgradeWindow || showSettings || showCrewSelect || showShipRoster || showClearLaunch)
+                if (showFirstRun || showRename || showNewPad || showUpgradeWindow || showSettings || showCrewSelect || showShipRoster || showClearLaunch || showAirlaunch)
                 {
                     if (!isKSCLocked)
                     {
@@ -284,6 +289,7 @@ namespace KerbalConstructionTime
             showFirstRun = false;
             showPresetSaver = false;
             showLaunchSiteSelector = false;
+            showAirlaunch = false;
 
             ResetBLWindow();
         }
@@ -689,17 +695,27 @@ namespace KerbalConstructionTime
             GUILayout.BeginVertical();
             if (GUILayout.Button("Recover Flight and Proceed"))
             {
+                showClearLaunch = false;
+
                 List<ProtoVessel> list = ShipConstruction.FindVesselsLandedAt(HighLogic.CurrentGame.flightState, KCT_GameStates.launchedVessel.launchSite);
                 foreach (ProtoVessel pv in list)
                     ShipConstruction.RecoverVesselFromFlight(pv, HighLogic.CurrentGame.flightState);
-                if (!IsCrewable(KCT_GameStates.launchedVessel.ExtractedParts))
-                    KCT_GameStates.launchedVessel.Launch();
+
+                if (showAirlaunch)
+                {
+                    // Will be shown automatically as soon as showClearLaunch is set to false
+                }
                 else
                 {
-                    showClearLaunch = false;
-                    centralWindowPosition.height = 1;
-                    AssignInitialCrew();
-                    showShipRoster = true;
+                    if (!IsCrewable(KCT_GameStates.launchedVessel.ExtractedParts))
+                    {
+                        KCT_GameStates.launchedVessel.Launch();
+                    }
+                    else
+                    {
+                        AssignInitialCrew();
+                        showShipRoster = true;
+                    }
                 }
                 centralWindowPosition.height = 1;
             }
@@ -707,6 +723,7 @@ namespace KerbalConstructionTime
             if (GUILayout.Button("Cancel"))
             {
                 showClearLaunch = false;
+                showAirlaunch = false;
                 centralWindowPosition.height = 1;
             }
             GUILayout.EndVertical();
@@ -1743,12 +1760,15 @@ namespace KerbalConstructionTime
                 }
             }
 
+            int availablePoints = upgrades - spentPoints;
+
             //TODO: Calculate the cost of resetting
             int ResetCost = (int)KCT_MathParsing.GetStandardFormulaValue("UpgradeReset", new Dictionary<string, string> { { "N", KCT_GameStates.UpgradesResetCounter.ToString() } });
             if (ResetCost >= 0)
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Reset Upgrades: ");
+
                 bool canAfford = (availablePoints >= ResetCost);
                 var style = canAfford ? GUI.skin.button : GetCannotAffordStyle();
                 if (GUILayout.Button(ResetCost + " Points", style, GUILayout.ExpandWidth(false)))
@@ -1777,6 +1797,7 @@ namespace KerbalConstructionTime
                         KCT_GameStates.UpgradesResetCounter++;
                     }
                 }
+                GUI.enabled = true;
                 GUILayout.EndHorizontal();
             }
 
@@ -1909,8 +1930,7 @@ namespace KerbalConstructionTime
                     //    KCT_Events.instance.KCTButtonStock.SetTrue();
                     if (KCT_GameStates.toolbarControl != null)
                         KCT_GameStates.toolbarControl.SetTrue();
-
-                    else
+                    //else
                         showBuildList = true;
                 }
             }
@@ -2135,6 +2155,127 @@ namespace KerbalConstructionTime
             GUILayout.EndVertical();
             if (!Input.GetMouseButtonDown(1) && !Input.GetMouseButtonDown(2))
                 GUI.DragWindow();
+        }
+
+        private static string sKscDistance = "500";
+        private static string sKscAzimuth = "90";
+        private static string sAltitude = "10000";
+        private static string sAzimuth = "270";
+        private static string sVelocity = "180";
+        private static string errorMsg;
+        private static AirlaunchParams airlaunchParams;
+
+        public static void DrawAirlaunchWindow(int windowID)
+        {
+            if (airlaunchParams == null)
+            {
+                airlaunchParams = new AirlaunchParams();
+                var lvl = AirlaunchTechLevel.GetCurrentLevel();
+                if (lvl != null)
+                {
+                    sKscDistance = (lvl.MaxKscDistance / 1000).ToString();
+                    sAltitude = lvl.MaxAltitude.ToString();
+                    sVelocity = lvl.MaxVelocity.ToString();
+                }
+            }
+
+            GUILayout.BeginVertical();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Distance from Space Center: ", GUILayout.ExpandWidth(true));
+            sKscDistance = GUILayout.TextField(sKscDistance, GUILayout.MaxWidth(70f));
+            GUILayout.Label("km", GUILayout.Width(25f));
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Azimuth from KSC: ", GUILayout.ExpandWidth(true));
+            sKscAzimuth = GUILayout.TextField(sKscAzimuth, GUILayout.MaxWidth(70f));
+            GUILayout.Label("°", GUILayout.Width(25f));
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Launch azimuth: ", GUILayout.ExpandWidth(true));
+            sAzimuth = GUILayout.TextField(sAzimuth, GUILayout.MaxWidth(70f));
+            GUILayout.Label("°", GUILayout.Width(25f));
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Altitude from SL: ", GUILayout.ExpandWidth(true));
+            sAltitude = GUILayout.TextField(sAltitude, GUILayout.MaxWidth(70f));
+            GUILayout.Label("m", GUILayout.Width(25f));
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Velocity: ", GUILayout.ExpandWidth(true));
+            sVelocity = GUILayout.TextField(sVelocity, GUILayout.MaxWidth(70f));
+            GUILayout.Label("m/s", GUILayout.Width(25f));
+            GUILayout.EndHorizontal();
+
+            if (errorMsg != null)
+            {
+                if (orangeText == null)
+                {
+                    orangeText = new GUIStyle(GUI.skin.label);
+                    orangeText.normal.textColor = XKCDColors.Orange;
+                }
+
+                GUILayout.Label(errorMsg, orangeText);
+            }
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Launch"))
+            {
+                try
+                {
+                    airlaunchParams.VesselId = KCT_GameStates.launchedVessel.id;
+                    airlaunchParams.Altitude = double.Parse(sAltitude);
+                    airlaunchParams.Velocity = double.Parse(sVelocity);
+                    airlaunchParams.LaunchAzimuth = double.Parse(sAzimuth);
+                    airlaunchParams.KscDistance = double.Parse(sKscDistance) * 1000;
+                    airlaunchParams.KscAzimuth = double.Parse(sKscAzimuth);
+
+                    bool valid = airlaunchParams.Validate(out errorMsg);
+                    if (valid)
+                    {
+                        errorMsg = null;
+                        KCT_GameStates.AirlaunchParams = airlaunchParams;
+
+                        var b = KCT_GameStates.launchedVessel;
+                        if (!IsCrewable(b.ExtractedParts))
+                        {
+                            b.Launch();
+                        }
+                        else
+                        {
+                            showAirlaunch = false;
+                            if (KCT_GameStates.toolbarControl != null)
+                            {
+                                KCT_GameStates.toolbarControl.SetFalse();
+                            }
+                            centralWindowPosition.height = 1;
+                            AssignInitialCrew();
+                            showShipRoster = true;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    errorMsg = ex.Message;
+                    Debug.LogError(ex.ToString());
+                }
+            }
+            if (GUILayout.Button("Cancel"))
+            {
+                centralWindowPosition.width = 150;
+                centralWindowPosition.x = (Screen.width - 150) / 2;
+                showAirlaunch = false;
+                showBuildList = true;
+                errorMsg = null;
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.EndVertical();
+            CenterWindow(ref centralWindowPosition);
         }
 
         public static void CenterWindow(ref Rect window)
