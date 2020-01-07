@@ -127,6 +127,28 @@ namespace KerbalConstructionTime
             return (this.isComplete);
         }
 
+        public void IncrementProgress(double UTDiff)
+        {
+            // Don't progress blocked items
+            if (GetBlockingTech(KCT_GameStates.TechList) != null)
+                return;
+
+            progress += BuildRate * UTDiff;
+            if (isComplete || !KCT_PresetManager.Instance.ActivePreset.generalSettings.TechUnlockTimes)
+            {
+                if (KCT_GameStates.settings.ForceStopWarp && TimeWarp.CurrentRate > 1f)
+                    TimeWarp.SetRate(0, true);
+                if (protoNode == null) return;
+                EnableTech();
+                KCT_GameStates.TechList.Remove(this);
+                if (KCT_PresetManager.PresetLoaded() && KCT_PresetManager.Instance.ActivePreset.generalSettings.TechUpgrades)
+                    KCT_GameStates.MiscellaneousTempUpgrades++;
+
+                for (int j = 0; j < KCT_GameStates.TechList.Count; j++)
+                    KCT_GameStates.TechList[j].UpdateBuildRate(j);
+            }
+        }
+
         public string GetBlockingTech(KCT_GameStates.KCT_TechItemIlist<KCT_TechItem> techList)
         {
             string blockingTech = null;
