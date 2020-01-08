@@ -2007,7 +2007,7 @@ namespace KerbalConstructionTime
             selectedPadIdx = GUILayout.SelectionGrid(selectedPadIdx, padLvlOptions, 1);
 
             double curPadCost = padCosts[selectedPadIdx];
-            double curPadBuildTime = KCT_UpgradingBuilding.CalculateBuildTime(curPadCost);
+            double curPadBuildTime = KCT_UpgradingBuilding.CalculateBuildTime(curPadCost, SpaceCenterFacility.LaunchPad);
             string sBuildTime = KSPUtil.PrintDateDelta(curPadBuildTime, true);
 
             GUILayout.Label($"It will cost {Math.Round(curPadCost, 2):N} funds to build the new launchpad. " +
@@ -2052,6 +2052,7 @@ namespace KerbalConstructionTime
                     KCT_GameStates.ActiveKSC.LaunchPads.Add(new KCT_LaunchPad(newName, -1));
                     //create new upgradeable
                     KCT_UpgradingBuilding newPad = new KCT_UpgradingBuilding();
+                    newPad.facilityType = SpaceCenterFacility.LaunchPad;
                     newPad.id = KCT_LaunchPad.LPID;
                     newPad.isLaunchpad = true;
                     newPad.launchpadID = KCT_GameStates.ActiveKSC.LaunchPads.Count - 1;
