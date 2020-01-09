@@ -2228,7 +2228,7 @@ namespace KerbalConstructionTime
             {
                 try
                 {
-                    airlaunchParams.VesselId = KCT_GameStates.launchedVessel.id;
+                    airlaunchParams.KCTVesselId = KCT_GameStates.launchedVessel.id;
                     airlaunchParams.Altitude = double.Parse(sAltitude);
                     airlaunchParams.Velocity = double.Parse(sVelocity);
                     airlaunchParams.LaunchAzimuth = double.Parse(sAzimuth);
