@@ -1760,7 +1760,7 @@ namespace KerbalConstructionTime
                 }
             }
 
-            int availablePoints = upgrades - spentPoints;
+            availablePoints = upgrades - spentPoints;
 
             //TODO: Calculate the cost of resetting
             int ResetCost = (int)KCT_MathParsing.GetStandardFormulaValue("UpgradeReset", new Dictionary<string, string> { { "N", KCT_GameStates.UpgradesResetCounter.ToString() } });
