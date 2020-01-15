@@ -1,5 +1,15 @@
 ChangeLog
 
+1.4.6.19
+	Fixed unnecessary int in KCT_GUI.cs
+		Thanks to user @siimav for the following:
+		Make launchpads non-upgradeable and add option to delete them
+		Formula improvements & Airlaunch fix for KRASH
+		Note:  The following two are specific for RP-1
+			Add button for deleting LPs
+			Add option for making LPs unupgradable
+		Fix Airlaunch persisting to a KRASH sim
+
 1.4.6.18
 	Fixed issue where switching editor building while editing a new vessel would end up having the new vessel rolled out to the wrong launchsite (fixed in ClickThroughBlocker), listed here for completeness
 	Fixed issue when closing Upgrades was not returning to main KCT dialog
