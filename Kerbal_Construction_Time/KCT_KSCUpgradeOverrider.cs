@@ -1,11 +1,12 @@
-﻿using KSP.UI.Screens;
+﻿using KSP.UI;
+using KSP.UI.Screens;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace KerbalConstructionTime
 {
@@ -14,7 +15,10 @@ namespace KerbalConstructionTime
     /// </summary>
     public class KCT_KSCContextMenuOverrider
     {
-        KSCFacilityContextMenu _menu = null;
+        protected static Dictionary<string, Dictionary<int, string>> techGatings = null;
+
+        private KSCFacilityContextMenu _menu = null;
+
         public KCT_KSCContextMenuOverrider(KSCFacilityContextMenu menu)
         {
             _menu = menu;
@@ -26,19 +30,29 @@ namespace KerbalConstructionTime
             if (KCT_PresetManager.Instance.ActivePreset.generalSettings.KSCUpgradeTimes && _menu != null)
             {
                 SpaceCenterBuilding hostBuilding = getMember<SpaceCenterBuilding>("host");
-                KCTDebug.Log("Trying to override upgrade button of menu for "+hostBuilding.facilityName);
-                UnityEngine.UI.Button button = getMember<UnityEngine.UI.Button>("UpgradeButton");
+                KCTDebug.Log("Trying to override upgrade button of menu for " + hostBuilding.facilityName);
+                Button button = getMember<Button>("UpgradeButton");
                 if (button == null)
                 {
                     KCTDebug.Log("Could not find UpgradeButton by name, using index instead.", true);
                     button = getMember<UnityEngine.UI.Button>(2);
                 }
+
                 if (button != null)
                 {
                     KCTDebug.Log("Found upgrade button, overriding it.");
-                    button.onClick = new UnityEngine.UI.Button.ButtonClickedEvent(); //Clear existing KSP listener
-                    
-                    button.onClick.AddListener(handleUpgrade);
+                    button.onClick = new Button.ButtonClickedEvent();    //Clear existing KSP listener
+                    button.onClick.AddListener(HandleUpgrade);
+
+                    if (KCT_PresetManager.Instance.ActivePreset.generalSettings.DisableLPUpgrades &&
+                        GetFacilityID().ToLower().Contains("launchpad"))
+                    {
+                        button.interactable = false;
+                        var hov = button.gameObject.GetComponent<UIOnHover>();
+                        hov.gameObject.DestroyGameObject();
+
+                        _menu.levelStatsText.text = "<color=red><b>Launchpads cannot be upgraded. Build a new launchpad from the KCT menu instead.</b></color>";
+                    }
                 }
                 else
                 {
@@ -82,8 +96,6 @@ namespace KerbalConstructionTime
             return default(T);
         }
 
-        protected static Dictionary<string, Dictionary<int, string>> techGatings = null;
-
         protected static void CheckLoadDict()
         {
             if (techGatings != null)
@@ -122,12 +134,13 @@ namespace KerbalConstructionTime
             return string.Empty;
         }
 
-        internal void processUpgrade()
+        internal void ProcessUpgrade()
         {
             int oldLevel = getMember<int>("level");
             KCTDebug.Log($"Upgrading from level {oldLevel}");
 
             string facilityID = GetFacilityID();
+            SpaceCenterFacility facilityType = GetFacilityType();
 
             string gate = GetTechGate(facilityID, oldLevel + 1);
             KCTDebug.Log("[KCTT] Gate for " + facilityID + "? " + gate);
@@ -147,7 +160,7 @@ namespace KerbalConstructionTime
                 }
             }
 
-            KCT_UpgradingBuilding upgrading = new KCT_UpgradingBuilding(facilityID, oldLevel + 1, oldLevel, facilityID.Split('/').Last());
+            KCT_UpgradingBuilding upgrading = new KCT_UpgradingBuilding(facilityType, facilityID, oldLevel + 1, oldLevel, facilityID.Split('/').Last());
 
             upgrading.isLaunchpad = facilityID.ToLower().Contains("launchpad");
             if (upgrading.isLaunchpad)
@@ -186,7 +199,7 @@ namespace KerbalConstructionTime
 
         void stub() { }
 
-        internal void handleUpgrade()
+        internal void HandleUpgrade()
         {
             if (GetFacilityID().ToLower().Contains("launchpad"))
             {
@@ -194,21 +207,36 @@ namespace KerbalConstructionTime
                             "Upgrading this launchpad will render it unusable until the upgrade finishes.\n\nAre you sure you want to?",
                             "Upgrade Launchpad?",
                             HighLogic.UISkin,
-                            new DialogGUIButton("Yes", processUpgrade),
+                            new DialogGUIButton("Yes", ProcessUpgrade),
                             new DialogGUIButton("No", stub)),
                             false,
                             HighLogic.UISkin);
             }
             else
-                processUpgrade();
+                ProcessUpgrade();
 
             _menu.Dismiss(KSCFacilityContextMenu.DismissAction.None);
         }
 
-
         public string GetFacilityID()
         {
             return getMember<SpaceCenterBuilding>("host").Facility.id;
+        }
+
+        public SpaceCenterFacility GetFacilityType()
+        {
+            var scb = getMember<SpaceCenterBuilding>("host");
+            if (scb is AdministrationFacility) return SpaceCenterFacility.Administration;
+            if (scb is AstronautComplexFacility) return SpaceCenterFacility.AstronautComplex;
+            if (scb is LaunchSiteFacility && ((LaunchSiteFacility)scb).facilityType == EditorFacility.VAB) return SpaceCenterFacility.LaunchPad;
+            if (scb is LaunchSiteFacility && ((LaunchSiteFacility)scb).facilityType == EditorFacility.SPH) return SpaceCenterFacility.Runway;
+            if (scb is MissionControlBuilding) return SpaceCenterFacility.MissionControl;
+            if (scb is RnDBuilding) return SpaceCenterFacility.ResearchAndDevelopment;
+            if (scb is SpacePlaneHangarBuilding) return SpaceCenterFacility.SpaceplaneHangar;
+            if (scb is TrackingStationBuilding) return SpaceCenterFacility.TrackingStation;
+            if (scb is VehicleAssemblyBuilding) return SpaceCenterFacility.VehicleAssemblyBuilding;
+
+            throw new Exception($"Invalid facility type {scb.GetType().Name}");
         }
     }
 }

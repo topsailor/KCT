@@ -15,8 +15,8 @@ namespace KerbalConstructionTime
     {
         public static bool showMainGUI, showEditorGUI, showSOIAlert, showLaunchAlert, showTimeRemaining,
             showBuildList, showClearLaunch, showShipRoster, showCrewSelect, showSettings, showUpgradeWindow,
-            showBLPlus, showNewPad, showRename, showFirstRun, showLaunchSiteSelector, showBuildPlansWindow,
-            showAirlaunch;
+            showBLPlus, showNewPad, showRename, showDismantlePad, showFirstRun, showLaunchSiteSelector,
+            showBuildPlansWindow, showAirlaunch;
 
         public static bool clicked = false;
 
@@ -91,6 +91,8 @@ namespace KerbalConstructionTime
                     upgradePosition = ClickThruBlocker.GUILayoutWindow(KCT_WindowHelper.NextWindowId("DrawUpgradeWindow"), upgradePosition, KCT_GUI.DrawUpgradeWindow, "Upgrades", HighLogic.Skin.window);
                 if (showBLPlus)
                     bLPlusPosition = ClickThruBlocker.GUILayoutWindow(KCT_WindowHelper.NextWindowId("DrawBLPlusWindow"), bLPlusPosition, KCT_GUI.DrawBLPlusWindow, "Options", HighLogic.Skin.window);
+                if (showDismantlePad)
+                    centralWindowPosition = ClickThruBlocker.GUILayoutWindow(KCT_WindowHelper.NextWindowId("DrawDismantlePadWindow"), centralWindowPosition, KCT_GUI.DrawDismantlePadWindow, "Dismantle pad", HighLogic.Skin.window);
                 if (showRename)
                     centralWindowPosition = ClickThruBlocker.GUILayoutWindow(KCT_WindowHelper.NextWindowId("DrawRenameWindow"), centralWindowPosition, KCT_GUI.DrawRenameWindow, "Rename", HighLogic.Skin.window);
                 if (showNewPad)
@@ -121,7 +123,7 @@ namespace KerbalConstructionTime
                 }
 
                 //Disable KSC things when certain windows are shown.
-                if (showFirstRun || showRename || showNewPad || showUpgradeWindow || showSettings || showCrewSelect || showShipRoster || showClearLaunch || showAirlaunch)
+                if (showFirstRun || showRename || showNewPad || showDismantlePad || showUpgradeWindow || showSettings || showCrewSelect || showShipRoster || showClearLaunch || showAirlaunch)
                 {
                     if (!isKSCLocked)
                     {
@@ -286,6 +288,7 @@ namespace KerbalConstructionTime
             showUpgradeWindow = false;
             showBLPlus = false;
             showRename = false;
+            showDismantlePad = false;
             showFirstRun = false;
             showPresetSaver = false;
             showLaunchSiteSelector = false;
@@ -1950,6 +1953,39 @@ namespace KerbalConstructionTime
             costOfNewLP = -13;
         }
 
+        public static void DrawDismantlePadWindow(int windowID)
+        {
+            GUILayout.BeginVertical();
+            GUILayout.Label("Are you sure you want to dismantle the currently selected launch pad? This cannot be undone!");
+            GUILayout.BeginHorizontal();
+
+            if (GUILayout.Button("Yes"))
+            {
+                if (KCT_GameStates.ActiveKSC.LaunchPadCount < 2) return;
+
+                KCT_LaunchPad lpToDel = KCT_GameStates.ActiveKSC.ActiveLPInstance;
+                if (!lpToDel.Delete(out string err))
+                {
+                    ScreenMessages.PostScreenMessage("Dismantle failed: " + err, 5f, ScreenMessageStyle.UPPER_CENTER);
+                }
+
+                showDismantlePad = false;
+                showBuildList = true;
+            }
+
+            if (GUILayout.Button("No"))
+            {
+                centralWindowPosition.width = 150;
+                centralWindowPosition.x = (Screen.width - 150) / 2;
+                showDismantlePad = false;
+                showBuildList = true;
+            }
+
+            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
+            CenterWindow(ref centralWindowPosition);
+        }
+
         private static string newName = "";
         private static bool renamingLaunchPad = false;
         public static void DrawRenameWindow(int windowID)
@@ -2007,7 +2043,7 @@ namespace KerbalConstructionTime
             selectedPadIdx = GUILayout.SelectionGrid(selectedPadIdx, padLvlOptions, 1);
 
             double curPadCost = padCosts[selectedPadIdx];
-            double curPadBuildTime = KCT_UpgradingBuilding.CalculateBuildTime(curPadCost);
+            double curPadBuildTime = KCT_UpgradingBuilding.CalculateBuildTime(curPadCost, SpaceCenterFacility.LaunchPad);
             string sBuildTime = KSPUtil.PrintDateDelta(curPadBuildTime, true);
 
             GUILayout.Label($"It will cost {Math.Round(curPadCost, 2):N} funds to build the new launchpad. " +
@@ -2052,6 +2088,7 @@ namespace KerbalConstructionTime
                     KCT_GameStates.ActiveKSC.LaunchPads.Add(new KCT_LaunchPad(newName, -1));
                     //create new upgradeable
                     KCT_UpgradingBuilding newPad = new KCT_UpgradingBuilding();
+                    newPad.facilityType = SpaceCenterFacility.LaunchPad;
                     newPad.id = KCT_LaunchPad.LPID;
                     newPad.isLaunchpad = true;
                     newPad.launchpadID = KCT_GameStates.ActiveKSC.LaunchPads.Count - 1;
@@ -2227,7 +2264,7 @@ namespace KerbalConstructionTime
             {
                 try
                 {
-                    airlaunchParams.VesselId = KCT_GameStates.launchedVessel.id;
+                    airlaunchParams.KCTVesselId = KCT_GameStates.launchedVessel.id;
                     airlaunchParams.Altitude = double.Parse(sAltitude);
                     airlaunchParams.Velocity = double.Parse(sVelocity);
                     airlaunchParams.LaunchAzimuth = double.Parse(sAzimuth);
