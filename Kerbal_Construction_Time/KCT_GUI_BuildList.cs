@@ -1186,7 +1186,7 @@ namespace KerbalConstructionTime
             KCT_Recon_Rollout rollout = KCT_GameStates.ActiveKSC.GetReconRollout(KCT_Recon_Rollout.RolloutReconType.Rollout, launchSite);
             bool onPad = rollout != null && rollout.IsComplete() && rollout.associatedID == b.id.ToString();
             //This vessel is rolled out onto the pad
-#if KSP1_4
+
             // 1.4 Addition
             if (!onPad && GUILayout.Button("Select LaunchSite"))
             {
@@ -1203,7 +1203,7 @@ namespace KerbalConstructionTime
                     PopupDialog.SpawnPopupDialog(new MultiOptionDialog("KCTNoLaunchsites", "No launch sites available to choose from. Try visiting an editor first.", "No Launch Sites", null, new DialogGUIButton("OK", () => { })), false, HighLogic.UISkin);
                 }
             }
-#endif
+
             if (!onPad && GUILayout.Button("Scrap"))
             {
                 InputLockManager.SetControlLock(ControlTypes.KSC_ALL, "KCTPopupLock");

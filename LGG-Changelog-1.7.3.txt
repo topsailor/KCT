@@ -1,5 +1,8 @@
 ChangeLog
 
+1.4.6.20
+	Removed old #if which was disabling the multiple launchsites
+
 1.4.6.19
 	Fixed unnecessary int in KCT_GUI.cs
 		Thanks to user @siimav for the following:
