@@ -1,5 +1,14 @@
 ChangeLog
 
+1.4.6.21
+	Fixed issue of blizzy toolbar button sometimes not being there when the UI scale was not 100%
+	Fixed issue of toolbar buttons (both blizzy & stock) not changing when clicked
+	Removed old code which provided the textures for the Blizzy toolbar
+	Minor refactoring of code in KerbalConstructionTime.cs in Start() to replace multiple If's with a switch
+	Fixed small memory leak by replacing all the "new Wait4Second" with constants
+	Fixed big memory lean (1-3 meg/sec) caused by needless changing of textures in the toolbar buttons
+	Removed unused function:  GetStockButtonTexture, not needed since the ToolbarController handles all of that 
+
 1.4.6.20
 	Removed old #if which was disabling the multiple launchsites
 

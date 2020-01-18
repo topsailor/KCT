@@ -63,7 +63,10 @@ namespace KerbalConstructionTime
 
             if (validScenes.Contains(HighLogic.LoadedScene)) //&& KCT_GameStates.settings.enabledForSave)//!(HighLogic.CurrentGame.Mode == Game.Modes.SANDBOX && !KCT_GameStates.settings.SandboxEnabled))
             {
-                KCT_GameStates.toolbarControl.SetTexture(KCT_Utilities.GetStockButtonTexturePath(), KCT_Utilities.GetButtonTexture());
+                //Debug.Log("SetGUIPositions, KCT_Utilities.GetStockButtonTexturePath(): [" + KCT_Utilities.GetStockButtonTexturePath() +
+                //    "], KCT_Utilities.GetButtonTexturePath(): [" + KCT_Utilities.GetButtonTexturePath() + "]"
+                //);
+                //KCT_GameStates.toolbarControl.SetTexture(KCT_Utilities.GetStockButtonTexturePath(), KCT_Utilities.GetButtonTexturePath());
 
                 if (showSettings)
                     //settingsPosition = GUILayout.Window(KCT_WindowHelper.NextWindowId("DrawSettings"), settingsPosition, KCT_GUI.DrawSettings, "KCT Settings", HighLogic.Skin.window);

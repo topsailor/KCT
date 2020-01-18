@@ -235,7 +235,7 @@ namespace KerbalConstructionTime
             {
                 KCT_Events.instance.CreateEvents();
             }
-            
+
             var go = new GameObject();
             KCT_GameStates.toolbarControl = go.AddComponent<ToolbarControl>();
             KCT_GameStates.toolbarControl.AddToAllToolbars(null, null,//KCT_GUI.ClickOn, KCT_GUI.ClickOff,
@@ -306,139 +306,154 @@ namespace KerbalConstructionTime
 
             KCT_GUI.guiDataSaver.Load();
 
-            if (HighLogic.LoadedSceneIsEditor)
+            switch (HighLogic.LoadedScene)
             {
-                KCT_GUI.hideAll();
-                if (!KCT_GUI.PrimarilyDisabled)
-                {
-                    KCT_GUI.showEditorGUI = KCT_GameStates.showWindows[1];
-                    if (KCT_GUI.showEditorGUI)
-                        KCT_GUI.ClickOn();
-                    else
-                        KCT_GUI.ClickOff();
-                }
-            }
-            else if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
-            {
-                bool shouldStart = KCT_GUI.showFirstRun;
-                KCT_GUI.hideAll();
-                if (!shouldStart)
-                {
-                    KCT_GUI.showBuildList = KCT_GameStates.showWindows[0];
-                    if (KCT_GUI.showBuildList)
-                        KCT_GUI.ClickOn();
-                    else
-                        KCT_GUI.ClickOff();
-                }
-                KCT_GUI.showFirstRun = shouldStart;
-            }
+                case GameScenes.EDITOR:
 
-            if (HighLogic.LoadedSceneIsFlight && FlightGlobals.ActiveVessel.situation == Vessel.Situations.PRELAUNCH &&
-                FlightGlobals.ActiveVessel.GetCrewCount() == 0 && KCT_GameStates.launchedCrew.Count > 0)
-            {
-                KerbalRoster roster = HighLogic.CurrentGame.CrewRoster;
-
-                for (int i = 0; i < FlightGlobals.ActiveVessel.parts.Count; i++)
-                {
-                    Part p = FlightGlobals.ActiveVessel.parts[i];
-                    //KCTDebug.Log("craft: " + p.craftID);
-                    KCTDebug.LogError("Part being tested: " + p.partInfo.title);
+                    //if (HighLogic.LoadedSceneIsEditor)
                     {
-                        CrewedPart cP = KCT_GameStates.launchedCrew.Find(part => part.partID == p.craftID);
-                        if (cP == null) continue;
-                        List<ProtoCrewMember> crewList = cP.crewList;
-                        KCTDebug.LogError("cP.crewList.Count: " + cP.crewList.Count);
-                        foreach (ProtoCrewMember crewMember in crewList)
+                        KCT_GUI.hideAll();
+                        if (!KCT_GUI.PrimarilyDisabled)
                         {
-                            if (crewMember != null)
+                            KCT_GUI.showEditorGUI = KCT_GameStates.showWindows[1];
+                            if (KCT_GUI.showEditorGUI)
+                                KCT_GUI.ClickOn();
+                            else
+                                KCT_GUI.ClickOff();
+                        }
+                    }
+                    break;
+                case GameScenes.SPACECENTER:
+                    //else if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
+                    {
+                        bool shouldStart = KCT_GUI.showFirstRun;
+                        KCT_GUI.hideAll();
+                        if (!shouldStart)
+                        {
+                            KCT_GUI.showBuildList = KCT_GameStates.showWindows[0];
+                            if (KCT_GUI.showBuildList)
+                                KCT_GUI.ClickOn();
+                            else
+                                KCT_GUI.ClickOff();
+                        }
+                        KCT_GUI.showFirstRun = shouldStart;
+                    }
+                    break;
+                case GameScenes.FLIGHT:
+                    if ( /*HighLogic.LoadedSceneIsFlight && */ FlightGlobals.ActiveVessel.situation == Vessel.Situations.PRELAUNCH &&
+                        FlightGlobals.ActiveVessel.GetCrewCount() == 0 && KCT_GameStates.launchedCrew.Count > 0)
+                    {
+                        KerbalRoster roster = HighLogic.CurrentGame.CrewRoster;
+
+                        for (int i = 0; i < FlightGlobals.ActiveVessel.parts.Count; i++)
+                        {
+                            Part p = FlightGlobals.ActiveVessel.parts[i];
+                            //KCTDebug.Log("craft: " + p.craftID);
+                            KCTDebug.LogError("Part being tested: " + p.partInfo.title);
                             {
-                                ProtoCrewMember finalCrewMember = crewMember;
-                                if (crewMember.type == ProtoCrewMember.KerbalType.Crew)
+                                CrewedPart cP = KCT_GameStates.launchedCrew.Find(part => part.partID == p.craftID);
+                                if (cP == null) continue;
+                                List<ProtoCrewMember> crewList = cP.crewList;
+                                KCTDebug.LogError("cP.crewList.Count: " + cP.crewList.Count);
+                                foreach (ProtoCrewMember crewMember in crewList)
                                 {
-                                    finalCrewMember = roster.Crew.FirstOrDefault(c => c.name == crewMember.name);
-                                }
-                                else if (crewMember.type == ProtoCrewMember.KerbalType.Tourist)
-                                {
-                                    finalCrewMember = roster.Tourist.FirstOrDefault(c => c.name == crewMember.name);
-                                }
-                                if (finalCrewMember == null)
-                                {
-                                    KCTDebug.LogError("Error when assigning " + crewMember.name + " to " + p.partInfo.name + ". Cannot find Kerbal in list.");
-                                    continue;
-                                }
-                                try
-                                {
-                                    KCTDebug.Log("Assigning " + finalCrewMember.name + " to " + p.partInfo.name);
-                                    if (p.AddCrewmember(finalCrewMember))//p.AddCrewmemberAt(finalCrewMember, crewList.IndexOf(crewMember)))
+                                    if (crewMember != null)
                                     {
-                                        finalCrewMember.rosterStatus = ProtoCrewMember.RosterStatus.Assigned;
-                                        if (finalCrewMember.seat != null)
-                                            finalCrewMember.seat.SpawnCrew();
+                                        ProtoCrewMember finalCrewMember = crewMember;
+                                        if (crewMember.type == ProtoCrewMember.KerbalType.Crew)
+                                        {
+                                            finalCrewMember = roster.Crew.FirstOrDefault(c => c.name == crewMember.name);
+                                        }
+                                        else if (crewMember.type == ProtoCrewMember.KerbalType.Tourist)
+                                        {
+                                            finalCrewMember = roster.Tourist.FirstOrDefault(c => c.name == crewMember.name);
+                                        }
+                                        if (finalCrewMember == null)
+                                        {
+                                            KCTDebug.LogError("Error when assigning " + crewMember.name + " to " + p.partInfo.name + ". Cannot find Kerbal in list.");
+                                            continue;
+                                        }
+                                        try
+                                        {
+                                            KCTDebug.Log("Assigning " + finalCrewMember.name + " to " + p.partInfo.name);
+                                            if (p.AddCrewmember(finalCrewMember))//p.AddCrewmemberAt(finalCrewMember, crewList.IndexOf(crewMember)))
+                                            {
+                                                finalCrewMember.rosterStatus = ProtoCrewMember.RosterStatus.Assigned;
+                                                if (finalCrewMember.seat != null)
+                                                    finalCrewMember.seat.SpawnCrew();
+                                            }
+                                            else
+                                            {
+                                                KCTDebug.LogError("Error when assigning " + crewMember.name + " to " + p.partInfo.name);
+                                                finalCrewMember.rosterStatus = ProtoCrewMember.RosterStatus.Available;
+                                                continue;
+                                            }
+                                        }
+                                        catch
+                                        {
+                                            KCTDebug.LogError("Error when assigning " + crewMember.name + " to " + p.partInfo.name);
+                                            finalCrewMember.rosterStatus = ProtoCrewMember.RosterStatus.Available;
+                                            continue;
+                                        }
                                     }
-                                    else
-                                    {
-                                        KCTDebug.LogError("Error when assigning " + crewMember.name + " to " + p.partInfo.name);
-                                        finalCrewMember.rosterStatus = ProtoCrewMember.RosterStatus.Available;
-                                        continue;
-                                    }
-                                }
-                                catch
-                                {
-                                    KCTDebug.LogError("Error when assigning " + crewMember.name + " to " + p.partInfo.name);
-                                    finalCrewMember.rosterStatus = ProtoCrewMember.RosterStatus.Available;
-                                    continue;
                                 }
                             }
                         }
+                        KCT_GameStates.launchedCrew.Clear();
                     }
-                }
-                KCT_GameStates.launchedCrew.Clear();
-            }
-
-            if (HighLogic.LoadedSceneIsFlight)
-            {
-                KCT_GUI.hideAll();
-                if (KCT_GameStates.launchedVessel != null && FlightGlobals.ActiveVessel != null && FlightGlobals.ActiveVessel.situation == Vessel.Situations.PRELAUNCH)
-                {
-                    KCT_GameStates.launchedVessel.KSC = null; //it's invalid now
-                    KCTDebug.Log("Attempting to remove launched vessel from build list");
-                    bool removed = KCT_GameStates.launchedVessel.RemoveFromBuildList();
-                    if (removed) //Only do these when the vessel is first removed from the list
+                    //if (HighLogic.LoadedSceneIsFlight)
                     {
-                        //Add the cost of the ship to the funds so it can be removed again by KSP
-                        KCT_Utilities.AddFunds(KCT_GameStates.launchedVessel.cost, TransactionReasons.VesselRollout);
-                        FlightGlobals.ActiveVessel.vesselName = KCT_GameStates.launchedVessel.shipName;
+                        KCT_GUI.hideAll();
+                        if (KCT_GameStates.launchedVessel != null && FlightGlobals.ActiveVessel != null && FlightGlobals.ActiveVessel.situation == Vessel.Situations.PRELAUNCH)
+                        {
+                            KCT_GameStates.launchedVessel.KSC = null; //it's invalid now
+                            KCTDebug.Log("Attempting to remove launched vessel from build list");
+                            bool removed = KCT_GameStates.launchedVessel.RemoveFromBuildList();
+                            if (removed) //Only do these when the vessel is first removed from the list
+                            {
+                                //Add the cost of the ship to the funds so it can be removed again by KSP
+                                KCT_Utilities.AddFunds(KCT_GameStates.launchedVessel.cost, TransactionReasons.VesselRollout);
+                                FlightGlobals.ActiveVessel.vesselName = KCT_GameStates.launchedVessel.shipName;
+                            }
+
+                            KCT_Recon_Rollout rollout = KCT_GameStates.ActiveKSC.Recon_Rollout.FirstOrDefault(r => r.associatedID == KCT_GameStates.launchedVessel.id.ToString());
+                            if (rollout != null)
+                                KCT_GameStates.ActiveKSC.Recon_Rollout.Remove(rollout);
+
+                            KCT_AirlaunchPrep alPrep = KCT_GameStates.ActiveKSC.AirlaunchPrep.FirstOrDefault(r => r.associatedID == KCT_GameStates.launchedVessel.id.ToString());
+                            if (alPrep != null)
+                                KCT_GameStates.ActiveKSC.AirlaunchPrep.Remove(alPrep);
+
+                            AirlaunchParams alParams = KCT_GameStates.AirlaunchParams;
+                            if (alParams != null && alParams.KCTVesselId == KCT_GameStates.launchedVessel.id &&
+                                (!alParams.KSPVesselId.HasValue || alParams.KSPVesselId == FlightGlobals.ActiveVessel.id))
+                            {
+                                if (!alParams.KSPVesselId.HasValue) alParams.KSPVesselId = FlightGlobals.ActiveVessel.id;
+                                StartCoroutine(AirlaunchRoutine(alParams, FlightGlobals.ActiveVessel.id));
+                            }
+                        }
                     }
-
-                    KCT_Recon_Rollout rollout = KCT_GameStates.ActiveKSC.Recon_Rollout.FirstOrDefault(r => r.associatedID == KCT_GameStates.launchedVessel.id.ToString());
-                    if (rollout != null)
-                        KCT_GameStates.ActiveKSC.Recon_Rollout.Remove(rollout);
-
-                    KCT_AirlaunchPrep alPrep = KCT_GameStates.ActiveKSC.AirlaunchPrep.FirstOrDefault(r => r.associatedID == KCT_GameStates.launchedVessel.id.ToString());
-                    if (alPrep != null)
-                        KCT_GameStates.ActiveKSC.AirlaunchPrep.Remove(alPrep);
-
-                    AirlaunchParams alParams = KCT_GameStates.AirlaunchParams;
-                    if (alParams != null && alParams.KCTVesselId == KCT_GameStates.launchedVessel.id &&
-                        (!alParams.KSPVesselId.HasValue || alParams.KSPVesselId == FlightGlobals.ActiveVessel.id))
-                    {
-                        if (!alParams.KSPVesselId.HasValue) alParams.KSPVesselId = FlightGlobals.ActiveVessel.id;
-                        StartCoroutine(AirlaunchRoutine(alParams, FlightGlobals.ActiveVessel.id));
-                    }
-                }
+                    break;
             }
 
             ratesUpdated = false;
             KCTDebug.Log("Start finished");
+
+            wfsOne = new WaitForSeconds(1f);
+            wfsTwo = new WaitForSeconds(2f);
+            wfsHalf = new WaitForSeconds(0.5f);
+
             DelayedStart();
 
             UpdateTechlistIconColor();
             StartCoroutine(HandleEditorButton_Coroutine());
         }
 
+        WaitForSeconds wfsHalf = null;
+        WaitForSeconds wfsOne = null, wfsTwo = null;
         private IEnumerator AirlaunchRoutine(AirlaunchParams launchParams, Guid vesselId)
         {
-            yield return new WaitForSeconds(2);
+            yield return wfsTwo; // new WaitForSeconds(2);
 
             for (int i = 10; i > 0; i--)
             {
@@ -449,7 +464,7 @@ namespace KerbalConstructionTime
                 }
 
                 ScreenMessages.PostScreenMessage($"[KCT] Launching in {i}...", 1f, ScreenMessageStyle.UPPER_CENTER, XKCDColors.Red);
-                yield return new WaitForSeconds(1);
+                yield return wfsOne; // new WaitForSeconds(1);
             }
 
             HyperEdit_Utilities.DoAirlaunch(launchParams);
@@ -465,7 +480,6 @@ namespace KerbalConstructionTime
         }
 
 
-
         /// <summary>
         /// Coroutine to reset the launch button handlers every 1/2 second
         /// Needed because KSP seems to change them behind the scene sometimes
@@ -473,11 +487,12 @@ namespace KerbalConstructionTime
         /// <returns></returns>
         IEnumerator HandleEditorButton_Coroutine()
         {
+ 
             while (true)
             {
                 if (HighLogic.LoadedSceneIsEditor)
                     KCT_Utilities.HandleEditorButton();
-                yield return new WaitForSeconds(0.5f);
+                yield return wfsHalf; // new WaitForSeconds(0.5f);
             }
         }
 
@@ -494,13 +509,14 @@ namespace KerbalConstructionTime
             KCT_GameStates.UT = Planetarium.GetUniversalTime();
             try
             {
-                //
-
+                // No need to set this true or false every single fixed upate
+                // Actually not needed anymore not that the ToolbarController is handling it
+#if false
                 if (KCT_GUI.clicked && KCT_GameStates.toolbarControl != null)
                     KCT_GameStates.toolbarControl.SetTrue(false);
                 else
                     KCT_GameStates.toolbarControl.SetFalse(false);
-
+#endif
                 if (!KCT_PresetManager.Instance.ActivePreset.generalSettings.Enabled)
                     return;
 

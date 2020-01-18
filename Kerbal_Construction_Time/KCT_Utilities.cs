@@ -622,17 +622,13 @@ namespace KerbalConstructionTime
 
         private static DateTime startedFlashing;
 
-        static Texture2D KCT_Off_38, KCT_On_38;
-        static string KCT_OFF_38_str, KCT_On_38_str;
-        static bool textureInited = false;
+        static string KCT_OFF_38_str = "KerbalConstructionTime/PluginData/Icons/KCT_off-38";
+        static string KCT_On_38_str = "KerbalConstructionTime/PluginData/Icons/KCT_on-38";
+ 
 
         public static string GetStockButtonTexturePath()
         {
-            if (!textureInited)
-            {
-                KCT_OFF_38_str = "KerbalConstructionTime/PluginData/Icons/KCT_off-38";
-                KCT_On_38_str = "KerbalConstructionTime/PluginData/Icons/KCT_on-38";
-            }
+
             if (KCT_Events.instance.KCTButtonStockImportant && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(0))) > 0 && DateTime.Now.Millisecond < 500)
                 return KCT_OFF_38_str;
             else if (KCT_Events.instance.KCTButtonStockImportant && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(3))) > 0)
@@ -646,30 +642,7 @@ namespace KerbalConstructionTime
         }
 
 
-        public static Texture2D GetStockButtonTexture()
-        {
-            if (!textureInited)
-            {
-                KCT_Off_38 = new Texture2D(2, 2);
-                KCT_On_38 = new Texture2D(2, 2);
-                ToolbarControl.LoadImageFromFile(ref KCT_Off_38, "KerbalConstructionTime/PluginData/Icons/KCT_off-38");
-                ToolbarControl.LoadImageFromFile(ref KCT_On_38, "KerbalConstructionTime/PluginData/Icons/KCT_on-38");
-                //KCT_Off_38 = GameDatabase.Instance.GetTexture("KerbalConstructionTime/PluginData/Icons/KCT_off-38", false);
-                //KCT_On_38 = GameDatabase.Instance.GetTexture("KerbalConstructionTime/PluginData/Icons/KCT_on-38", false);
-            }
-            if (KCT_Events.instance.KCTButtonStockImportant && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(0))) > 0 && DateTime.Now.Millisecond < 500)
-                return KCT_Off_38;
-            else if (KCT_Events.instance.KCTButtonStockImportant && (DateTime.Now.CompareTo(startedFlashing.AddSeconds(3))) > 0)
-            {
-                KCT_Events.instance.KCTButtonStockImportant = false;
-                return KCT_On_38;
-            }
-            //The normal icon
-            else
-                return KCT_On_38;
-        }
-
-        public static String GetButtonTexture()
+        public static String GetButtonTexturePath()
         {
             String textureReturn;
            
