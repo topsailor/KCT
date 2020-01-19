@@ -8,6 +8,8 @@ ChangeLog
 	Fixed small memory leak by replacing all the "new Wait4Second" with constants
 	Fixed big memory lean (1-3 meg/sec) caused by needless changing of textures in the toolbar buttons
 	Removed unused function:  GetStockButtonTexture, not needed since the ToolbarController handles all of that 
+	Fixed the unable to resize Blizzy's toolbar when KCT icon is transferred to it
+	Added AirLaunch configs
 
 1.3.7.9
 	Removed old #if which was disabling the multiple launchsites
