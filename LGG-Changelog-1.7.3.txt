@@ -1,5 +1,8 @@
 ChangeLog
 
+1.4.6.22
+	Updated AirlaunchLevels.cfg for stock tech
+
 1.4.6.21
 	Fixed issue of blizzy toolbar button sometimes not being there when the UI scale was not 100%
 	Fixed issue of toolbar buttons (both blizzy & stock) not changing when clicked
