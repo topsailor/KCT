@@ -1282,9 +1282,8 @@ namespace KerbalConstructionTime
             {
                 b.DoRushBuild();
             }
-#if false
-            if ((b.type == KCT_BuildListVessel.ListType.SPH || b.type == KCT_BuildListVessel.ListType.VAB) &&
-                string.IsNullOrEmpty(KCT_PresetManager.Instance.ActivePreset.generalSettings.VABRecoveryTech) &&    // Disabled in RP-1
+
+            if ((b.type == KCT_BuildListVessel.ListType.SPH || b.type == KCT_BuildListVessel.ListType.VAB) &&    // Disabled in RP-1
                 GUILayout.Button("Move to " + (b.type == KCT_BuildListVessel.ListType.SPH ? "VAB" : "SPH")))
             {
                 if (b.type == KCT_BuildListVessel.ListType.VAB)
@@ -1308,7 +1307,7 @@ namespace KerbalConstructionTime
                     KCT_GameStates.ActiveKSC.VABList.Insert(0, b);
                 }
             }
-#endif
+
             if (GUILayout.Button("Close"))
             {
                 showBLPlus = false;
